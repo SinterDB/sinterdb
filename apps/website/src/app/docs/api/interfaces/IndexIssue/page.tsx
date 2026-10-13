@@ -38,6 +38,7 @@ const page = {
           name: "detail",
           anchor: "detail",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -60,7 +61,7 @@ const page = {
             {
               path: "packages/driver/src/indexes.ts",
               line: 104,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/indexes.ts#L104",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L104",
             },
           ],
         },
@@ -69,6 +70,7 @@ const page = {
           name: "index",
           anchor: "index-2",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -91,7 +93,7 @@ const page = {
             {
               path: "packages/driver/src/indexes.ts",
               line: 100,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/indexes.ts#L100",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L100",
             },
           ],
         },
@@ -100,6 +102,7 @@ const page = {
           name: "problem",
           anchor: "problem",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -122,7 +125,7 @@ const page = {
             {
               path: "packages/driver/src/indexes.ts",
               line: 102,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/indexes.ts#L102",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L102",
             },
           ],
         },
@@ -138,16 +141,19 @@ const page = {
           anchor: "detail",
           name: "detail",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "index-2",
           name: "index",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "problem",
           name: "problem",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -156,7 +162,7 @@ const page = {
     {
       path: "packages/driver/src/indexes.ts",
       line: 98,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/indexes.ts#L98",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L98",
     },
   ],
 } satisfies ApiPage;

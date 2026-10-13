@@ -31,24 +31,28 @@ const page = {
     name: "Error",
     href: null,
     kind: null,
+    deprecated: false,
     current: false,
     children: [
       {
         name: "SinterError",
         href: "/docs/api/classes/SinterError",
         kind: "class",
+        deprecated: true,
         current: false,
         children: [
           {
             name: "SinterConnectionError",
             href: "/docs/api/classes/SinterConnectionError",
             kind: "class",
+            deprecated: false,
             current: false,
             children: [
               {
                 name: "SinterSocketTimeoutError",
                 href: null,
                 kind: "class",
+                deprecated: false,
                 current: true,
                 children: [],
               },
@@ -70,6 +74,7 @@ const page = {
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
+          deprecated: false,
           label: "Constructor",
           badges: [],
           code: null,
@@ -118,8 +123,8 @@ const page = {
               sources: [
                 {
                   path: "packages/driver/src/errors.ts",
-                  line: 126,
-                  url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L126",
+                  line: 128,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L128",
                 },
               ],
             },
@@ -135,8 +140,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 126,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L126",
+              line: 128,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L128",
             },
           ],
         },
@@ -151,6 +156,7 @@ const page = {
           name: "code",
           anchor: "code",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -178,8 +184,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 141,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L141",
+              line: 143,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L143",
             },
           ],
         },
@@ -195,6 +201,7 @@ const page = {
           anchor: "constructor",
           name: "constructor",
           kind: "constructor",
+          deprecated: false,
         },
       ],
     },
@@ -206,6 +213,7 @@ const page = {
           anchor: "code",
           name: "code",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -213,8 +221,8 @@ const page = {
   sources: [
     {
       path: "packages/driver/src/errors.ts",
-      line: 139,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L139",
+      line: 141,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L141",
     },
   ],
 } satisfies ApiPage;

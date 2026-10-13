@@ -11,6 +11,7 @@ import type {
 } from "../_generated/model";
 import { project } from "../_generated/project";
 import { Code } from "./code";
+import { CopyHandler } from "./copy";
 import { Badges, Comment, Deprecated, Html } from "./comment";
 import { HierarchyTree } from "./hierarchy";
 import { KindIcon } from "./kind-icon";
@@ -49,6 +50,7 @@ export function ApiShell({
         <main className="tdk-main">{children}</main>
         {showToc && <Toc entries={toc} />}
       </div>
+      <CopyHandler />
     </div>
   );
 }
@@ -59,15 +61,22 @@ export function ApiIndexPage({
   readonly groups: readonly ApiIndexGroup[];
 }) {
   const total = groups.reduce((count, group) => count + group.items.length, 0);
+  // Members of a deprecated class are covered by the class's own entry.
+  const deprecated = project.deprecated.filter((item) => !item.inheritedFrom);
 
   return (
     <ApiShell
       activeHref={project.href}
-      toc={groups.map((group) => ({
-        id: group.id,
-        title: group.title,
-        items: [],
-      }))}
+      toc={[
+        ...groups.map((group) => ({
+          id: group.id,
+          title: group.title,
+          items: [],
+        })),
+        ...(deprecated.length > 0
+          ? [{ id: "deprecated", title: "Deprecated", items: [] }]
+          : []),
+      ]}
     >
       <article className="tdk-page">
         <header className="tdk-header">
@@ -88,6 +97,14 @@ export function ApiIndexPage({
               <>
                 {" · "}
                 <Link href={project.hierarchyHref}>hierarchy</Link>
+              </>
+            )}
+            {deprecated.length > 0 && (
+              <>
+                {" · "}
+                <a href="#deprecated" className="tdk-stats-deprecated">
+                  {deprecated.length} deprecated
+                </a>
               </>
             )}
           </p>
@@ -124,6 +141,26 @@ export function ApiIndexPage({
             </ul>
           </section>
         ))}
+
+        {deprecated.length > 0 && (
+          <section id="deprecated" className="tdk-section">
+            <SectionHeading id="deprecated">Deprecated</SectionHeading>
+            <p className="tdk-section-note">
+              Still available, but avoid these in new code.
+            </p>
+            <ul className="tdk-deprecated-list">
+              {deprecated.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} prefetch={false}>
+                    <KindIcon kind={item.kind} />
+                    <code className="tdk-deprecated">{item.name}</code>
+                  </Link>
+                  {item.reason && <span>{item.reason}</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </article>
     </ApiShell>
   );

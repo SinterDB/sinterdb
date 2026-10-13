@@ -137,9 +137,9 @@ const page = {
   ],
   comment: {
     summary:
-      '<p>The stable string codes carried by <a href="/docs/api/classes/SinterError#code">SinterError.code</a>. Branch on\nthese rather than on message text.</p>',
+      '<p>The stable string codes carried by <a href="/docs/api/classes/SinterError#code" class="tdk-deprecated" title="Deprecated (SinterError is deprecated): This is a test">SinterError.code</a>. Branch on\nthese rather than on message text.</p>',
     short:
-      'The stable string codes carried by <a href="/docs/api/classes/SinterError#code">SinterError.code</a>. Branch on these rather than on message text.',
+      'The stable string codes carried by <a href="/docs/api/classes/SinterError#code" class="tdk-deprecated" title="Deprecated (SinterError is deprecated): This is a test">SinterError.code</a>. Branch on these rather than on message text.',
     deprecated: null,
     modifiers: [],
     blocks: [],
@@ -158,6 +158,7 @@ const page = {
           name: "ClientClosed",
           anchor: "client-closed",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -180,7 +181,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 15,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L15",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L15",
             },
           ],
         },
@@ -189,6 +190,7 @@ const page = {
           name: "ClientNotConnected",
           anchor: "client-not-connected",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -213,7 +215,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 17,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L17",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L17",
             },
           ],
         },
@@ -222,6 +224,7 @@ const page = {
           name: "ConnectionFailed",
           anchor: "connection-failed",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -245,7 +248,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 19,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L19",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L19",
             },
           ],
         },
@@ -254,6 +257,7 @@ const page = {
           name: "ConnectionTimeout",
           anchor: "connection-timeout",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -277,7 +281,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 21,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L21",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L21",
             },
           ],
         },
@@ -286,6 +290,7 @@ const page = {
           name: "IncompatibleProtocol",
           anchor: "incompatible-protocol",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -309,7 +314,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 27,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L27",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L27",
             },
           ],
         },
@@ -318,6 +323,7 @@ const page = {
           name: "InvalidClientOptions",
           anchor: "invalid-client-options",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -342,7 +348,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 11,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L11",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L11",
             },
           ],
         },
@@ -351,6 +357,7 @@ const page = {
           name: "InvalidConnectionString",
           anchor: "invalid-connection-string",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -373,7 +380,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 9,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L9",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L9",
             },
           ],
         },
@@ -382,6 +389,7 @@ const page = {
           name: "InvalidDocument",
           anchor: "invalid-document",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -406,7 +414,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 13,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L13",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L13",
             },
           ],
         },
@@ -415,6 +423,7 @@ const page = {
           name: "ProtocolViolation",
           anchor: "protocol-violation",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -438,7 +447,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 29,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L29",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L29",
             },
           ],
         },
@@ -447,6 +456,7 @@ const page = {
           name: "RequestTimeout",
           anchor: "request-timeout",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -469,7 +479,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 25,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L25",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L25",
             },
           ],
         },
@@ -478,6 +488,7 @@ const page = {
           name: "ServerError",
           anchor: "server-error",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -502,7 +513,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 31,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L31",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L31",
             },
           ],
         },
@@ -511,6 +522,7 @@ const page = {
           name: "SocketTimeout",
           anchor: "socket-timeout",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -535,7 +547,7 @@ const page = {
             {
               path: "packages/driver/src/errors.ts",
               line: 23,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L23",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L23",
             },
           ],
         },
@@ -551,61 +563,73 @@ const page = {
           anchor: "client-closed",
           name: "ClientClosed",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "client-not-connected",
           name: "ClientNotConnected",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "connection-failed",
           name: "ConnectionFailed",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "connection-timeout",
           name: "ConnectionTimeout",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "incompatible-protocol",
           name: "IncompatibleProtocol",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "invalid-client-options",
           name: "InvalidClientOptions",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "invalid-connection-string",
           name: "InvalidConnectionString",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "invalid-document",
           name: "InvalidDocument",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "protocol-violation",
           name: "ProtocolViolation",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "request-timeout",
           name: "RequestTimeout",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "server-error",
           name: "ServerError",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "socket-timeout",
           name: "SocketTimeout",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -614,12 +638,12 @@ const page = {
     {
       path: "packages/driver/src/errors.ts",
       line: 7,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L7",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L7",
     },
     {
       path: "packages/driver/src/errors.ts",
       line: 35,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/errors.ts#L35",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L35",
     },
   ],
 } satisfies ApiPage;

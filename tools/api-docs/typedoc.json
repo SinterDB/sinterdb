@@ -26,7 +26,8 @@
       "directory": "_generated"
     },
     "components": {
-      "directory": "_components"
+      "directory": "_components",
+      "overrides": "../../apps/website/src/api-theme"
     },
     "declarations": {
       "enabled": true,

@@ -237,6 +237,7 @@ const page = {
           name: "$addToSet",
           anchor: "add-to-set",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -281,7 +282,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 102,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L102",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L102",
             },
           ],
         },
@@ -290,6 +291,7 @@ const page = {
           name: "$inc",
           anchor: "inc",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -332,7 +334,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 78,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L78",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L78",
             },
           ],
         },
@@ -341,6 +343,7 @@ const page = {
           name: "$max",
           anchor: "max",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -383,7 +386,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 90,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L90",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L90",
             },
           ],
         },
@@ -392,6 +395,7 @@ const page = {
           name: "$min",
           anchor: "min",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -434,7 +438,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 84,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L84",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L84",
             },
           ],
         },
@@ -443,6 +447,7 @@ const page = {
           name: "$pull",
           anchor: "pull",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -485,7 +490,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 108,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L108",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L108",
             },
           ],
         },
@@ -494,6 +499,7 @@ const page = {
           name: "$push",
           anchor: "push",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -538,7 +544,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 96,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L96",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L96",
             },
           ],
         },
@@ -547,6 +553,7 @@ const page = {
           name: "$set",
           anchor: "set",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -586,7 +593,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 67,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L67",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L67",
             },
           ],
         },
@@ -595,6 +602,7 @@ const page = {
           name: "$unset",
           anchor: "unset",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -628,7 +636,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 74,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L74",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L74",
             },
           ],
         },
@@ -644,41 +652,49 @@ const page = {
           anchor: "add-to-set",
           name: "$addToSet",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "inc",
           name: "$inc",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "max",
           name: "$max",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "min",
           name: "$min",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "pull",
           name: "$pull",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "push",
           name: "$push",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "set",
           name: "$set",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "unset",
           name: "$unset",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -687,7 +703,7 @@ const page = {
     {
       path: "packages/driver/src/update.ts",
       line: 65,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L65",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L65",
     },
   ],
 } satisfies ApiPage;

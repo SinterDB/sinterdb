@@ -17,6 +17,7 @@ const MODEL_TYPES = [
   "ApiNavigationGroup",
   "ApiIndexItem",
   "ApiIndexGroup",
+  "ApiDeprecation",
   "ApiProject",
 ];
 

@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 
 import type { ApiProject } from "../_generated/model";
 import { KindIcon } from "./kind-icon";
-import { cx } from "./utils";
 
 export function Sidebar({
   project,
@@ -84,14 +83,19 @@ export function Sidebar({
                       <Link
                         ref={active ? activeRef : undefined}
                         href={item.href}
-                        className={cx(
-                          "tdk-nav-link",
-                          item.deprecated && "tdk-deprecated",
-                        )}
+                        className="tdk-nav-link"
+                        data-deprecated={item.deprecated || undefined}
+                        title={item.deprecated ? "Deprecated" : undefined}
                         aria-current={active ? "page" : undefined}
                       >
                         <KindIcon kind={item.kind} />
-                        <span>{item.name}</span>
+                        <span
+                          className={
+                            item.deprecated ? "tdk-deprecated" : undefined
+                          }
+                        >
+                          {item.name}
+                        </span>
                       </Link>
                     </li>
                   );

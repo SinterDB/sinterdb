@@ -39,6 +39,7 @@ const page = {
           name: "database",
           anchor: "database",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -61,7 +62,7 @@ const page = {
             {
               path: "packages/driver/src/connection-string.ts",
               line: 19,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/connection-string.ts#L19",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L19",
             },
           ],
         },
@@ -70,6 +71,7 @@ const page = {
           name: "host",
           anchor: "host",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -92,7 +94,7 @@ const page = {
             {
               path: "packages/driver/src/connection-string.ts",
               line: 13,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/connection-string.ts#L13",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L13",
             },
           ],
         },
@@ -101,6 +103,7 @@ const page = {
           name: "port",
           anchor: "port",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -125,7 +128,7 @@ const page = {
             {
               path: "packages/driver/src/connection-string.ts",
               line: 17,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/connection-string.ts#L17",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L17",
             },
           ],
         },
@@ -141,16 +144,19 @@ const page = {
           anchor: "database",
           name: "database",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "host",
           name: "host",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "port",
           name: "port",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -159,7 +165,7 @@ const page = {
     {
       path: "packages/driver/src/connection-string.ts",
       line: 11,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/connection-string.ts#L11",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L11",
     },
   ],
 } satisfies ApiPage;

@@ -8,6 +8,7 @@ export function renderGeneratedProjectTemplate(model) {
     summary: model.summary,
     hierarchyHref: model.hierarchyHref,
     navigation: model.navigation,
+    deprecated: model.deprecated,
   };
 
   return `import type { ApiProject } from "./model";

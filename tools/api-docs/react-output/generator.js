@@ -1,8 +1,9 @@
-import { cp, mkdir, rm, stat, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { cp, mkdir, rm, stat } from "node:fs/promises";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { generateDeclarations } from "./declarations/index.js";
+import { writeFormatted } from "./format.js";
 import { ModelContext } from "./model/context.js";
 import { createMarkdownRenderer } from "./model/markdown.js";
 import { createProjectModel } from "./model/project.js";
@@ -27,7 +28,7 @@ const THEMES_DIRECTORY = join(
  * layout.tsx, page.tsx          index and shared layout
  * <kind>/<name>/page.tsx        one page per export
  * hierarchy/page.tsx            inheritance overview
- * _components/                  copied from themes/<theme.name>
+ * _components/                  themes/<theme.name>, then components.overrides
  * _generated/                   model types, project data, config
  * _types/                       optional standalone declarations
  * ```
@@ -69,11 +70,9 @@ export async function generateReactOutput({ project, options }) {
   }
 
   await mkdir(join(output, options.generated.directory), { recursive: true });
+  await copyComponents(themeDirectory, options, output);
 
   await Promise.all([
-    cp(themeDirectory, join(output, options.components.directory), {
-      recursive: true,
-    }),
     write(
       output,
       `${options.generated.directory}/model.ts`,
@@ -112,10 +111,36 @@ export async function generateReactOutput({ project, options }) {
   ]);
 }
 
-async function write(root, path, contents) {
-  const file = join(root, path);
-  await mkdir(dirname(file), { recursive: true });
-  await writeFile(file, contents, "utf8");
+/**
+ * Copies the theme, then the site's own versions of any theme files on top.
+ * The overrides live outside the output folder, so `cleanOutput` never
+ * deletes them.
+ */
+async function copyComponents(themeDirectory, options, output) {
+  const target = join(output, options.components.directory);
+
+  await cp(themeDirectory, target, { recursive: true });
+
+  if (!options.components.overrides) {
+    return;
+  }
+
+  const overrides = resolve(options.components.overrides);
+
+  if (!(await isDirectory(overrides))) {
+    throw new Error(
+      `reactOutput: components.overrides "${options.components.overrides}" is not a directory (looked in ${overrides})`,
+    );
+  }
+
+  await cp(overrides, target, {
+    recursive: true,
+    filter: (source) => !/\.md$/iu.test(basename(source)),
+  });
+}
+
+function write(root, path, contents) {
+  return writeFormatted(join(root, path), contents);
 }
 
 async function isDirectory(path) {

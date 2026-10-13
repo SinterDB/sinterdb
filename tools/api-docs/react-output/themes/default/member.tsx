@@ -12,13 +12,21 @@ import { config } from "../_generated/config";
 import { Code } from "./code";
 import { Badges, Comment, Deprecated, Html } from "./comment";
 import { KindIcon } from "./kind-icon";
+import { cx } from "./utils";
 
 export function MemberCard({ member }: { readonly member: ApiMember }) {
   return (
     <article id={member.anchor ?? undefined} className="tdk-member">
       <header className="tdk-member-header">
         <KindIcon kind={member.kind} label={member.label} />
-        <h3 className="tdk-member-name">{member.name}</h3>
+        <h3
+          className={cx(
+            "tdk-member-name",
+            member.deprecated && "tdk-deprecated",
+          )}
+        >
+          {member.name}
+        </h3>
         {member.anchor && (
           <a
             href={`#${member.anchor}`}

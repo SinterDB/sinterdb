@@ -1,5 +1,6 @@
-import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+
+import { writeFormatted } from "../format.js";
 
 import { renderModelDeclarations } from "./model.js";
 import { renderModuleDeclarations } from "./modules.js";
@@ -26,18 +27,13 @@ export async function generateDeclarations({ outputPath, options }) {
 
   const directory = join(outputPath, declarationOptions.directory);
 
-  await mkdir(directory, {
-    recursive: true,
-  });
-
   const files = [
-    writeFile(join(directory, "model.d.ts"), renderModelDeclarations(), "utf8"),
-    writeFile(
+    writeFormatted(join(directory, "model.d.ts"), renderModelDeclarations()),
+    writeFormatted(
       join(directory, "renderer.d.ts"),
       renderRendererDeclarations(),
-      "utf8",
     ),
-    writeFile(join(directory, "index.d.ts"), renderIndexDeclarations(), "utf8"),
+    writeFormatted(join(directory, "index.d.ts"), renderIndexDeclarations()),
   ];
 
   const modules = renderModuleDeclarations({
@@ -45,7 +41,7 @@ export async function generateDeclarations({ outputPath, options }) {
   });
 
   if (modules) {
-    files.push(writeFile(join(directory, "modules.d.ts"), modules, "utf8"));
+    files.push(writeFormatted(join(directory, "modules.d.ts"), modules));
   }
 
   await Promise.all(files);

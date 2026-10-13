@@ -128,7 +128,7 @@ const groups = [
         label: "Class",
         short:
           "The base class of every error the driver throws on its own. Check <code>code</code> to tell them apart.",
-        deprecated: false,
+        deprecated: true,
       },
       {
         id: 511,
@@ -705,7 +705,7 @@ const groups = [
         kind: "variable",
         label: "Variable",
         short:
-          'The stable string codes carried by <a href="/docs/api/classes/SinterError#code">SinterError.code</a>. Branch on these rather than on message text.',
+          'The stable string codes carried by <a href="/docs/api/classes/SinterError#code" class="tdk-deprecated" title="Deprecated (SinterError is deprecated): This is a test">SinterError.code</a>. Branch on these rather than on message text.',
         deprecated: false,
       },
     ],

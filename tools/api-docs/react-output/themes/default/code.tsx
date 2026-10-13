@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import type { ApiCode, ApiToken } from "../_generated/model";
+import { CopyButton } from "./copy";
+import { deprecationOf, deprecationTitle } from "./deprecation";
 import { cx } from "./utils";
 
 /**
@@ -22,9 +24,12 @@ export function Code({
 
   if (block) {
     return (
-      <pre className={cx("tdk-code", className)}>
-        <code>{tokens}</code>
-      </pre>
+      <div className="tdk-code-block">
+        <pre className={cx("tdk-code", className)}>
+          <code>{tokens}</code>
+        </pre>
+        <CopyButton />
+      </div>
     );
   }
 
@@ -33,13 +38,19 @@ export function Code({
 
 function Token({ token }: { readonly token: ApiToken }) {
   const [text, kind, href] = token;
-  const className = kind ? `tdk-t-${kind}` : undefined;
+  const deprecation = deprecationOf(href);
+  const className = cx(
+    kind && `tdk-t-${kind}`,
+    deprecation && "tdk-deprecated",
+  );
+  const title = deprecation ? deprecationTitle(deprecation) : undefined;
 
   if (href) {
     return /^https?:/u.test(href) ? (
       <a
         href={href}
         className={cx("tdk-t-link", className)}
+        title={title}
         target="_blank"
         rel="noreferrer"
       >
@@ -50,6 +61,7 @@ function Token({ token }: { readonly token: ApiToken }) {
         href={href}
         prefetch={false}
         className={cx("tdk-t-link", className)}
+        title={title}
       >
         {text}
       </Link>

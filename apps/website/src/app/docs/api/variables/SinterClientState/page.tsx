@@ -71,6 +71,7 @@ const page = {
           name: "Closed",
           anchor: "closed",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -93,7 +94,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 135,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L135",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L135",
             },
           ],
         },
@@ -102,6 +103,7 @@ const page = {
           name: "Closing",
           anchor: "closing",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -124,7 +126,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 133,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L133",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L133",
             },
           ],
         },
@@ -133,6 +135,7 @@ const page = {
           name: "Connected",
           anchor: "connected",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -155,7 +158,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 131,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L131",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L131",
             },
           ],
         },
@@ -164,6 +167,7 @@ const page = {
           name: "Connecting",
           anchor: "connecting",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -186,7 +190,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 129,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L129",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L129",
             },
           ],
         },
@@ -195,6 +199,7 @@ const page = {
           name: "New",
           anchor: "new",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -219,7 +224,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 127,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L127",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L127",
             },
           ],
         },
@@ -235,26 +240,31 @@ const page = {
           anchor: "closed",
           name: "Closed",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "closing",
           name: "Closing",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "connected",
           name: "Connected",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "connecting",
           name: "Connecting",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "new",
           name: "New",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -263,12 +273,12 @@ const page = {
     {
       path: "packages/driver/src/client.ts",
       line: 125,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L125",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L125",
     },
     {
       path: "packages/driver/src/client.ts",
       line: 139,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L139",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L139",
     },
   ],
 } satisfies ApiPage;

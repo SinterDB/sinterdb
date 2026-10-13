@@ -30,6 +30,7 @@ const page = {
           name: "[key]",
           anchor: "index-signature",
           kind: "index-signature",
+          deprecated: false,
           label: "Index Signature",
           badges: [],
           code: [
@@ -48,7 +49,7 @@ const page = {
             {
               path: "packages/protocol/src/document.ts",
               line: 4,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/protocol/src/document.ts#L4",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/document.ts#L4",
             },
           ],
         },
@@ -64,6 +65,7 @@ const page = {
           anchor: "index-signature",
           name: "[key]",
           kind: "index-signature",
+          deprecated: false,
         },
       ],
     },
@@ -72,7 +74,7 @@ const page = {
     {
       path: "packages/protocol/src/document.ts",
       line: 3,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/protocol/src/document.ts#L3",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/document.ts#L3",
     },
   ],
 } satisfies ApiPage;

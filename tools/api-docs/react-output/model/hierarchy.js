@@ -7,6 +7,7 @@ import { getKindName } from "./navigation.js";
  * @property {string} name
  * @property {string | null} href
  * @property {string | null} kind
+ * @property {boolean} deprecated
  * @property {boolean} current
  * @property {HierarchyNode[]} children
  */
@@ -34,6 +35,7 @@ export function createHierarchyNode(reflection, ctx) {
     name: reflection.name,
     href: null,
     kind: getKindName(reflection.kind),
+    deprecated: ctx.deprecationFor(reflection) !== null,
     current: true,
     children: descendants,
   };
@@ -78,6 +80,7 @@ export function createHierarchyForest(ctx) {
     name: reflection.name,
     href: ctx.hrefForReflection(reflection),
     kind: getKindName(reflection.kind),
+    deprecated: ctx.deprecationFor(reflection) !== null,
     current: false,
     children: types
       .filter(
@@ -126,6 +129,7 @@ function referenceNode(type, ctx) {
     name: type.toString(),
     href: ctx.hrefForReference(type),
     kind: target ? getKindName(target.kind) : null,
+    deprecated: target ? ctx.deprecationFor(target) !== null : false,
     current: false,
     children: [],
   };

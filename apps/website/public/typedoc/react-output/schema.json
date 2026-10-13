@@ -52,7 +52,7 @@
         "repository": {
           "type": ["string", "null"],
           "default": null,
-          "description": "Repository URL used for source links, e.g. https://github.com/SinterDB/sinterdb. Detected from the git origin remote when null. Links use TypeDoc's gitRevision option, or the current commit."
+          "description": "Repository URL used for source links, e.g. https://github.com/SinterDB/sinterdb. Detected from the git origin remote when null. Links use TypeDoc's gitRevision option, else the release tag on HEAD, else main."
         }
       }
     },
@@ -75,6 +75,11 @@
           "type": "string",
           "default": "_components",
           "description": "Directory containing generated React components."
+        },
+        "overrides": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Folder of the site's own versions of theme files, relative to where TypeDoc runs. Copied over the theme after every regenerate, so edits survive cleanOutput. Markdown files in it are skipped."
         }
       }
     },
@@ -156,12 +161,12 @@
           "properties": {
             "light": {
               "type": "string",
-              "default": "github-light",
+              "default": "github-light-default",
               "description": "Shiki theme for code blocks in light mode."
             },
             "dark": {
               "type": "string",
-              "default": "github-dark",
+              "default": "github-dark-default",
               "description": "Shiki theme for code blocks in dark mode."
             }
           }

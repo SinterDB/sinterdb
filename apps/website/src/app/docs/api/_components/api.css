@@ -27,7 +27,8 @@
   --tdk-border-strong: light-dark(#d4d4d8, rgb(255 255 255 / 0.14));
   --tdk-surface: light-dark(#fafafa, rgb(255 255 255 / 0.025));
   --tdk-surface-hover: light-dark(#f4f4f5, rgb(255 255 255 / 0.05));
-  --tdk-code-bg: light-dark(#f8f8f9, #0d0d10);
+  --tdk-code-bg: light-dark(#f8f8f9, #0d0d0d);
+  --tdk-inline-code: light-dark(#c2410c, #fdba74);
   --tdk-accent: light-dark(#ea580c, #fb923c);
   --tdk-accent-soft: light-dark(rgb(234 88 12 / 0.08), rgb(251 146 60 / 0.1));
   --tdk-warning: light-dark(#b45309, #fbbf24);
@@ -802,9 +803,69 @@
   color: var(--tdk-warning);
 }
 
+/* Anything that is, or points at, a deprecated API. Links keep their own
+   color so they still read as links; the strike and tooltip carry the rest. */
 .tdk-deprecated {
   text-decoration: line-through;
-  text-decoration-color: var(--tdk-subtle);
+  text-decoration-color: color-mix(in srgb, var(--tdk-danger) 75%, transparent);
+  text-decoration-thickness: 1px;
+}
+
+/* Links set their own underline; deprecated ones are struck instead. */
+.tdk-t-link.tdk-deprecated,
+.tdk-t-link.tdk-deprecated:hover,
+.tdk-prose a.tdk-deprecated,
+.tdk-prose a.tdk-deprecated:hover {
+  text-decoration-line: line-through;
+  text-decoration-color: color-mix(in srgb, var(--tdk-danger) 75%, transparent);
+}
+
+.tdk-nav-link[data-deprecated],
+.tdk-toc .tdk-deprecated,
+.tdk-tree-node[data-deprecated] {
+  opacity: 0.7;
+}
+
+.tdk-stats .tdk-stats-deprecated {
+  color: var(--tdk-danger);
+}
+
+.tdk-section-note {
+  margin: 0.5rem 0 1rem;
+  color: var(--tdk-muted);
+  font-size: 0.875rem;
+}
+
+.tdk-deprecated-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--tdk-border);
+}
+
+.tdk-deprecated-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--tdk-border);
+  font-size: 0.875rem;
+}
+
+.tdk-deprecated-list a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--tdk-fg-strong);
+}
+
+.tdk-deprecated-list a:hover code {
+  color: var(--tdk-accent);
+}
+
+.tdk-deprecated-list span {
+  color: var(--tdk-muted);
 }
 
 .tdk-callout {
@@ -829,13 +890,57 @@
 
 /* Code */
 
+/* A code block and its copy button, from signatures or doc comments. */
+.tdk-code-block {
+  position: relative;
+  margin: 1rem 0;
+}
+
+.tdk-code-block > pre {
+  margin: 0;
+}
+
+.tdk-copy {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--tdk-border);
+  border-radius: 6px;
+  background: light-dark(#ffffff, #141414);
+  color: var(--tdk-muted);
+  font-family: var(--tdk-font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 120ms,
+    color 120ms;
+}
+
+.tdk-code-block:hover .tdk-copy,
+.tdk-copy:focus-visible {
+  opacity: 1;
+}
+
+.tdk-copy:hover {
+  color: var(--tdk-fg-strong);
+}
+
+@media (hover: none) {
+  .tdk-copy {
+    opacity: 1;
+  }
+}
+
 .tdk-code,
 .tdk-prose pre {
   margin: 1rem 0;
   padding: 0.85rem 1rem;
   overflow-x: auto;
   border: 1px solid var(--tdk-border);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--tdk-code-bg);
   color: var(--tdk-t-prop);
   font-size: 0.8125rem;
@@ -937,12 +1042,9 @@
   text-decoration-color: currentColor;
 }
 
+/* Inline code reads as colored text, the same as the hand-written guides. */
 .tdk-prose :not(pre) > code {
-  padding: 0.1rem 0.35rem;
-  border: 1px solid var(--tdk-border);
-  border-radius: 5px;
-  background: var(--tdk-surface);
-  color: var(--tdk-fg-strong);
+  color: var(--tdk-inline-code);
   font-size: 0.85em;
 }
 

@@ -36,6 +36,7 @@ const page = {
           name: "acknowledged",
           anchor: "acknowledged",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -59,7 +60,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 136,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L136",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L136",
             },
           ],
         },
@@ -68,6 +69,7 @@ const page = {
           name: "deletedCount",
           anchor: "deleted-count",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -90,7 +92,7 @@ const page = {
             {
               path: "packages/driver/src/update.ts",
               line: 138,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L138",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L138",
             },
           ],
         },
@@ -106,11 +108,13 @@ const page = {
           anchor: "acknowledged",
           name: "acknowledged",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "deleted-count",
           name: "deletedCount",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -119,7 +123,7 @@ const page = {
     {
       path: "packages/driver/src/update.ts",
       line: 134,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/update.ts#L134",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L134",
     },
   ],
 } satisfies ApiPage;

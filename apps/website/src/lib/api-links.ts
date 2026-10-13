@@ -6,10 +6,16 @@ import { project } from "@/app/docs/api/_generated/project";
  * renamed export breaks the build instead of leaving a dead link.
  */
 const items = project.navigation.flatMap((group) => group.items);
+const deprecations = new Map(
+  project.deprecated.map((item) => [item.href, item]),
+);
+const warned = new Set<string>();
 
 export interface ResolvedApiLink {
   readonly href: string;
   readonly kind: string;
+  /** Tooltip text when the target is deprecated, otherwise null. */
+  readonly deprecated: string | null;
 }
 
 export function resolveApiLink(reference: string): ResolvedApiLink {
@@ -39,10 +45,30 @@ export function resolveApiLink(reference: string): ResolvedApiLink {
 
   const [item] = matches;
   const member = memberPath.join(".");
+  const href = member ? `${item.href}#${toAnchor(member)}` : item.href;
+  const deprecation = deprecations.get(href);
+
+  // A guide pointing at a deprecated API probably needs updating.
+  if (deprecation && !warned.has(reference)) {
+    warned.add(reference);
+    console.warn(
+      `[docs] "${reference}" is deprecated${deprecation.reason ? `: ${deprecation.reason}` : "."}`,
+    );
+  }
 
   return {
-    href: member ? `${item.href}#${toAnchor(member)}` : item.href,
+    href,
     kind: item.kind,
+    deprecated: deprecation
+      ? [
+          "Deprecated",
+          deprecation.inheritedFrom &&
+            ` (${deprecation.inheritedFrom} is deprecated)`,
+          deprecation.reason && `: ${deprecation.reason}`,
+        ]
+          .filter(Boolean)
+          .join("")
+      : null,
   };
 }
 

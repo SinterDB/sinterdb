@@ -38,6 +38,7 @@ const page = {
           name: "ok",
           anchor: "ok",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -61,7 +62,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 84,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L84",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L84",
             },
           ],
         },
@@ -70,6 +71,7 @@ const page = {
           name: "receivedAt",
           anchor: "received-at",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -93,7 +95,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 88,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L88",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L88",
             },
           ],
         },
@@ -102,6 +104,7 @@ const page = {
           name: "roundTripTimeMS",
           anchor: "round-trip-time-ms",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -126,7 +129,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 92,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L92",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L92",
             },
           ],
         },
@@ -135,6 +138,7 @@ const page = {
           name: "sentAt",
           anchor: "sent-at",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -157,7 +161,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 86,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L86",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L86",
             },
           ],
         },
@@ -173,21 +177,25 @@ const page = {
           anchor: "ok",
           name: "ok",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "received-at",
           name: "receivedAt",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "round-trip-time-ms",
           name: "roundTripTimeMS",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "sent-at",
           name: "sentAt",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -196,7 +204,7 @@ const page = {
     {
       path: "packages/driver/src/client.ts",
       line: 82,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L82",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L82",
     },
   ],
 } satisfies ApiPage;

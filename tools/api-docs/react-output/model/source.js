@@ -212,6 +212,11 @@ function detectRepository(root) {
     : null;
 }
 
+/**
+ * The release tag when HEAD is tagged, so published docs link to the exact
+ * release. Between releases this returns null and links use `main`, so a
+ * regenerate doesn't rewrite every page just because the commit changed.
+ */
 function detectRevision(root) {
-  return git(root, ["rev-parse", "HEAD"]);
+  return git(root, ["describe", "--tags", "--exact-match", "HEAD"]);
 }

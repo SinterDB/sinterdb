@@ -54,8 +54,15 @@ const components: MDXComponents = {
   // `[label](api:SinterClient)`, `/internal` and external links.
   a({ href = "", children, ...props }: ComponentProps<"a">) {
     if (href.startsWith("api:")) {
+      const link = resolveApiLink(href.slice(4));
+
       return (
-        <Link href={resolveApiLink(href.slice(4)).href} {...props}>
+        <Link
+          href={link.href}
+          className={link.deprecated ? "docs-api-deprecated" : undefined}
+          title={link.deprecated ?? undefined}
+          {...props}
+        >
           {children}
         </Link>
       );

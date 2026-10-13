@@ -99,7 +99,7 @@ export const project = {
           name: "SinterError",
           href: "/docs/api/classes/SinterError",
           kind: "class",
-          deprecated: false,
+          deprecated: true,
         },
         {
           id: 511,
@@ -519,6 +519,29 @@ export const project = {
           deprecated: false,
         },
       ],
+    },
+  ],
+  deprecated: [
+    {
+      name: "SinterError",
+      href: "/docs/api/classes/SinterError",
+      kind: "class",
+      reason: "This is a test",
+      inheritedFrom: null,
+    },
+    {
+      name: "SinterError.code",
+      href: "/docs/api/classes/SinterError#code",
+      kind: "property",
+      reason: "This is a test",
+      inheritedFrom: "SinterError",
+    },
+    {
+      name: "SinterError.constructor",
+      href: "/docs/api/classes/SinterError#constructor",
+      kind: "constructor",
+      reason: "This is a test",
+      inheritedFrom: "SinterError",
     },
   ],
 } satisfies ApiProject;

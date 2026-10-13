@@ -39,6 +39,7 @@ const page = {
           name: "connectTimeoutMS",
           anchor: "connect-timeout-ms",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -63,7 +64,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 52,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L52",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L52",
             },
           ],
         },
@@ -72,6 +73,7 @@ const page = {
           name: "requestTimeoutMS",
           anchor: "request-timeout-ms",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -96,7 +98,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 58,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L58",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L58",
             },
           ],
         },
@@ -105,6 +107,7 @@ const page = {
           name: "socketTimeoutMS",
           anchor: "socket-timeout-ms",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -129,7 +132,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 63,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L63",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L63",
             },
           ],
         },
@@ -145,16 +148,19 @@ const page = {
           anchor: "connect-timeout-ms",
           name: "connectTimeoutMS",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "request-timeout-ms",
           name: "requestTimeoutMS",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "socket-timeout-ms",
           name: "socketTimeoutMS",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -163,7 +169,7 @@ const page = {
     {
       path: "packages/driver/src/client.ts",
       line: 46,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L46",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L46",
     },
   ],
 } satisfies ApiPage;

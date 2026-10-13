@@ -32,6 +32,9 @@ const LANGUAGE_ALIASES = {
  *
  * @param {{ light: string; dark: string }} themes
  */
+const COPY_BUTTON =
+  '<button type="button" class="tdk-copy" data-tdk-copy aria-label="Copy code">Copy</button>';
+
 export async function createMarkdownRenderer(themes) {
   const highlighter = await createHighlighter({
     themes: [themes.light, themes.dark],
@@ -56,6 +59,12 @@ export async function createMarkdownRenderer(themes) {
       });
     },
   });
+
+  // Every fenced block gets the same frame and copy button as signatures.
+  // The theme's copy handler reads the text from the <pre> at click time.
+  const fence = md.renderer.rules.fence;
+  md.renderer.rules.fence = (...args) =>
+    `<div class="tdk-code-block">${fence(...args)}${COPY_BUTTON}</div>`;
 
   return {
     /** @param {string} markdown */

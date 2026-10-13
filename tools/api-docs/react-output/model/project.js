@@ -32,8 +32,7 @@ export function createProjectModel(ctx) {
             kind: getKindName(child.kind),
             label: getKindLabel(child.kind),
             short: comment?.short ?? "",
-            deprecated:
-              comment?.deprecated !== null && comment?.deprecated !== undefined,
+            deprecated: ctx.deprecationFor(child) !== null,
           };
         }),
     }))
@@ -61,6 +60,8 @@ export function createProjectModel(ctx) {
       })),
     })),
     index: groups,
+    /** Every deprecated page and member, so links anywhere can be marked. */
+    deprecated: ctx.deprecations,
     hierarchy: ctx.options.features.hierarchy ? createHierarchyForest(ctx) : [],
     pages: ctx.pages.map((plan) => ({
       route: plan.route,

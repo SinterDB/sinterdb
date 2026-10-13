@@ -149,11 +149,43 @@ function inlineTagToMarkdown(part, ctx) {
     return part.text;
   }
 
+  const href = resolveTarget(part.target, ctx);
+  const deprecation =
+    href && typeof part.target === "object" && part.target !== null
+      ? ctx.deprecationFor(part.target)
+      : null;
+
+  // Deprecated targets need a class and title, so they are written as HTML.
+  if (deprecation) {
+    const text = escapeHtml(part.text);
+    const label = part.tag === "@linkcode" ? `<code>${text}</code>` : text;
+    const title = escapeHtml(deprecationTitle(deprecation));
+
+    return `<a href="${escapeHtml(href)}" class="tdk-deprecated" title="${title}">${label}</a>`;
+  }
+
   const label =
     part.tag === "@linkcode" ? "`" + part.text + "`" : escapeLabel(part.text);
-  const href = resolveTarget(part.target, ctx);
 
   return href ? `[${label}](${href})` : label;
+}
+
+/** Tooltip text for anything pointing at a deprecated API. */
+export function deprecationTitle(deprecation) {
+  const owner = deprecation.inheritedFrom
+    ? ` (${deprecation.inheritedFrom} is deprecated)`
+    : "";
+  return deprecation.reason
+    ? `Deprecated${owner}: ${deprecation.reason}`
+    : `Deprecated${owner}`;
+}
+
+function escapeHtml(text) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
 function resolveTarget(target, ctx) {

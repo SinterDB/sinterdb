@@ -104,6 +104,7 @@ const page = {
           name: "$eq",
           anchor: "eq",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -126,7 +127,7 @@ const page = {
             {
               path: "packages/driver/src/filter.ts",
               line: 46,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L46",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L46",
             },
           ],
         },
@@ -135,6 +136,7 @@ const page = {
           name: "$exists",
           anchor: "exists",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -157,7 +159,7 @@ const page = {
             {
               path: "packages/driver/src/filter.ts",
               line: 54,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L54",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L54",
             },
           ],
         },
@@ -166,6 +168,7 @@ const page = {
           name: "$in",
           anchor: "in",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -197,7 +200,7 @@ const page = {
             {
               path: "packages/driver/src/filter.ts",
               line: 50,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L50",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L50",
             },
           ],
         },
@@ -206,6 +209,7 @@ const page = {
           name: "$ne",
           anchor: "ne",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -228,7 +232,7 @@ const page = {
             {
               path: "packages/driver/src/filter.ts",
               line: 48,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L48",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L48",
             },
           ],
         },
@@ -237,6 +241,7 @@ const page = {
           name: "$nin",
           anchor: "nin",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -266,7 +271,7 @@ const page = {
             {
               path: "packages/driver/src/filter.ts",
               line: 52,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L52",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L52",
             },
           ],
         },
@@ -275,6 +280,7 @@ const page = {
           name: "$not",
           anchor: "not",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -300,7 +306,7 @@ const page = {
             {
               path: "packages/driver/src/filter.ts",
               line: 56,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L56",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L56",
             },
           ],
         },
@@ -316,31 +322,37 @@ const page = {
           anchor: "eq",
           name: "$eq",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "exists",
           name: "$exists",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "in",
           name: "$in",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "ne",
           name: "$ne",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "nin",
           name: "$nin",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "not",
           name: "$not",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -349,7 +361,7 @@ const page = {
     {
       path: "packages/driver/src/filter.ts",
       line: 44,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/filter.ts#L44",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L44",
     },
   ],
 } satisfies ApiPage;

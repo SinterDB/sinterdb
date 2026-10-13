@@ -10,6 +10,7 @@ const DEFAULT_REACT_OUTPUT_OPTIONS = {
   },
   components: {
     directory: "_components",
+    overrides: null,
   },
   declarations: {
     enabled: true,
@@ -28,8 +29,8 @@ const DEFAULT_REACT_OUTPUT_OPTIONS = {
     name: "default",
     colorScheme: "dark",
     codeThemes: {
-      light: "github-light",
-      dark: "github-dark",
+      light: "github-light-default",
+      dark: "github-dark-default",
     },
   },
 };

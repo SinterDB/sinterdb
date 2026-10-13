@@ -1,6 +1,12 @@
 import { ReflectionKind } from "typedoc";
 
-import { AnchorRegistry, createSlug, getKindDirectory } from "./navigation.js";
+import { toPlainText } from "./comments.js";
+import {
+  AnchorRegistry,
+  createSlug,
+  getKindDirectory,
+  getKindName,
+} from "./navigation.js";
 
 /**
  * @typedef {object} SectionPlan
@@ -14,6 +20,13 @@ import { AnchorRegistry, createSlug, getKindDirectory } from "./navigation.js";
  * @property {string} href
  * @property {SectionPlan[]} sections
  * @property {import("typedoc").DeclarationReflection[]} typeMembers Members of an object type alias or variable.
+ *
+ * @typedef {object} Deprecation
+ * @property {string} name Qualified name, e.g. `SinterCollection.find`.
+ * @property {string} href
+ * @property {string} kind
+ * @property {string} reason Plain text from `@deprecated`, may be empty.
+ * @property {string | null} inheritedFrom Set when only the parent is deprecated.
  */
 
 /**
@@ -26,6 +39,9 @@ export class ModelContext {
 
   /** @type {Map<number, string>} */
   #anchors = new Map();
+
+  /** @type {Map<number, Deprecation>} */
+  #deprecations = new Map();
 
   /** @type {PagePlan[]} */
   pages = [];
@@ -50,6 +66,107 @@ export class ModelContext {
     for (const reflection of project.children ?? []) {
       this.#planPage(reflection);
     }
+
+    for (const plan of this.pages) {
+      this.#collectDeprecations(plan);
+    }
+  }
+
+  /** Every deprecated page and member, own and inherited. */
+  get deprecations() {
+    return [...this.#deprecations.values()].toSorted((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }
+
+  /**
+   * Deprecation of a reflection, or of what it belongs to: signatures and
+   * parameters answer for their owner, members of a deprecated class or
+   * interface are deprecated with it.
+   *
+   * @param {import("typedoc").Reflection} reflection
+   * @returns {Deprecation | null}
+   */
+  deprecationFor(reflection) {
+    let current = reflection;
+
+    while (current) {
+      const deprecation = this.#deprecations.get(current.id);
+
+      if (deprecation) {
+        return deprecation;
+      }
+
+      if (
+        current.kindOf(
+          ReflectionKind.SomeSignature |
+            ReflectionKind.Parameter |
+            ReflectionKind.TypeParameter |
+            ReflectionKind.TypeLiteral,
+        )
+      ) {
+        current = current.parent;
+        continue;
+      }
+
+      return null;
+    }
+
+    return null;
+  }
+
+  /** @param {PagePlan} plan */
+  #collectDeprecations(plan) {
+    const page = this.#markDeprecated(
+      plan.reflection,
+      plan.reflection.name,
+      null,
+    );
+
+    const visit = (member, path, parent) => {
+      const own = this.#markDeprecated(
+        member,
+        `${path}.${member.name}`,
+        parent,
+      );
+
+      for (const child of getTypeDeclaration(member)?.children ?? []) {
+        visit(child, `${path}.${member.name}`, own ?? parent);
+      }
+    };
+
+    for (const member of [
+      ...plan.sections.flatMap((section) => section.members),
+      ...plan.typeMembers,
+    ]) {
+      visit(member, plan.reflection.name, page);
+    }
+  }
+
+  /**
+   * @param {import("typedoc").DeclarationReflection} reflection
+   * @param {string} name
+   * @param {Deprecation | null} parent Deprecation inherited from the parent.
+   */
+  #markDeprecated(reflection, name, parent) {
+    const href = this.#hrefs.get(reflection.id);
+    const tag = deprecationTag(reflection);
+
+    if (!href || (!tag && !parent)) {
+      return null;
+    }
+
+    /** @type {Deprecation} */
+    const deprecation = {
+      name,
+      href,
+      kind: getKindName(reflection.kind),
+      reason: tag ? toPlainText(tag.content) : parent.reason,
+      inheritedFrom: tag ? null : (parent.inheritedFrom ?? parent.name),
+    };
+
+    this.#deprecations.set(reflection.id, deprecation);
+    return tag ? deprecation : parent;
   }
 
   /** Every member that ends up on a page has an anchor. */
@@ -154,6 +271,32 @@ export class ModelContext {
       this.#registerMember(child, pageHref, anchors, `${anchor}.`);
     }
   }
+}
+
+/**
+ * The `@deprecated` tag on a reflection, or on all of its signatures, so a
+ * function or method whose every overload is deprecated counts as deprecated.
+ *
+ * @param {import("typedoc").DeclarationReflection} reflection
+ */
+function deprecationTag(reflection) {
+  const own = reflection.comment?.getTag("@deprecated");
+
+  if (own) {
+    return own;
+  }
+
+  const signatures = [
+    ...(reflection.signatures ?? []),
+    reflection.getSignature,
+    reflection.setSignature,
+  ].filter(Boolean);
+
+  const tags = signatures.map((signature) =>
+    signature.comment?.getTag("@deprecated"),
+  );
+
+  return tags.length > 0 && tags.every(Boolean) ? tags[0] : null;
 }
 
 const SECTION_ORDER = [

@@ -38,6 +38,7 @@ const page = {
           name: "acknowledged",
           anchor: "acknowledged",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -61,7 +62,7 @@ const page = {
             {
               path: "packages/driver/src/collection.ts",
               line: 76,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/collection.ts#L76",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L76",
             },
           ],
         },
@@ -70,6 +71,7 @@ const page = {
           name: "insertedCount",
           anchor: "inserted-count",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -92,7 +94,7 @@ const page = {
             {
               path: "packages/driver/src/collection.ts",
               line: 78,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/collection.ts#L78",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L78",
             },
           ],
         },
@@ -101,6 +103,7 @@ const page = {
           name: "insertedIds",
           anchor: "inserted-ids",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -127,7 +130,7 @@ const page = {
             {
               path: "packages/driver/src/collection.ts",
               line: 80,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/collection.ts#L80",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L80",
             },
           ],
         },
@@ -143,16 +146,19 @@ const page = {
           anchor: "acknowledged",
           name: "acknowledged",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "inserted-count",
           name: "insertedCount",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "inserted-ids",
           name: "insertedIds",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -161,7 +167,7 @@ const page = {
     {
       path: "packages/driver/src/collection.ts",
       line: 74,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/collection.ts#L74",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L74",
     },
   ],
 } satisfies ApiPage;

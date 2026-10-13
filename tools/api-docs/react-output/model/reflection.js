@@ -110,7 +110,7 @@ export function createPageModel(plan, ctx) {
     label: getKindLabel(reflection.kind),
     href: plan.href,
     description: (comment ?? firstSignatureComment)?.plain ?? "",
-    badges: createBadges(reflection, comment),
+    badges: withDeprecated(createBadges(reflection, comment), reflection, ctx),
     declaration: isFunction ? null : declarationCode(reflection, ctx),
     comment: headerComment ? withoutPlain(headerComment) : null,
     typeParameters: (reflection.typeParameters ?? []).map((parameter) =>
@@ -140,7 +140,7 @@ export function createMemberModel(member, ctx) {
   const comment = createCommentModel(member.comment, ctx);
   const model = {
     ...emptyMember(member, ctx),
-    badges: createBadges(member, comment),
+    badges: withDeprecated(createBadges(member, comment), member, ctx),
     comment: comment ? withoutPlain(comment) : null,
     relations: createRelations(member, ctx),
   };
@@ -186,6 +186,7 @@ function emptyMember(reflection, ctx) {
     name: reflection.name,
     anchor: ctx.anchorFor(reflection),
     kind: getKindName(reflection.kind),
+    deprecated: ctx.deprecationFor(reflection) !== null,
     label: getKindLabel(reflection.kind),
     badges: [],
     code: null,
@@ -505,6 +506,16 @@ function createBadges(reflection, comment) {
   return badges;
 }
 
+/**
+ * Adds the badge when the reflection is deprecated without its own tag: every
+ * overload is deprecated, or its class or interface is.
+ */
+function withDeprecated(badges, reflection, ctx) {
+  return !badges.includes("deprecated") && ctx.deprecationFor(reflection)
+    ? ["deprecated", ...badges]
+    : badges;
+}
+
 function createToc(signatureSection, sections) {
   const toc = [];
 
@@ -526,6 +537,7 @@ function createToc(signatureSection, sections) {
           anchor: member.anchor,
           name: member.name,
           kind: member.kind,
+          deprecated: member.deprecated,
         })),
     });
   }

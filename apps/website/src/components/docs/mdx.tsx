@@ -19,10 +19,16 @@ export function Api({
   readonly name: string;
   readonly children?: ReactNode;
 }) {
-  const { href } = resolveApiLink(name);
+  const { href, deprecated } = resolveApiLink(name);
 
   return (
-    <Link href={href} className="docs-api-link">
+    <Link
+      href={href}
+      className={
+        deprecated ? "docs-api-link docs-api-deprecated" : "docs-api-link"
+      }
+      title={deprecated ?? undefined}
+    >
       <code>{children ?? name}</code>
     </Link>
   );

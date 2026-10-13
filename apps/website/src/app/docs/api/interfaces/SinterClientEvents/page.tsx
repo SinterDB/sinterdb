@@ -38,6 +38,7 @@ const page = {
           name: "closed",
           anchor: "closed",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -62,7 +63,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 110,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L110",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L110",
             },
           ],
         },
@@ -71,6 +72,7 @@ const page = {
           name: "connected",
           anchor: "connected",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -97,7 +99,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 108,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L108",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L108",
             },
           ],
         },
@@ -106,6 +108,7 @@ const page = {
           name: "connecting",
           anchor: "connecting",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -132,7 +135,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 103,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L103",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L103",
             },
           ],
         },
@@ -141,6 +144,7 @@ const page = {
           name: "error",
           anchor: "error",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -167,7 +171,7 @@ const page = {
             {
               path: "packages/driver/src/client.ts",
               line: 115,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L115",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L115",
             },
           ],
         },
@@ -183,21 +187,25 @@ const page = {
           anchor: "closed",
           name: "closed",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "connected",
           name: "connected",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "connecting",
           name: "connecting",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "error",
           name: "error",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -206,7 +214,7 @@ const page = {
     {
       path: "packages/driver/src/client.ts",
       line: 101,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/client.ts#L101",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L101",
     },
   ],
 } satisfies ApiPage;

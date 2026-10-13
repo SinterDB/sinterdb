@@ -79,6 +79,8 @@ export interface ApiMember {
   readonly kind: string;
   /** Human-readable kind, e.g. `Property`. */
   readonly label: string;
+  /** Deprecated itself, through every overload, or through its parent. */
+  readonly deprecated: boolean;
   readonly badges: readonly string[];
   /** Declaration for members without signatures. */
   readonly code: ApiCode | null;
@@ -103,6 +105,7 @@ export interface ApiTocEntry {
     readonly anchor: string;
     readonly name: string;
     readonly kind: string;
+    readonly deprecated: boolean;
   }[];
 }
 
@@ -110,6 +113,7 @@ export interface ApiHierarchyNode {
   readonly name: string;
   readonly href: string | null;
   readonly kind: string | null;
+  readonly deprecated: boolean;
   readonly current: boolean;
   readonly children: readonly ApiHierarchyNode[];
 }
@@ -170,4 +174,17 @@ export interface ApiProject {
   readonly summary: string;
   readonly hierarchyHref: string | null;
   readonly navigation: readonly ApiNavigationGroup[];
+  /** Every deprecated page and member, so links anywhere can be marked. */
+  readonly deprecated: readonly ApiDeprecation[];
+}
+
+export interface ApiDeprecation {
+  /** Qualified name, e.g. `SinterCollection.find`. */
+  readonly name: string;
+  readonly href: string;
+  readonly kind: string;
+  /** Plain text from `@deprecated`, may be empty. */
+  readonly reason: string;
+  /** Name of the deprecated parent when only the parent is deprecated. */
+  readonly inheritedFrom: string | null;
 }

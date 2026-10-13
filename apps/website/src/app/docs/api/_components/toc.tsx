@@ -57,6 +57,10 @@ export function Toc({ entries }: { readonly entries: readonly ApiTocEntry[] }) {
                     <li key={item.anchor}>
                       <a
                         href={`#${item.anchor}`}
+                        className={
+                          item.deprecated ? "tdk-deprecated" : undefined
+                        }
+                        title={item.deprecated ? "Deprecated" : undefined}
                         aria-current={
                           active === item.anchor ? "location" : undefined
                         }

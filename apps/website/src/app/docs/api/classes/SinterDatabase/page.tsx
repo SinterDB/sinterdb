@@ -37,6 +37,7 @@ const page = {
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
+          deprecated: false,
           label: "Constructor",
           badges: [],
           code: null,
@@ -92,7 +93,7 @@ const page = {
                 {
                   path: "packages/driver/src/database.ts",
                   line: 16,
-                  url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L16",
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L16",
                 },
               ],
             },
@@ -103,7 +104,7 @@ const page = {
             {
               path: "packages/driver/src/database.ts",
               line: 16,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L16",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L16",
             },
           ],
         },
@@ -118,6 +119,7 @@ const page = {
           name: "client",
           anchor: "client",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -140,7 +142,7 @@ const page = {
             {
               path: "packages/driver/src/database.ts",
               line: 18,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L18",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L18",
             },
           ],
         },
@@ -149,6 +151,7 @@ const page = {
           name: "name",
           anchor: "name",
           kind: "property",
+          deprecated: false,
           label: "Property",
           badges: [],
           code: [
@@ -171,7 +174,7 @@ const page = {
             {
               path: "packages/driver/src/database.ts",
               line: 14,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L14",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L14",
             },
           ],
         },
@@ -186,6 +189,7 @@ const page = {
           name: "collection",
           anchor: "collection",
           kind: "method",
+          deprecated: false,
           label: "Method",
           badges: [],
           code: null,
@@ -283,7 +287,7 @@ const page = {
                 {
                   path: "packages/driver/src/database.ts",
                   line: 33,
-                  url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L33",
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L33",
                 },
               ],
             },
@@ -294,7 +298,7 @@ const page = {
             {
               path: "packages/driver/src/database.ts",
               line: 33,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L33",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L33",
             },
           ],
         },
@@ -303,6 +307,7 @@ const page = {
           name: "listCollections",
           anchor: "list-collections",
           kind: "method",
+          deprecated: false,
           label: "Method",
           badges: [],
           code: null,
@@ -341,7 +346,7 @@ const page = {
                 {
                   path: "packages/driver/src/database.ts",
                   line: 40,
-                  url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L40",
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L40",
                 },
               ],
             },
@@ -352,7 +357,7 @@ const page = {
             {
               path: "packages/driver/src/database.ts",
               line: 40,
-              url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L40",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L40",
             },
           ],
         },
@@ -368,6 +373,7 @@ const page = {
           anchor: "constructor",
           name: "constructor",
           kind: "constructor",
+          deprecated: false,
         },
       ],
     },
@@ -379,11 +385,13 @@ const page = {
           anchor: "client",
           name: "client",
           kind: "property",
+          deprecated: false,
         },
         {
           anchor: "name",
           name: "name",
           kind: "property",
+          deprecated: false,
         },
       ],
     },
@@ -395,11 +403,13 @@ const page = {
           anchor: "collection",
           name: "collection",
           kind: "method",
+          deprecated: false,
         },
         {
           anchor: "list-collections",
           name: "listCollections",
           kind: "method",
+          deprecated: false,
         },
       ],
     },
@@ -408,7 +418,7 @@ const page = {
     {
       path: "packages/driver/src/database.ts",
       line: 12,
-      url: "https://github.com/SinterDB/sinterdb/blob/53b68e54a4471f29fb9644bdcca6e1b81d7b3b1f/packages/driver/src/database.ts#L12",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L12",
     },
   ],
 } satisfies ApiPage;
