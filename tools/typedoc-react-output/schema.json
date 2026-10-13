@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "$ref": "../schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "reactOutput": {
+          "$ref": "#/$defs/reactOutput"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "reactOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "framework": {
+          "type": "string",
+          "enum": ["next"],
+          "default": "next",
+          "description": "React framework target used by the generated output."
+        },
+        "routeBase": {
+          "type": "string",
+          "default": "/docs/api",
+          "description": "Base route used when generating links between API pages."
+        },
+        "cleanOutput": {
+          "type": "boolean",
+          "default": true,
+          "description": "Remove the React output directory before generating documentation."
+        },
+        "generated": {
+          "$ref": "#/$defs/generated"
+        },
+        "components": {
+          "$ref": "#/$defs/components"
+        },
+        "declarations": {
+          "$ref": "#/$defs/declarations"
+        },
+        "features": {
+          "$ref": "#/$defs/features"
+        },
+        "theme": {
+          "$ref": "#/$defs/theme"
+        },
+        "repository": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Repository URL used for source links, e.g. https://github.com/SinterDB/sinterdb. Detected from the git origin remote when null. Links use TypeDoc's gitRevision option, else the release tag on HEAD, else main."
+        }
+      }
+    },
+    "generated": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "default": "_generated",
+          "description": "Directory containing generated model and project data."
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "directory": {
+          "type": "string",
+          "default": "_components",
+          "description": "Directory containing generated React components."
+        },
+        "overrides": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Folder of the site's own versions of theme files, relative to where TypeDoc runs. Copied over the theme after every regenerate, so edits survive cleanOutput. Markdown files in it are skipped."
+        }
+      }
+    },
+    "declarations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate TypeScript declaration files for the React output API."
+        },
+        "directory": {
+          "type": "string",
+          "default": "_types",
+          "description": "Directory containing generated TypeScript declaration files."
+        },
+        "moduleName": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Optional ambient module name exposing the generated React documentation types."
+        }
+      }
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hierarchy": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate the API hierarchy page and hierarchy information."
+        },
+        "navigation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate site-wide API navigation."
+        },
+        "pageNavigation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate per-page member navigation."
+        },
+        "sourceLinks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Link declarations to their original source files (resolved through declaration maps)."
+        },
+        "comments": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include TypeDoc comments and documentation blocks."
+        },
+        "externalInherited": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show members inherited from outside the project, such as Error.stack."
+        }
+      }
+    },
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "default",
+          "description": "Theme directory under src/themes whose components are copied into the output."
+        },
+        "colorScheme": {
+          "type": "string",
+          "enum": ["dark", "light", "system"],
+          "default": "dark",
+          "description": "Color scheme of the generated pages. \"system\" follows prefers-color-scheme, or a .dark/.light class or data-theme attribute on an ancestor."
+        },
+        "codeThemes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "light": {
+              "type": "string",
+              "default": "github-light-default",
+              "description": "Shiki theme for code blocks in light mode."
+            },
+            "dark": {
+              "type": "string",
+              "default": "github-dark-default",
+              "description": "Shiki theme for code blocks in dark mode."
+            }
+          }
+        }
+      }
+    }
+  }
+}
