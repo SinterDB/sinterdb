@@ -11,6 +11,7 @@ import { SourceResolver } from "./model/source.js";
 import { renderGeneratedConfigTemplate } from "./templates/generated/config.js";
 import { renderGeneratedModelTemplate } from "./templates/generated/model.js";
 import { renderGeneratedProjectTemplate } from "./templates/generated/project.js";
+import { renderGeneratedSearchTemplate } from "./templates/generated/search.js";
 import { renderHierarchyPageTemplate } from "./templates/hierarchy-page.js";
 import { renderIndexPageTemplate } from "./templates/index-page.js";
 import { renderLayoutTemplate } from "./templates/layout.js";
@@ -29,7 +30,7 @@ const THEMES_DIRECTORY = join(
  * <kind>/<name>/page.tsx        one page per export
  * hierarchy/page.tsx            inheritance overview
  * _components/                  themes/<theme.name>, then components.overrides
- * _generated/                   model types, project data, config
+ * _generated/                   model types, project data, search index, config
  * _types/                       optional standalone declarations
  * ```
  *
@@ -82,6 +83,11 @@ export async function generateReactOutput({ project, options }) {
       output,
       `${options.generated.directory}/project.ts`,
       renderGeneratedProjectTemplate(model),
+    ),
+    write(
+      output,
+      `${options.generated.directory}/search.ts`,
+      renderGeneratedSearchTemplate(model.search),
     ),
     write(
       output,

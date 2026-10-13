@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 180,
   name: "SinterClientEvents",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/SinterClientEvents",
+  since: null,
   description: "The events a SinterClient emits.",
   badges: [],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "closed",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -73,6 +75,7 @@ const page = {
           anchor: "connected",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -109,6 +112,7 @@ const page = {
           anchor: "connecting",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -145,6 +149,7 @@ const page = {
           anchor: "error",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -209,6 +214,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -217,7 +227,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L101",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClient",
+      href: "/docs/api/classes/SinterClient",
+      kind: "class",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

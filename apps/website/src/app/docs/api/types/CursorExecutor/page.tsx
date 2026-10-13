@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 316,
   name: "CursorExecutor",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/CursorExecutor",
+  since: null,
   description:
     "The function a FindCursor uses to reach the server. Cursors are created by SinterCollection.find; do not construct them directly.",
   badges: [],
@@ -43,7 +44,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/cursor.ts",
@@ -51,7 +58,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L12",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FindCursor.constructor",
+      href: "/docs/api/classes/FindCursor#constructor",
+      kind: "constructor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

@@ -147,7 +147,7 @@
         "name": {
           "type": "string",
           "default": "default",
-          "description": "Theme directory under react-output/themes whose components are copied into the output."
+          "description": "Theme directory under src/themes whose components are copied into the output."
         },
         "colorScheme": {
           "type": "string",

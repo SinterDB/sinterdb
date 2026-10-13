@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 199,
   name: "SinterCollection",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/SinterCollection",
+  since: null,
   description: "A collection of documents, typed by TDocument.",
   badges: [],
   declaration: [
@@ -57,6 +58,7 @@ const page = {
           anchor: "constructor",
           kind: "constructor",
           deprecated: false,
+          since: null,
           label: "Constructor",
           badges: [],
           code: null,
@@ -165,6 +167,7 @@ const page = {
           anchor: "database",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -197,6 +200,7 @@ const page = {
           anchor: "name",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -235,6 +239,7 @@ const page = {
           anchor: "namespace",
           kind: "accessor",
           deprecated: false,
+          since: null,
           label: "Accessor",
           badges: [],
           code: null,
@@ -294,6 +299,7 @@ const page = {
           anchor: "create-index",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -390,6 +396,7 @@ const page = {
           anchor: "delete-many",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -469,6 +476,7 @@ const page = {
           anchor: "delete-one",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -548,6 +556,7 @@ const page = {
           anchor: "drop-index",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -623,6 +632,7 @@ const page = {
           anchor: "find",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -726,6 +736,7 @@ const page = {
           anchor: "find-one",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -814,6 +825,7 @@ const page = {
           anchor: "indexes",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -874,6 +886,7 @@ const page = {
           anchor: "insert-many",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -966,6 +979,7 @@ const page = {
           anchor: "insert-one",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -1059,6 +1073,7 @@ const page = {
           anchor: "replace-one",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -1181,6 +1196,7 @@ const page = {
           anchor: "update-many",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -1302,6 +1318,7 @@ const page = {
           anchor: "update-one",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -1423,6 +1440,7 @@ const page = {
           anchor: "validate-indexes",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -1615,6 +1633,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -1623,7 +1646,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L90",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterDatabase.collection",
+      href: "/docs/api/classes/SinterDatabase#collection",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

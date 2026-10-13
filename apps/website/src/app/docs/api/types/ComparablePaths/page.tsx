@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 721,
   name: "ComparablePaths",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/ComparablePaths",
+  since: null,
   description:
     "Updatable paths that hold a comparable value, the targets of $min and $max.",
   badges: [],
@@ -53,7 +54,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/update.ts",
@@ -61,7 +68,24 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L38",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "UpdateFilter",
+      href: "/docs/api/types/UpdateFilter",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter.$max",
+      href: "/docs/api/types/UpdateFilter#max",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$min",
+      href: "/docs/api/types/UpdateFilter#min",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

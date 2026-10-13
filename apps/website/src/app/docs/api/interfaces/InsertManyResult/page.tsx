@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 265,
   name: "InsertManyResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/InsertManyResult",
+  since: null,
   description: "The result of SinterCollection.insertMany.",
   badges: [],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "acknowledged",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -72,6 +74,7 @@ const page = {
           anchor: "inserted-count",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -104,6 +107,7 @@ const page = {
           anchor: "inserted-ids",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -162,6 +166,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -170,7 +179,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L74",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.insertMany",
+      href: "/docs/api/classes/SinterCollection#insert-many",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

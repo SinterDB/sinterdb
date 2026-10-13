@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 32,
   name: "SinterClient",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/SinterClient",
+  since: null,
   description: "A connection to a SinterDB server.",
   badges: [],
   declaration: [
@@ -59,6 +60,7 @@ const page = {
           anchor: "constructor",
           kind: "constructor",
           deprecated: false,
+          since: null,
           label: "Constructor",
           badges: [],
           code: null,
@@ -143,6 +145,7 @@ const page = {
           anchor: "connect-timeout-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -175,6 +178,7 @@ const page = {
           anchor: "request-timeout-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -207,6 +211,7 @@ const page = {
           anchor: "socket-timeout-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -241,6 +246,7 @@ const page = {
           anchor: "target",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -285,6 +291,7 @@ const page = {
           anchor: "connected",
           kind: "accessor",
           deprecated: false,
+          since: null,
           label: "Accessor",
           badges: [],
           code: null,
@@ -338,6 +345,7 @@ const page = {
           anchor: "server-info",
           kind: "accessor",
           deprecated: false,
+          since: null,
           label: "Accessor",
           badges: [],
           code: null,
@@ -405,6 +413,7 @@ const page = {
           anchor: "state",
           kind: "accessor",
           deprecated: false,
+          since: null,
           label: "Accessor",
           badges: [],
           code: null,
@@ -472,6 +481,7 @@ const page = {
           anchor: "close",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -532,6 +542,7 @@ const page = {
           anchor: "connect",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -592,6 +603,7 @@ const page = {
           anchor: "db",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -674,6 +686,7 @@ const page = {
           anchor: "execute-command",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -805,6 +818,7 @@ const page = {
           anchor: "list-databases",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -864,6 +878,7 @@ const page = {
           anchor: "ping",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -1038,6 +1053,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -1046,7 +1066,34 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L150",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClientEvents.closed",
+      href: "/docs/api/interfaces/SinterClientEvents#closed",
+      kind: "property",
+    },
+    {
+      name: "SinterClientEvents.connected",
+      href: "/docs/api/interfaces/SinterClientEvents#connected",
+      kind: "property",
+    },
+    {
+      name: "SinterClientEvents.connecting",
+      href: "/docs/api/interfaces/SinterClientEvents#connecting",
+      kind: "property",
+    },
+    {
+      name: "SinterDatabase.client",
+      href: "/docs/api/classes/SinterDatabase#client",
+      kind: "property",
+    },
+    {
+      name: "SinterDatabase.constructor",
+      href: "/docs/api/classes/SinterDatabase#constructor",
+      kind: "constructor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 746,
   name: "UpdateResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/UpdateResult",
+  since: null,
   description: "The result of an update or replace.",
   badges: [],
   declaration: [
@@ -37,6 +38,7 @@ const page = {
           anchor: "acknowledged",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -70,6 +72,7 @@ const page = {
           anchor: "matched-count",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -102,6 +105,7 @@ const page = {
           anchor: "modified-count",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -136,6 +140,7 @@ const page = {
           anchor: "upserted-id",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -200,6 +205,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -208,7 +218,24 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L116",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.replaceOne",
+      href: "/docs/api/classes/SinterCollection#replace-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateMany",
+      href: "/docs/api/classes/SinterCollection#update-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateOne",
+      href: "/docs/api/classes/SinterCollection#update-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

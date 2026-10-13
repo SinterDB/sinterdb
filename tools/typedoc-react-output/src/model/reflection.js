@@ -25,6 +25,17 @@ const INLINE = { block: false, indent: "", position: "none" };
  * @param {import("./context.js").ModelContext} ctx
  */
 export function createPageModel(plan, ctx) {
+  return ctx.withOwner(
+    {
+      name: plan.reflection.name,
+      href: plan.href,
+      kind: getKindName(plan.reflection.kind),
+    },
+    () => buildPageModel(plan, ctx),
+  );
+}
+
+function buildPageModel(plan, ctx) {
   const { reflection } = plan;
   const comment = createCommentModel(reflection.comment, ctx);
   const isFunction = reflection.kindOf(ReflectionKind.Function);
@@ -109,6 +120,7 @@ export function createPageModel(plan, ctx) {
     kind: getKindName(reflection.kind),
     label: getKindLabel(reflection.kind),
     href: plan.href,
+    since: ctx.sinceFor(reflection),
     description: (comment ?? firstSignatureComment)?.plain ?? "",
     badges: withDeprecated(createBadges(reflection, comment), reflection, ctx),
     declaration: isFunction ? null : declarationCode(reflection, ctx),
@@ -116,8 +128,9 @@ export function createPageModel(plan, ctx) {
     typeParameters: (reflection.typeParameters ?? []).map((parameter) =>
       createTypeParameterModel(parameter, ctx),
     ),
+    // The inheritance tree links both ways, so it doesn't count as "used by".
     hierarchy: ctx.options.features.hierarchy
-      ? createHierarchyNode(reflection, ctx)
+      ? ctx.withOwner(null, () => createHierarchyNode(reflection, ctx))
       : null,
     signatureSection,
     signatures: promote
@@ -137,10 +150,30 @@ export function createPageModel(plan, ctx) {
  * @param {import("./context.js").ModelContext} ctx
  */
 export function createMemberModel(member, ctx) {
+  const href = ctx.anchorFor(member) ? ctx.hrefForReflection(member) : null;
+
+  // Members with their own anchor become the owner of what they reference;
+  // properties of an inline parameter type stay with their method.
+  if (!href || !ctx.owner) {
+    return buildMemberModel(member, ctx);
+  }
+
+  return ctx.withOwner(
+    {
+      name: `${ctx.owner.name}.${member.name}`,
+      href,
+      kind: getKindName(member.kind),
+    },
+    () => buildMemberModel(member, ctx),
+  );
+}
+
+function buildMemberModel(member, ctx) {
   const comment = createCommentModel(member.comment, ctx);
   const model = {
     ...emptyMember(member, ctx),
     badges: withDeprecated(createBadges(member, comment), member, ctx),
+    since: ctx.sinceFor(member),
     comment: comment ? withoutPlain(comment) : null,
     relations: createRelations(member, ctx),
   };
@@ -187,6 +220,7 @@ function emptyMember(reflection, ctx) {
     anchor: ctx.anchorFor(reflection),
     kind: getKindName(reflection.kind),
     deprecated: ctx.deprecationFor(reflection) !== null,
+    since: null,
     label: getKindLabel(reflection.kind),
     badges: [],
     code: null,

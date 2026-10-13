@@ -12,8 +12,10 @@ import type {
 import { project } from "../_generated/project";
 import { Code } from "./code";
 import { CopyHandler } from "./copy";
-import { Badges, Comment, Deprecated, Html } from "./comment";
+import { HoverPreview } from "./preview";
+import { Badges, Comment, Deprecated, Html, Since } from "./comment";
 import { HierarchyTree } from "./hierarchy";
+import { deprecationOf } from "./deprecation";
 import { KindIcon } from "./kind-icon";
 import {
   isDocumented,
@@ -24,6 +26,7 @@ import {
 } from "./member";
 import { Sidebar } from "./sidebar";
 import { Toc } from "./toc";
+import { cx } from "./utils";
 
 /** Three-column layout: sidebar, content, and the page's table of contents. */
 export function ApiShell({
@@ -51,6 +54,7 @@ export function ApiShell({
         {showToc && <Toc entries={toc} />}
       </div>
       <CopyHandler />
+      <HoverPreview />
     </div>
   );
 }
@@ -68,6 +72,9 @@ export function ApiIndexPage({
     <ApiShell
       activeHref={project.href}
       toc={[
+        ...(project.newIn
+          ? [{ id: "new", title: `New in ${project.newIn.version}`, items: [] }]
+          : []),
         ...groups.map((group) => ({
           id: group.id,
           title: group.title,
@@ -110,6 +117,24 @@ export function ApiIndexPage({
           </p>
         </header>
 
+        {project.newIn && (
+          <section id="new" className="tdk-section">
+            <SectionHeading id="new">
+              New in {project.newIn.version}
+            </SectionHeading>
+            <ul className="tdk-used-by">
+              {project.newIn.items.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} prefetch={false}>
+                    <KindIcon kind={item.kind} />
+                    <code>{item.name}</code>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         {groups.map((group) => (
           <section key={group.id} id={group.id} className="tdk-section">
             <SectionHeading id={group.id}>{group.title}</SectionHeading>
@@ -126,6 +151,14 @@ export function ApiIndexPage({
                       >
                         {item.name}
                       </span>
+                      {item.since && item.since === project.newIn?.version && (
+                        <span
+                          className="tdk-since"
+                          title={`Added in ${item.since}`}
+                        >
+                          new
+                        </span>
+                      )}
                     </span>
                     {item.short && (
                       <span
@@ -181,6 +214,7 @@ export function ApiReflectionPage({ page }: { readonly page: ApiPage }) {
             <KindIcon kind={page.kind} />
             {page.label}
             <Badges badges={page.badges} />
+            <Since version={page.since} />
           </p>
           <h1 className="tdk-title">{page.name}</h1>
           {page.comment && (
@@ -232,8 +266,77 @@ export function ApiReflectionPage({ page }: { readonly page: ApiPage }) {
             ))}
           </section>
         ))}
+
+        {page.usedBy.length > 0 && (
+          <section id="used-by" className="tdk-section">
+            <SectionHeading id="used-by">Used by</SectionHeading>
+            <ul className="tdk-used-by">
+              {page.usedBy.map((usage) => (
+                <li key={usage.href}>
+                  <Link href={usage.href} prefetch={false}>
+                    <KindIcon kind={usage.kind} />
+                    <code
+                      className={cx(
+                        deprecationOf(usage.href) && "tdk-deprecated",
+                      )}
+                    >
+                      {usage.name}
+                    </code>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <Pager href={page.href} />
       </article>
     </ApiShell>
+  );
+}
+
+/** Previous and next page, in sidebar order. */
+function Pager({ href }: { readonly href: string }) {
+  const items = project.navigation.flatMap((group) => group.items);
+  const index = items.findIndex((item) => item.href === href);
+  const previous = index > 0 ? items[index - 1] : null;
+  const next = index >= 0 ? (items[index + 1] ?? null) : null;
+
+  if (!previous && !next) {
+    return null;
+  }
+
+  return (
+    <nav className="tdk-pager" aria-label="Previous and next">
+      {previous ? (
+        <Link href={previous.href} className="tdk-pager-link" rel="prev">
+          <span className="tdk-pager-label">Previous</span>
+          <span
+            className={cx(
+              "tdk-pager-name",
+              previous.deprecated && "tdk-deprecated",
+            )}
+          >
+            ← {previous.name}
+          </span>
+        </Link>
+      ) : (
+        <span />
+      )}
+      {next && (
+        <Link href={next.href} className="tdk-pager-link" data-next rel="next">
+          <span className="tdk-pager-label">Next</span>
+          <span
+            className={cx(
+              "tdk-pager-name",
+              next.deprecated && "tdk-deprecated",
+            )}
+          >
+            {next.name} →
+          </span>
+        </Link>
+      )}
+    </nav>
   );
 }
 

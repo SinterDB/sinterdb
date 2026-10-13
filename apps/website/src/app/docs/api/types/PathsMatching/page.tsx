@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 728,
   name: "PathsMatching",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/PathsMatching",
+  since: null,
   description: "The updatable paths whose value type is assignable to TKind.",
   badges: [],
   declaration: [
@@ -84,7 +85,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/update.ts",
@@ -92,7 +99,24 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L20",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "ArrayPaths",
+      href: "/docs/api/types/ArrayPaths",
+      kind: "type-alias",
+    },
+    {
+      name: "ComparablePaths",
+      href: "/docs/api/types/ComparablePaths",
+      kind: "type-alias",
+    },
+    {
+      name: "NumericPaths",
+      href: "/docs/api/types/NumericPaths",
+      kind: "type-alias",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

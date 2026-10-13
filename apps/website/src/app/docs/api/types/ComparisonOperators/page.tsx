@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 625,
   name: "ComparisonOperators",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/ComparisonOperators",
+  since: null,
   description:
     "The range operators $gt, $gte, $lt and $lte. They are available only when the value type includes a comparable type.",
   badges: [],
@@ -96,7 +97,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/filter.ts",
@@ -104,7 +111,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L25",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FilterOperators",
+      href: "/docs/api/types/FilterOperators",
+      kind: "type-alias",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

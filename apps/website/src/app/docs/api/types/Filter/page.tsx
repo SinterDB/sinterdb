@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 634,
   name: "Filter",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/Filter",
+  since: null,
   description:
     "A query filter: field paths mapped to a value or to operators, combined with $and, $or and $nor. An empty filter matches every document.",
   badges: [],
@@ -123,6 +124,7 @@ const page = {
           anchor: "_id",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -160,6 +162,7 @@ const page = {
           anchor: "and",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -196,6 +199,7 @@ const page = {
           anchor: "nor",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -232,6 +236,7 @@ const page = {
           anchor: "or",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -296,6 +301,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -304,7 +314,44 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L103",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.deleteMany",
+      href: "/docs/api/classes/SinterCollection#delete-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.deleteOne",
+      href: "/docs/api/classes/SinterCollection#delete-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.find",
+      href: "/docs/api/classes/SinterCollection#find",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.findOne",
+      href: "/docs/api/classes/SinterCollection#find-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.replaceOne",
+      href: "/docs/api/classes/SinterCollection#replace-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateMany",
+      href: "/docs/api/classes/SinterCollection#update-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateOne",
+      href: "/docs/api/classes/SinterCollection#update-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

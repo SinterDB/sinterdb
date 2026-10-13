@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 357,
   name: "SinterClientStateError",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/SinterClientStateError",
+  since: null,
   description:
     "A command was used in the wrong client state: CLIENT_NOT_CONNECTED before connect(), or CLIENT_CLOSED after close().",
   badges: [],
@@ -39,7 +40,7 @@ const page = {
         name: "SinterError",
         href: "/docs/api/classes/SinterError",
         kind: "class",
-        deprecated: true,
+        deprecated: false,
         current: false,
         children: [
           {
@@ -67,6 +68,7 @@ const page = {
           anchor: "constructor",
           kind: "constructor",
           deprecated: false,
+          since: null,
           label: "Constructor",
           badges: [],
           code: null,
@@ -138,8 +140,8 @@ const page = {
               sources: [
                 {
                   path: "packages/driver/src/errors.ts",
-                  line: 112,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L112",
+                  line: 110,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L110",
                 },
               ],
             },
@@ -155,8 +157,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 112,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L112",
+              line: 110,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L110",
             },
           ],
         },
@@ -172,6 +174,7 @@ const page = {
           anchor: "code",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -201,8 +204,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 60,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L60",
+              line: 58,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L58",
             },
           ],
         },
@@ -238,11 +241,12 @@ const page = {
   sources: [
     {
       path: "packages/driver/src/errors.ts",
-      line: 111,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L111",
+      line: 109,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L109",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

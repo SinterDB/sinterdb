@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 723,
   name: "DeleteResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/DeleteResult",
+  since: null,
   description: "The result of a delete.",
   badges: [],
   declaration: [
@@ -37,6 +38,7 @@ const page = {
           anchor: "acknowledged",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -70,6 +72,7 @@ const page = {
           anchor: "deleted-count",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -118,6 +121,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -126,7 +134,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L134",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.deleteMany",
+      href: "/docs/api/classes/SinterCollection#delete-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.deleteOne",
+      href: "/docs/api/classes/SinterCollection#delete-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

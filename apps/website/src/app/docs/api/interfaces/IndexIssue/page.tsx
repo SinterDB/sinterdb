@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 691,
   name: "IndexIssue",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/IndexIssue",
+  since: null,
   description: "One difference found by SinterCollection.validateIndexes.",
   badges: [],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "detail",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -71,6 +73,7 @@ const page = {
           anchor: "index-2",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -103,6 +106,7 @@ const page = {
           anchor: "problem",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -157,6 +161,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -165,7 +174,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L98",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "IndexValidationResult.issues",
+      href: "/docs/api/interfaces/IndexValidationResult#issues",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 744,
   name: "UpdatePaths",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/UpdatePaths",
+  since: null,
   description:
     "The field paths an update can change: every path except _id, which is immutable.",
   badges: [],
@@ -59,7 +60,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/update.ts",
@@ -67,7 +74,29 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L14",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "PathsMatching",
+      href: "/docs/api/types/PathsMatching",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter",
+      href: "/docs/api/types/UpdateFilter",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter.$set",
+      href: "/docs/api/types/UpdateFilter#set",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$unset",
+      href: "/docs/api/types/UpdateFilter#unset",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

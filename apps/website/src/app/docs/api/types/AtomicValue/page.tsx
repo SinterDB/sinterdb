@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 623,
   name: "AtomicValue",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/AtomicValue",
+  since: null,
   description:
     "Values that can be matched by equality: comparable values, booleans and null.",
   badges: [],
@@ -36,7 +37,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/filter.ts",
@@ -44,7 +51,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L11",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FilterPaths",
+      href: "/docs/api/types/FilterPaths",
+      kind: "type-alias",
+    },
+    {
+      name: "IndexDefinition.field",
+      href: "/docs/api/interfaces/IndexDefinition#field",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

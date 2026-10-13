@@ -81,6 +81,8 @@ export interface ApiMember {
   readonly label: string;
   /** Deprecated itself, through every overload, or through its parent. */
   readonly deprecated: boolean;
+  /** Version from \`@since\`. */
+  readonly since: string | null;
   readonly badges: readonly string[];
   /** Declaration for members without signatures. */
   readonly code: ApiCode | null;
@@ -124,6 +126,8 @@ export interface ApiPage {
   readonly kind: string;
   readonly label: string;
   readonly href: string;
+  /** Version from \`@since\`. */
+  readonly since: string | null;
   /** Plain-text summary for metadata. */
   readonly description: string;
   readonly badges: readonly string[];
@@ -139,6 +143,15 @@ export interface ApiPage {
   readonly sections: readonly ApiSection[];
   readonly toc: readonly ApiTocEntry[];
   readonly sources: readonly ApiSource[];
+  /** Pages and members whose signatures mention this page. */
+  readonly usedBy: readonly ApiUsage[];
+}
+
+export interface ApiUsage {
+  /** Qualified name, e.g. \`SinterCollection.find\`. */
+  readonly name: string;
+  readonly href: string;
+  readonly kind: string;
 }
 
 export interface ApiNavigationItem {
@@ -157,6 +170,7 @@ export interface ApiNavigationGroup {
 
 export interface ApiIndexItem extends ApiNavigationItem {
   readonly label: string;
+  readonly since: string | null;
   /** Inline HTML of the first summary paragraph. */
   readonly short: string;
 }
@@ -176,6 +190,32 @@ export interface ApiProject {
   readonly navigation: readonly ApiNavigationGroup[];
   /** Every deprecated page and member, so links anywhere can be marked. */
   readonly deprecated: readonly ApiDeprecation[];
+  /** The newest \`@since\` version and what it added, if any \`@since\` tags exist. */
+  readonly newIn: ApiNewIn | null;
+}
+
+export interface ApiNewIn {
+  readonly version: string;
+  readonly items: readonly {
+    readonly name: string;
+    readonly kind: string;
+    readonly href: string;
+  }[];
+}
+
+/** One page or member, for search and hover previews. */
+export interface ApiSearchEntry {
+  readonly name: string;
+  /** Page name for members, \`null\` for pages. */
+  readonly parent: string | null;
+  readonly kind: string;
+  readonly href: string;
+  /** Plain-text first sentence or paragraph. */
+  readonly summary: string;
+  /** Declaration or first signature on one line, truncated. */
+  readonly code: string;
+  readonly deprecated: boolean;
+  readonly since: string | null;
 }
 
 export interface ApiDeprecation {

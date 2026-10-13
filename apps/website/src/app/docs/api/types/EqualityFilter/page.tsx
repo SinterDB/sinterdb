@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 257,
   name: "EqualityFilter",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/EqualityFilter",
+  since: null,
   description: "A shorthand filter that matches fields by equality only.",
   badges: [],
   declaration: [
@@ -60,7 +61,8 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L44",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

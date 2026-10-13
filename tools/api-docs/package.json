@@ -9,8 +9,7 @@
     "clean": "rimraf ../../docs/api"
   },
   "devDependencies": {
-    "markdown-it": "^15.0.2",
-    "shiki": "^4.5.0",
+    "@sinterdb/typedoc-react-output": "workspace:^",
     "sinterdb": "workspace:^",
     "typedoc": "^0.28.20",
     "typescript": "~6.0.0"

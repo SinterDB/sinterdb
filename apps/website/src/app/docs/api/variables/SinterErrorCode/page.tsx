@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 496,
   name: "SinterErrorCode",
   kind: "variable",
   label: "Variable",
   href: "/docs/api/variables/SinterErrorCode",
+  since: null,
   description:
     "The stable string codes carried by SinterError.code. Branch on these rather than on message text.",
   badges: [],
@@ -137,9 +138,9 @@ const page = {
   ],
   comment: {
     summary:
-      '<p>The stable string codes carried by <a href="/docs/api/classes/SinterError#code" class="tdk-deprecated" title="Deprecated (SinterError is deprecated): This is a test">SinterError.code</a>. Branch on\nthese rather than on message text.</p>',
+      '<p>The stable string codes carried by <a href="/docs/api/classes/SinterError#code">SinterError.code</a>. Branch on\nthese rather than on message text.</p>',
     short:
-      'The stable string codes carried by <a href="/docs/api/classes/SinterError#code" class="tdk-deprecated" title="Deprecated (SinterError is deprecated): This is a test">SinterError.code</a>. Branch on these rather than on message text.',
+      'The stable string codes carried by <a href="/docs/api/classes/SinterError#code">SinterError.code</a>. Branch on these rather than on message text.',
     deprecated: null,
     modifiers: [],
     blocks: [],
@@ -159,6 +160,7 @@ const page = {
           anchor: "client-closed",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -191,6 +193,7 @@ const page = {
           anchor: "client-not-connected",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -225,6 +228,7 @@ const page = {
           anchor: "connection-failed",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -258,6 +262,7 @@ const page = {
           anchor: "connection-timeout",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -291,6 +296,7 @@ const page = {
           anchor: "incompatible-protocol",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -324,6 +330,7 @@ const page = {
           anchor: "invalid-client-options",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -358,6 +365,7 @@ const page = {
           anchor: "invalid-connection-string",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -390,6 +398,7 @@ const page = {
           anchor: "invalid-document",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -424,6 +433,7 @@ const page = {
           anchor: "protocol-violation",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -457,6 +467,7 @@ const page = {
           anchor: "request-timeout",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -489,6 +500,7 @@ const page = {
           anchor: "server-error",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -523,6 +535,7 @@ const page = {
           anchor: "socket-timeout",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -633,6 +646,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -646,7 +664,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L35",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterErrorCode",
+      href: "/docs/api/types/SinterErrorCode",
+      kind: "type-alias",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

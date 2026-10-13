@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 650,
   name: "FilterPaths",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/FilterPaths",
+  since: null,
   description:
     "Every dotted field path of a document type, such as profile.name. Arrays and atomic values end a path.",
   badges: [],
@@ -140,7 +141,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/filter.ts",
@@ -148,7 +155,29 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L69",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "Filter",
+      href: "/docs/api/types/Filter",
+      kind: "type-alias",
+    },
+    {
+      name: "IndexablePath",
+      href: "/docs/api/types/IndexablePath",
+      kind: "type-alias",
+    },
+    {
+      name: "Sort",
+      href: "/docs/api/types/Sort",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdatePaths",
+      href: "/docs/api/types/UpdatePaths",
+      kind: "type-alias",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

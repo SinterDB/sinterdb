@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 281,
   name: "ParsedSinterConnectionString",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/ParsedSinterConnectionString",
+  since: null,
   description:
     "A parsed sinterdb:// connection string, available as SinterClient.target.",
   badges: [],
@@ -40,6 +41,7 @@ const page = {
           anchor: "database",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -72,6 +74,7 @@ const page = {
           anchor: "host",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -104,6 +107,7 @@ const page = {
           anchor: "port",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -160,6 +164,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -168,7 +177,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L11",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClient.target",
+      href: "/docs/api/classes/SinterClient#target",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

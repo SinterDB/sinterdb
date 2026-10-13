@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 269,
   name: "InsertOneResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/InsertOneResult",
+  since: null,
   description: "The result of SinterCollection.insertOne.",
   badges: [],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "acknowledged",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -72,6 +74,7 @@ const page = {
           anchor: "inserted-id",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -122,6 +125,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -130,7 +138,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L66",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.insertOne",
+      href: "/docs/api/classes/SinterCollection#insert-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

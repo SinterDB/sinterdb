@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 185,
   name: "SinterClientOptions",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/SinterClientOptions",
+  since: null,
   description:
     "Options for SinterClient. Every timeout is a whole number of milliseconds no greater than 2,147,483,647. An invalid value throws a SinterClientOptionsError.",
   badges: [],
@@ -40,6 +41,7 @@ const page = {
           anchor: "connect-timeout-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -74,6 +76,7 @@ const page = {
           anchor: "request-timeout-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -108,6 +111,7 @@ const page = {
           anchor: "socket-timeout-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -164,6 +168,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -172,7 +181,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L46",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClient.constructor",
+      href: "/docs/api/classes/SinterClient#constructor",
+      kind: "constructor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

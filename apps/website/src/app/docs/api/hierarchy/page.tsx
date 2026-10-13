@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { ApiHierarchyPage } from "../_components/pages";
 import type { ApiHierarchyNode } from "../_generated/model";
 
-const nodes = [
+const nodes: readonly ApiHierarchyNode[] = [
   {
     name: "Error",
     href: null,
@@ -15,7 +15,7 @@ const nodes = [
         name: "SinterError",
         href: "/docs/api/classes/SinterError",
         kind: "class",
-        deprecated: true,
+        deprecated: false,
         current: false,
         children: [
           {
@@ -163,7 +163,7 @@ const nodes = [
       },
     ],
   },
-] satisfies readonly ApiHierarchyNode[];
+];
 
 export const metadata: Metadata = {
   title: "Hierarchy",

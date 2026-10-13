@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 285,
   name: "FindCursor",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/FindCursor",
+  since: null,
   description: "A lazy, batched cursor over the results of a find.",
   badges: [],
   declaration: [
@@ -64,6 +65,7 @@ const page = {
           anchor: "constructor",
           kind: "constructor",
           deprecated: false,
+          since: null,
           label: "Constructor",
           badges: [],
           code: null,
@@ -219,6 +221,7 @@ const page = {
           anchor: "async-iterator",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -291,6 +294,7 @@ const page = {
           anchor: "close",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -351,6 +355,7 @@ const page = {
           anchor: "explain",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -415,6 +420,7 @@ const page = {
           anchor: "has-next",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -475,6 +481,7 @@ const page = {
           anchor: "next",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -543,6 +550,7 @@ const page = {
           anchor: "to-array",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -659,6 +667,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -667,7 +680,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L35",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.find",
+      href: "/docs/api/classes/SinterCollection#find",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

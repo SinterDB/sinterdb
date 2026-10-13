@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 664,
   name: "ExplainResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/ExplainResult",
+  since: null,
   description:
     "The query plan the server reports for a find. The shape is experimental and may change in any release; see docs/compatibility.md.",
   badges: ["beta"],
@@ -40,6 +41,7 @@ const page = {
           anchor: "access",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -78,6 +80,7 @@ const page = {
           anchor: "documents",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -110,6 +113,7 @@ const page = {
           anchor: "estimated-candidates",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -142,6 +146,7 @@ const page = {
           anchor: "field",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -175,6 +180,7 @@ const page = {
           anchor: "index-2",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -207,6 +213,7 @@ const page = {
           anchor: "lower",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -239,6 +246,7 @@ const page = {
           anchor: "stage",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -277,6 +285,7 @@ const page = {
           anchor: "upper",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -361,6 +370,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -369,7 +383,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L73",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FindCursor.explain",
+      href: "/docs/api/classes/FindCursor#explain",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

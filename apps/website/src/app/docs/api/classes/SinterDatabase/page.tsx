@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 325,
   name: "SinterDatabase",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/SinterDatabase",
+  since: null,
   description: "A handle to a database on a server.",
   badges: [],
   declaration: [
@@ -38,6 +39,7 @@ const page = {
           anchor: "constructor",
           kind: "constructor",
           deprecated: false,
+          since: null,
           label: "Constructor",
           badges: [],
           code: null,
@@ -120,6 +122,7 @@ const page = {
           anchor: "client",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -152,6 +155,7 @@ const page = {
           anchor: "name",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -190,6 +194,7 @@ const page = {
           anchor: "collection",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -308,6 +313,7 @@ const page = {
           anchor: "list-collections",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -413,6 +419,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -421,7 +432,24 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/database.ts#L12",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClient.db",
+      href: "/docs/api/classes/SinterClient#db",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.constructor",
+      href: "/docs/api/classes/SinterCollection#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterCollection.database",
+      href: "/docs/api/classes/SinterCollection#database",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

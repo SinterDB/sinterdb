@@ -10,7 +10,7 @@ import type {
 } from "../_generated/model";
 import { config } from "../_generated/config";
 import { Code } from "./code";
-import { Badges, Comment, Deprecated, Html } from "./comment";
+import { Badges, Comment, Deprecated, Html, Since } from "./comment";
 import { KindIcon } from "./kind-icon";
 import { cx } from "./utils";
 
@@ -37,6 +37,7 @@ export function MemberCard({ member }: { readonly member: ApiMember }) {
           </a>
         )}
         <Badges badges={member.badges} />
+        <Since version={member.since} />
       </header>
 
       <Deprecated comment={member.comment} />

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 179,
   name: "SinterClientState",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/SinterClientState",
+  since: null,
   description: "A value of SinterClientState.",
   badges: [],
   declaration: [
@@ -36,7 +37,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/client.ts",
@@ -49,7 +56,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L139",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClient.state",
+      href: "/docs/api/classes/SinterClient#state",
+      kind: "accessor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

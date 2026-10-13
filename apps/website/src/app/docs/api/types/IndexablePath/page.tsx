@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 673,
   name: "IndexablePath",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/IndexablePath",
+  since: null,
   description:
     "Field paths that can be indexed: every known path except _id, which always has its own unique index.",
   badges: [],
@@ -67,7 +68,8 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L10",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

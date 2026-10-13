@@ -14,6 +14,7 @@
  * @property {string} plain Plain text of the first summary paragraph.
  * @property {string | null} deprecated HTML, `""` when deprecated without a reason.
  * @property {string | null} returns HTML of `@returns`.
+ * @property {string | null} since Plain text of `@since`, e.g. `0.2.0`.
  * @property {string[]} modifiers Modifier tags without the `@`, such as `beta`.
  * @property {CommentBlockModel[]} blocks
  */
@@ -31,6 +32,7 @@ const BLOCK_TITLES = {
 /** Blocks shown somewhere other than the generic block list. */
 const HANDLED_ELSEWHERE = new Set([
   "@returns",
+  "@since",
   "@deprecated",
   "@param",
   "@typeParam",
@@ -70,6 +72,7 @@ export function createCommentModel(comment, ctx) {
   const firstParagraph = summaryMarkdown.split(/\n\s*\n/u)[0] ?? "";
   const deprecated = comment.getTag("@deprecated");
   const returns = comment.getTag("@returns");
+  const since = comment.getTag("@since");
 
   const blocks = comment.blockTags
     .filter((block) => !HANDLED_ELSEWHERE.has(block.tag))
@@ -90,6 +93,7 @@ export function createCommentModel(comment, ctx) {
     returns: returns
       ? ctx.markdown.render(partsToMarkdown(returns.content, ctx))
       : null,
+    since: since ? toPlainText(since.content).replace(/^v/u, "") || null : null,
     modifiers: [...comment.modifierTags]
       .filter((tag) => SHOWN_MODIFIERS.has(tag))
       .map((tag) => tag.slice(1)),
@@ -100,6 +104,7 @@ export function createCommentModel(comment, ctx) {
     !model.summary &&
     model.deprecated === null &&
     model.returns === null &&
+    model.since === null &&
     model.modifiers.length === 0 &&
     model.blocks.length === 0;
 

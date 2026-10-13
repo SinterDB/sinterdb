@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 685,
   name: "IndexInfo",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/IndexInfo",
+  since: null,
   description:
     "A description of an index, as returned by SinterCollection.indexes.",
   badges: [],
@@ -40,6 +41,7 @@ const page = {
           anchor: "direction",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -76,6 +78,7 @@ const page = {
           anchor: "field",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -108,6 +111,7 @@ const page = {
           anchor: "name",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -140,6 +144,7 @@ const page = {
           anchor: "sparse",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -174,6 +179,7 @@ const page = {
           anchor: "unique",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -240,6 +246,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -248,7 +259,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L42",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.indexes",
+      href: "/docs/api/classes/SinterCollection#indexes",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

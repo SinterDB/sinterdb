@@ -1,7 +1,7 @@
 import { ApiIndexPage } from "./_components/pages";
 import type { ApiIndexGroup } from "./_generated/model";
 
-const groups = [
+const groups: readonly ApiIndexGroup[] = [
   {
     id: "classes",
     title: "Classes",
@@ -14,6 +14,7 @@ const groups = [
         label: "Class",
         short: "",
         deprecated: false,
+        since: null,
       },
       {
         id: 285,
@@ -23,6 +24,7 @@ const groups = [
         label: "Class",
         short: "A lazy, batched cursor over the results of a find.",
         deprecated: false,
+        since: null,
       },
       {
         id: 32,
@@ -32,6 +34,7 @@ const groups = [
         label: "Class",
         short: "A connection to a SinterDB server.",
         deprecated: false,
+        since: null,
       },
       {
         id: 338,
@@ -42,6 +45,7 @@ const groups = [
         short:
           "A client option or a database or collection name is invalid. Code <code>INVALID_CLIENT_OPTIONS</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 357,
@@ -52,6 +56,7 @@ const groups = [
         short:
           "A command was used in the wrong client state: <code>CLIENT_NOT_CONNECTED</code> before <code>connect()</code>, or <code>CLIENT_CLOSED</code> after <code>close()</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 199,
@@ -61,6 +66,7 @@ const groups = [
         label: "Class",
         short: "A collection of documents, typed by <code>TDocument</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 377,
@@ -71,6 +77,7 @@ const groups = [
         short:
           "The server does not speak a compatible protocol version. Code <code>INCOMPATIBLE_PROTOCOL</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 400,
@@ -81,6 +88,7 @@ const groups = [
         short:
           "The connection could not be established or was lost. Code <code>CONNECTION_FAILED</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 419,
@@ -91,6 +99,7 @@ const groups = [
         short:
           "The connection string is malformed. Code <code>INVALID_CONNECTION_STRING</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 438,
@@ -100,6 +109,7 @@ const groups = [
         label: "Class",
         short: "Connecting took longer than <code>connectTimeoutMS</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 325,
@@ -109,6 +119,7 @@ const groups = [
         label: "Class",
         short: "A handle to a database on a server.",
         deprecated: false,
+        since: null,
       },
       {
         id: 457,
@@ -119,6 +130,7 @@ const groups = [
         short:
           "A request could not be encoded, so nothing was sent and the connection is unaffected. The usual causes are a value the database cannot store (such as <code>undefined</code>, a function, or a class instance like <code>Map</code>), a document nested more than 100 levels deep, or a request larger than 16 MiB. The <code>cause</code> says which. Code <code>INVALID_DOCUMENT</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 476,
@@ -128,7 +140,8 @@ const groups = [
         label: "Class",
         short:
           "The base class of every error the driver throws on its own. Check <code>code</code> to tell them apart.",
-        deprecated: true,
+        deprecated: false,
+        since: null,
       },
       {
         id: 511,
@@ -139,6 +152,7 @@ const groups = [
         short:
           "<code>insertMany</code> failed partway. The documents before <code>failedIndex</code> were inserted and stay committed.",
         deprecated: false,
+        since: null,
       },
       {
         id: 700,
@@ -149,6 +163,7 @@ const groups = [
         short:
           "A database or collection name is invalid: empty, or containing forbidden characters. Code <code>INVALID_CLIENT_OPTIONS</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 537,
@@ -159,6 +174,7 @@ const groups = [
         short:
           "The server sent something the driver cannot interpret. Code <code>PROTOCOL_VIOLATION</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 556,
@@ -169,6 +185,7 @@ const groups = [
         short:
           "A request got no response within <code>requestTimeoutMS</code>. The request may still have run on the server. Code <code>REQUEST_TIMEOUT</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 575,
@@ -178,6 +195,7 @@ const groups = [
         label: "Class",
         short: "The server rejected a request. Code <code>SERVER_ERROR</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 598,
@@ -188,6 +206,7 @@ const groups = [
         short:
           "The connection was idle for longer than <code>socketTimeoutMS</code>.",
         deprecated: false,
+        since: null,
       },
     ],
   },
@@ -204,6 +223,7 @@ const groups = [
         short:
           'The result of <a href="/docs/api/classes/SinterCollection#create-index">SinterCollection.createIndex</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 723,
@@ -213,6 +233,7 @@ const groups = [
         label: "Interface",
         short: "The result of a delete.",
         deprecated: false,
+        since: null,
       },
       {
         id: 26,
@@ -222,6 +243,7 @@ const groups = [
         label: "Interface",
         short: "",
         deprecated: false,
+        since: null,
       },
       {
         id: 664,
@@ -232,6 +254,7 @@ const groups = [
         short:
           "The query plan the server reports for a find. The shape is experimental and may change in any release; see docs/compatibility.md.",
         deprecated: false,
+        since: null,
       },
       {
         id: 259,
@@ -242,6 +265,7 @@ const groups = [
         short:
           'Options for <a href="/docs/api/classes/SinterCollection#find">SinterCollection.find</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 321,
@@ -252,6 +276,7 @@ const groups = [
         short:
           "The query parts of a find that are sent with the first request.",
         deprecated: false,
+        since: null,
       },
       {
         id: 675,
@@ -262,6 +287,7 @@ const groups = [
         short:
           'One end of an index range in an <a href="/docs/api/interfaces/ExplainResult">ExplainResult</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 678,
@@ -272,6 +298,7 @@ const groups = [
         short:
           'How to build an index, passed to <a href="/docs/api/classes/SinterCollection#create-index">SinterCollection.createIndex</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 685,
@@ -282,6 +309,7 @@ const groups = [
         short:
           'A description of an index, as returned by <a href="/docs/api/classes/SinterCollection#indexes">SinterCollection.indexes</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 691,
@@ -292,6 +320,7 @@ const groups = [
         short:
           'One difference found by <a href="/docs/api/classes/SinterCollection#validate-indexes">SinterCollection.validateIndexes</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 695,
@@ -302,6 +331,7 @@ const groups = [
         short:
           'The result of <a href="/docs/api/classes/SinterCollection#validate-indexes">SinterCollection.validateIndexes</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 265,
@@ -312,6 +342,7 @@ const groups = [
         short:
           'The result of <a href="/docs/api/classes/SinterCollection#insert-many">SinterCollection.insertMany</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 269,
@@ -322,6 +353,7 @@ const groups = [
         short:
           'The result of <a href="/docs/api/classes/SinterCollection#insert-one">SinterCollection.insertOne</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 281,
@@ -332,6 +364,7 @@ const groups = [
         short:
           'A parsed <code>sinterdb://</code> connection string, available as <a href="/docs/api/classes/SinterClient#target">SinterClient.target</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 180,
@@ -342,6 +375,7 @@ const groups = [
         short:
           'The events a <a href="/docs/api/classes/SinterClient">SinterClient</a> emits.',
         deprecated: false,
+        since: null,
       },
       {
         id: 185,
@@ -352,6 +386,7 @@ const groups = [
         short:
           'Options for <a href="/docs/api/classes/SinterClient">SinterClient</a>. Every timeout is a whole number of milliseconds no greater than 2,147,483,647. An invalid value throws a <a href="/docs/api/classes/SinterClientOptionsError">SinterClientOptionsError</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 189,
@@ -362,6 +397,7 @@ const groups = [
         short:
           'The result of <a href="/docs/api/classes/SinterClient#ping">SinterClient.ping</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 617,
@@ -371,6 +407,7 @@ const groups = [
         label: "Interface",
         short: "Details a server error response can carry.",
         deprecated: false,
+        since: null,
       },
       {
         id: 194,
@@ -381,6 +418,7 @@ const groups = [
         short:
           'What the server reported during the protocol handshake. Available from <a href="/docs/api/classes/SinterClient#server-info">SinterClient.serverInfo</a> once the client is connected.',
         deprecated: false,
+        since: null,
       },
       {
         id: 742,
@@ -390,6 +428,7 @@ const groups = [
         label: "Interface",
         short: "Options for updates and replacements.",
         deprecated: false,
+        since: null,
       },
       {
         id: 746,
@@ -399,6 +438,7 @@ const groups = [
         label: "Interface",
         short: "The result of an update or replace.",
         deprecated: false,
+        since: null,
       },
     ],
   },
@@ -415,6 +455,7 @@ const groups = [
         short:
           "Updatable paths that hold an array, the targets of <code>$push</code>, <code>$addToSet</code> and <code>$pull</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 623,
@@ -425,6 +466,7 @@ const groups = [
         short:
           "Values that can be matched by equality: comparable values, booleans and <code>null</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 721,
@@ -435,6 +477,7 @@ const groups = [
         short:
           "Updatable paths that hold a comparable value, the targets of <code>$min</code> and <code>$max</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 624,
@@ -445,6 +488,7 @@ const groups = [
         short:
           "Values that can be compared with <code>$gt</code>, <code>$gte</code>, <code>$lt</code> and <code>$lte</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 625,
@@ -455,6 +499,7 @@ const groups = [
         short:
           "The range operators <code>$gt</code>, <code>$gte</code>, <code>$lt</code> and <code>$lte</code>. They are available only when the value type includes a comparable type.",
         deprecated: false,
+        since: null,
       },
       {
         id: 316,
@@ -465,6 +510,7 @@ const groups = [
         short:
           'The function a <a href="/docs/api/classes/FindCursor">FindCursor</a> uses to reach the server. Cursors are created by <a href="/docs/api/classes/SinterCollection#find">SinterCollection.find</a>; do not construct them directly.',
         deprecated: false,
+        since: null,
       },
       {
         id: 632,
@@ -475,6 +521,7 @@ const groups = [
         short:
           "The element type of an array type, or the type itself when it is not an array.",
         deprecated: false,
+        since: null,
       },
       {
         id: 257,
@@ -484,6 +531,7 @@ const groups = [
         label: "Type Alias",
         short: "A shorthand filter that matches fields by equality only.",
         deprecated: false,
+        since: null,
       },
       {
         id: 634,
@@ -494,6 +542,7 @@ const groups = [
         short:
           "A query filter: field paths mapped to a value or to operators, combined with <code>$and</code>, <code>$or</code> and <code>$nor</code>. An empty filter matches every document.",
         deprecated: false,
+        since: null,
       },
       {
         id: 641,
@@ -504,6 +553,7 @@ const groups = [
         short:
           "The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>, <code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values.",
         deprecated: false,
+        since: null,
       },
       {
         id: 650,
@@ -514,6 +564,7 @@ const groups = [
         short:
           "Every dotted field path of a document type, such as <code>profile.name</code>. Arrays and atomic values end a path.",
         deprecated: false,
+        since: null,
       },
       {
         id: 653,
@@ -523,6 +574,7 @@ const groups = [
         label: "Type Alias",
         short: "The type of the value at a dotted field path.",
         deprecated: false,
+        since: null,
       },
       {
         id: 673,
@@ -533,6 +585,7 @@ const groups = [
         short:
           "Field paths that can be indexed: every known path except <code>_id</code>, which always has its own unique index.",
         deprecated: false,
+        since: null,
       },
       {
         id: 656,
@@ -543,6 +596,7 @@ const groups = [
         short:
           "How many levels of nesting the compiler follows when it builds field paths. Deeper paths still work at runtime but are not suggested or type-checked.",
         deprecated: false,
+        since: null,
       },
       {
         id: 726,
@@ -553,6 +607,7 @@ const groups = [
         short:
           "Updatable paths that hold a number or bigint, the targets of <code>$inc</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 272,
@@ -563,6 +618,7 @@ const groups = [
         short:
           "A document as accepted for insertion: <code>_id</code> is optional, and the server generates one when it is missing.",
         deprecated: false,
+        since: null,
       },
       {
         id: 728,
@@ -573,6 +629,7 @@ const groups = [
         short:
           "The updatable paths whose value type is assignable to <code>TKind</code>.",
         deprecated: false,
+        since: null,
       },
       {
         id: 179,
@@ -583,6 +640,7 @@ const groups = [
         short:
           'A value of <a href="/docs/api/variables/SinterClientState">SinterClientState</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 510,
@@ -593,6 +651,7 @@ const groups = [
         short:
           'A value of <a href="/docs/api/variables/SinterErrorCode">SinterErrorCode</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 657,
@@ -603,6 +662,7 @@ const groups = [
         short:
           "A sort order: <code>[path, direction]</code> pairs, where earlier pairs take priority.",
         deprecated: false,
+        since: null,
       },
       {
         id: 659,
@@ -613,6 +673,7 @@ const groups = [
         short:
           "<code>1</code> for ascending or <code>-1</code> for descending.",
         deprecated: false,
+        since: null,
       },
       {
         id: 731,
@@ -623,6 +684,7 @@ const groups = [
         short:
           "An update document built from operators: <code>$set</code>, <code>$unset</code>, <code>$inc</code>, <code>$min</code>, <code>$max</code>, <code>$push</code>, <code>$addToSet</code> and <code>$pull</code>. Each operator accepts only paths of a matching type.",
         deprecated: false,
+        since: null,
       },
       {
         id: 744,
@@ -633,6 +695,7 @@ const groups = [
         short:
           "The field paths an update can change: every path except <code>_id</code>, which is immutable.",
         deprecated: false,
+        since: null,
       },
       {
         id: 276,
@@ -643,6 +706,7 @@ const groups = [
         short:
           "A document as stored and returned: <code>_id</code> is always present.",
         deprecated: false,
+        since: null,
       },
     ],
   },
@@ -658,6 +722,7 @@ const groups = [
         label: "Variable",
         short: "The default <code>connectTimeoutMS</code>: 10 seconds.",
         deprecated: false,
+        since: null,
       },
       {
         id: 30,
@@ -667,6 +732,7 @@ const groups = [
         label: "Variable",
         short: "The default <code>requestTimeoutMS</code>: 10 seconds.",
         deprecated: false,
+        since: null,
       },
       {
         id: 280,
@@ -677,6 +743,7 @@ const groups = [
         short:
           "The port used when a connection string does not name one: 4721.",
         deprecated: false,
+        since: null,
       },
       {
         id: 31,
@@ -687,6 +754,7 @@ const groups = [
         short:
           "The default <code>socketTimeoutMS</code>: 0, which disables the idle timeout.",
         deprecated: false,
+        since: null,
       },
       {
         id: 172,
@@ -697,6 +765,7 @@ const groups = [
         short:
           'The lifecycle states of a <a href="/docs/api/classes/SinterClient">SinterClient</a>.',
         deprecated: false,
+        since: null,
       },
       {
         id: 496,
@@ -705,12 +774,13 @@ const groups = [
         kind: "variable",
         label: "Variable",
         short:
-          'The stable string codes carried by <a href="/docs/api/classes/SinterError#code" class="tdk-deprecated" title="Deprecated (SinterError is deprecated): This is a test">SinterError.code</a>. Branch on these rather than on message text.',
+          'The stable string codes carried by <a href="/docs/api/classes/SinterError#code">SinterError.code</a>. Branch on these rather than on message text.',
         deprecated: false,
+        since: null,
       },
     ],
   },
-] satisfies readonly ApiIndexGroup[];
+];
 
 export default function Page() {
   return <ApiIndexPage groups={groups} />;

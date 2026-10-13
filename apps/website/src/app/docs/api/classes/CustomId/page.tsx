@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 1,
   name: "CustomId",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/CustomId",
+  since: null,
   description: "",
   badges: [],
   declaration: [
@@ -31,6 +32,7 @@ const page = {
           anchor: "timestamp",
           kind: "accessor",
           deprecated: false,
+          since: null,
           label: "Accessor",
           badges: [],
           code: null,
@@ -82,6 +84,7 @@ const page = {
           anchor: "equals",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -141,6 +144,7 @@ const page = {
           anchor: "to-bytes",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -185,6 +189,7 @@ const page = {
           anchor: "to-hex-string",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -229,6 +234,7 @@ const page = {
           anchor: "to-json",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -273,6 +279,7 @@ const page = {
           anchor: "to-string",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: [],
           code: null,
@@ -317,6 +324,7 @@ const page = {
           anchor: "from-bytes",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: ["static"],
           code: null,
@@ -377,6 +385,7 @@ const page = {
           anchor: "from-hex-string",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: ["static"],
           code: null,
@@ -437,6 +446,7 @@ const page = {
           anchor: "generate",
           kind: "method",
           deprecated: false,
+          since: null,
           label: "Method",
           badges: ["static"],
           code: null,
@@ -546,6 +556,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -554,7 +569,69 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L10",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "ComparableValue",
+      href: "/docs/api/types/ComparableValue",
+      kind: "type-alias",
+    },
+    {
+      name: "Filter",
+      href: "/docs/api/types/Filter",
+      kind: "type-alias",
+    },
+    {
+      name: "Filter._id",
+      href: "/docs/api/types/Filter#_id",
+      kind: "property",
+    },
+    {
+      name: "InsertManyResult.insertedIds",
+      href: "/docs/api/interfaces/InsertManyResult#inserted-ids",
+      kind: "property",
+    },
+    {
+      name: "InsertOneResult.insertedId",
+      href: "/docs/api/interfaces/InsertOneResult#inserted-id",
+      kind: "property",
+    },
+    {
+      name: "OptionalId",
+      href: "/docs/api/types/OptionalId",
+      kind: "type-alias",
+    },
+    {
+      name: "OptionalId._id",
+      href: "/docs/api/types/OptionalId#_id",
+      kind: "property",
+    },
+    {
+      name: "SinterInsertManyError.constructor",
+      href: "/docs/api/classes/SinterInsertManyError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterInsertManyError.insertedIds",
+      href: "/docs/api/classes/SinterInsertManyError#inserted-ids",
+      kind: "property",
+    },
+    {
+      name: "UpdateResult.upsertedId",
+      href: "/docs/api/interfaces/UpdateResult#upserted-id",
+      kind: "property",
+    },
+    {
+      name: "WithId",
+      href: "/docs/api/types/WithId",
+      kind: "type-alias",
+    },
+    {
+      name: "WithId._id",
+      href: "/docs/api/types/WithId#_id",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

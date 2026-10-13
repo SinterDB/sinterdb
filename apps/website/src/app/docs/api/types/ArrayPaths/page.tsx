@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 719,
   name: "ArrayPaths",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/ArrayPaths",
+  since: null,
   description:
     "Updatable paths that hold an array, the targets of $push, $addToSet and $pull.",
   badges: [],
@@ -52,7 +53,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/update.ts",
@@ -60,7 +67,29 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L47",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "UpdateFilter",
+      href: "/docs/api/types/UpdateFilter",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter.$addToSet",
+      href: "/docs/api/types/UpdateFilter#add-to-set",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$pull",
+      href: "/docs/api/types/UpdateFilter#pull",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$push",
+      href: "/docs/api/types/UpdateFilter#push",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

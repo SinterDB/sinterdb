@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 280,
   name: "DEFAULT_SINTERDB_PORT",
   kind: "variable",
   label: "Variable",
   href: "/docs/api/variables/DEFAULT_SINTERDB_PORT",
+  since: null,
   description:
     "The port used when a connection string does not name one: 4721.",
   badges: [],
@@ -39,7 +40,8 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L5",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

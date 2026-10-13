@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 617,
   name: "SinterServerErrorOptions",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/SinterServerErrorOptions",
+  since: null,
   description: "Details a server error response can carry.",
   badges: [],
   declaration: [
@@ -55,6 +56,7 @@ const page = {
           anchor: "details",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -87,6 +89,7 @@ const page = {
           anchor: "retryable",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -121,6 +124,7 @@ const page = {
           anchor: "server-error-name",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -155,6 +159,7 @@ const page = {
           anchor: "wire-code",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -215,6 +220,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -223,7 +233,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L39",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCompatibilityError.constructor",
+      href: "/docs/api/classes/SinterCompatibilityError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterServerError.constructor",
+      href: "/docs/api/classes/SinterServerError#constructor",
+      kind: "constructor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

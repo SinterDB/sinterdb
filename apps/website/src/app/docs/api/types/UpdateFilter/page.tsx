@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 731,
   name: "UpdateFilter",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/UpdateFilter",
+  since: null,
   description:
     "An update document built from operators: $set, $unset, $inc, $min, $max, $push, $addToSet and $pull. Each operator accepts only paths of a matching type.",
   badges: [],
@@ -238,6 +239,7 @@ const page = {
           anchor: "add-to-set",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -292,6 +294,7 @@ const page = {
           anchor: "inc",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -344,6 +347,7 @@ const page = {
           anchor: "max",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -396,6 +400,7 @@ const page = {
           anchor: "min",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -448,6 +453,7 @@ const page = {
           anchor: "pull",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -500,6 +506,7 @@ const page = {
           anchor: "push",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -554,6 +561,7 @@ const page = {
           anchor: "set",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -603,6 +611,7 @@ const page = {
           anchor: "unset",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -698,6 +707,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -706,7 +720,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L65",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.updateMany",
+      href: "/docs/api/classes/SinterCollection#update-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateOne",
+      href: "/docs/api/classes/SinterCollection#update-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

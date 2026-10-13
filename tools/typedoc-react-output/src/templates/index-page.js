@@ -8,7 +8,7 @@ export function renderIndexPageTemplate({
   return `import { ApiIndexPage } from "./${componentsDirectory}/pages";
 import type { ApiIndexGroup } from "./${generatedDirectory}/model";
 
-const groups = ${serialize(groups)} satisfies readonly ApiIndexGroup[];
+const groups: readonly ApiIndexGroup[] = ${serialize(groups)};
 
 export default function Page() {
   return <ApiIndexPage groups={groups} />;

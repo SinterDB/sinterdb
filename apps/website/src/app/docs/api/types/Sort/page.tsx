@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 657,
   name: "Sort",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/Sort",
+  since: null,
   description:
     "A sort order: [path, direction] pairs, where earlier pairs take priority.",
   badges: [],
@@ -61,7 +62,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/filter.ts",
@@ -69,7 +76,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L124",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FindOptions.sort",
+      href: "/docs/api/interfaces/FindOptions#sort",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

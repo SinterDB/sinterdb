@@ -67,6 +67,15 @@ export function Comment({
   );
 }
 
+/** "v0.2.0" chip from `@since`. */
+export function Since({ version }: { readonly version: string | null }) {
+  return version ? (
+    <span className="tdk-since" title={`Added in ${version}`}>
+      v{version}
+    </span>
+  ) : null;
+}
+
 export function Badges({ badges }: { readonly badges: readonly string[] }) {
   if (badges.length === 0) {
     return null;

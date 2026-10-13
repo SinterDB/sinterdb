@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 695,
   name: "IndexValidationResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/IndexValidationResult",
+  since: null,
   description: "The result of SinterCollection.validateIndexes.",
   badges: [],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "documents",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -71,6 +73,7 @@ const page = {
           anchor: "indexes",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -103,6 +106,7 @@ const page = {
           anchor: "issues",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -139,6 +143,7 @@ const page = {
           anchor: "valid",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -199,6 +204,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -207,7 +217,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L108",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.validateIndexes",
+      href: "/docs/api/classes/SinterCollection#validate-indexes",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

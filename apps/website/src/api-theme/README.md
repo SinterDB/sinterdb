@@ -1,7 +1,7 @@
 # API theme overrides
 
 Files here replace the matching files from the API docs theme
-(`tools/api-docs/react-output/themes/default`) every time `pnpm docs:api`
+(`tools/typedoc-react-output/src/themes/default`) every time `pnpm docs:api`
 runs. Edit the copy here, not `src/app/docs/api/_components`, which is
 regenerated.
 

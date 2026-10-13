@@ -18,6 +18,9 @@ const MODEL_TYPES = [
   "ApiIndexItem",
   "ApiIndexGroup",
   "ApiDeprecation",
+  "ApiNewIn",
+  "ApiSearchEntry",
+  "ApiUsage",
   "ApiProject",
 ];
 

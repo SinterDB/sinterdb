@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 641,
   name: "FilterOperators",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/FilterOperators",
+  since: null,
   description:
     "The operators that can be applied to a single field: $eq, $ne, $in, $nin, $exists, $not, plus the range operators for comparable values.",
   badges: [],
@@ -105,6 +106,7 @@ const page = {
           anchor: "eq",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -137,6 +139,7 @@ const page = {
           anchor: "exists",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -169,6 +172,7 @@ const page = {
           anchor: "in",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -210,6 +214,7 @@ const page = {
           anchor: "ne",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -242,6 +247,7 @@ const page = {
           anchor: "nin",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -281,6 +287,7 @@ const page = {
           anchor: "not",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -356,6 +363,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -364,7 +376,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L44",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "Filter",
+      href: "/docs/api/types/Filter",
+      kind: "type-alias",
+    },
+    {
+      name: "Filter._id",
+      href: "/docs/api/types/Filter#_id",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

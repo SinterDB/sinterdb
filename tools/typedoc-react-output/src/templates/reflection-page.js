@@ -13,7 +13,7 @@ export function renderReflectionPageTemplate({
 import { ApiReflectionPage } from "${up}${componentsDirectory}/pages";
 import type { ApiPage } from "${up}${generatedDirectory}/model";
 
-const page = ${serialize(page)} satisfies ApiPage;
+const page: ApiPage = ${serialize(page)};
 
 export const metadata: Metadata = {
   title: page.name,

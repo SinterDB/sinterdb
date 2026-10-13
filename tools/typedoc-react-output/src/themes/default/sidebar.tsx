@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { ApiProject } from "../_generated/model";
 import { KindIcon } from "./kind-icon";
+import { Search } from "./search";
 
 export function Sidebar({
   project,
@@ -13,7 +14,6 @@ export function Sidebar({
   readonly project: ApiProject;
   readonly activeHref: string | null;
 }) {
-  const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const asideRef = useRef<HTMLElement>(null);
   const activeRef = useRef<HTMLAnchorElement>(null);
@@ -30,15 +30,7 @@ export function Sidebar({
     }
   }, [activeHref]);
 
-  const needle = query.trim().toLowerCase();
-  const groups = project.navigation
-    .map((group) => ({
-      ...group,
-      items: needle
-        ? group.items.filter((item) => item.name.toLowerCase().includes(needle))
-        : group.items,
-    }))
-    .filter((group) => group.items.length > 0);
+  const groups = project.navigation;
 
   return (
     <aside ref={asideRef} className="tdk-sidebar" data-open={open}>
@@ -61,14 +53,7 @@ export function Sidebar({
           {project.name}
         </Link>
 
-        <input
-          type="search"
-          className="tdk-filter"
-          placeholder="Filter…"
-          aria-label="Filter API"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
+        <Search label="the API" />
 
         <nav aria-label="API reference" onClick={() => setOpen(false)}>
           {groups.map((group) => (
@@ -104,9 +89,7 @@ export function Sidebar({
             </section>
           ))}
 
-          {groups.length === 0 && <p className="tdk-empty">No matches</p>}
-
-          {project.hierarchyHref && !needle && (
+          {project.hierarchyHref && (
             <Link
               href={project.hierarchyHref}
               className="tdk-nav-link tdk-nav-extra"

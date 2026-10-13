@@ -1,6 +1,6 @@
 import type { ApiProject } from "./model";
 
-export const project = {
+export const project: ApiProject = {
   name: "SinterDB driver API",
   href: "/docs/api",
   summary: "",
@@ -99,7 +99,7 @@ export const project = {
           name: "SinterError",
           href: "/docs/api/classes/SinterError",
           kind: "class",
-          deprecated: true,
+          deprecated: false,
         },
         {
           id: 511,
@@ -521,27 +521,6 @@ export const project = {
       ],
     },
   ],
-  deprecated: [
-    {
-      name: "SinterError",
-      href: "/docs/api/classes/SinterError",
-      kind: "class",
-      reason: "This is a test",
-      inheritedFrom: null,
-    },
-    {
-      name: "SinterError.code",
-      href: "/docs/api/classes/SinterError#code",
-      kind: "property",
-      reason: "This is a test",
-      inheritedFrom: "SinterError",
-    },
-    {
-      name: "SinterError.constructor",
-      href: "/docs/api/classes/SinterError#constructor",
-      kind: "constructor",
-      reason: "This is a test",
-      inheritedFrom: "SinterError",
-    },
-  ],
-} satisfies ApiProject;
+  deprecated: [],
+  newIn: null,
+};

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 653,
   name: "FilterPathValue",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/FilterPathValue",
+  since: null,
   description: "The type of the value at a dotted field path.",
   badges: [],
   declaration: [
@@ -96,7 +97,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/filter.ts",
@@ -104,7 +111,59 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L88",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "Filter",
+      href: "/docs/api/types/Filter",
+      kind: "type-alias",
+    },
+    {
+      name: "PathsMatching",
+      href: "/docs/api/types/PathsMatching",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter",
+      href: "/docs/api/types/UpdateFilter",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter.$addToSet",
+      href: "/docs/api/types/UpdateFilter#add-to-set",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$inc",
+      href: "/docs/api/types/UpdateFilter#inc",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$max",
+      href: "/docs/api/types/UpdateFilter#max",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$min",
+      href: "/docs/api/types/UpdateFilter#min",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$pull",
+      href: "/docs/api/types/UpdateFilter#pull",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$push",
+      href: "/docs/api/types/UpdateFilter#push",
+      kind: "property",
+    },
+    {
+      name: "UpdateFilter.$set",
+      href: "/docs/api/types/UpdateFilter#set",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

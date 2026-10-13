@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 726,
   name: "NumericPaths",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/NumericPaths",
+  since: null,
   description:
     "Updatable paths that hold a number or bigint, the targets of $inc.",
   badges: [],
@@ -53,7 +54,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/update.ts",
@@ -61,7 +68,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L29",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "UpdateFilter",
+      href: "/docs/api/types/UpdateFilter",
+      kind: "type-alias",
+    },
+    {
+      name: "UpdateFilter.$inc",
+      href: "/docs/api/types/UpdateFilter#inc",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

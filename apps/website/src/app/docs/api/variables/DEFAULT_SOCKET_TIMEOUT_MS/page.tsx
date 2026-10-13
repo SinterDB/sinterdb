@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 31,
   name: "DEFAULT_SOCKET_TIMEOUT_MS",
   kind: "variable",
   label: "Variable",
   href: "/docs/api/variables/DEFAULT_SOCKET_TIMEOUT_MS",
+  since: null,
   description:
     "The default socketTimeoutMS: 0, which disables the idle timeout.",
   badges: [],
@@ -40,7 +41,8 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L35",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 189,
   name: "SinterPingResult",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/SinterPingResult",
+  since: null,
   description: "The result of SinterClient.ping.",
   badges: [],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "ok",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -72,6 +74,7 @@ const page = {
           anchor: "received-at",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -105,6 +108,7 @@ const page = {
           anchor: "round-trip-time-ms",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -139,6 +143,7 @@ const page = {
           anchor: "sent-at",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -199,6 +204,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -207,7 +217,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L82",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClient.ping",
+      href: "/docs/api/classes/SinterClient#ping",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

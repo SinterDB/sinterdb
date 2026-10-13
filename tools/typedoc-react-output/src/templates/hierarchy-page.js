@@ -12,7 +12,7 @@ export function renderHierarchyPageTemplate({
 import { ApiHierarchyPage } from "${up}${componentsDirectory}/pages";
 import type { ApiHierarchyNode } from "${up}${generatedDirectory}/model";
 
-const nodes = ${serialize(nodes)} satisfies readonly ApiHierarchyNode[];
+const nodes: readonly ApiHierarchyNode[] = ${serialize(nodes)};
 
 export const metadata: Metadata = {
   title: "Hierarchy",

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 742,
   name: "UpdateOptions",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/UpdateOptions",
+  since: null,
   description: "Options for updates and replacements.",
   badges: [],
   declaration: [
@@ -37,6 +38,7 @@ const page = {
           anchor: "upsert",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -80,6 +82,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -88,7 +95,24 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L53",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.replaceOne",
+      href: "/docs/api/classes/SinterCollection#replace-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateMany",
+      href: "/docs/api/classes/SinterCollection#update-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.updateOne",
+      href: "/docs/api/classes/SinterCollection#update-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

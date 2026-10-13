@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 276,
   name: "WithId",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/WithId",
+  since: null,
   description: "A document as stored and returned: _id is always present.",
   badges: [],
   declaration: [
@@ -65,6 +66,7 @@ const page = {
           anchor: "_id",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -107,6 +109,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -115,7 +122,34 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L38",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FindCursor",
+      href: "/docs/api/classes/FindCursor",
+      kind: "class",
+    },
+    {
+      name: "FindCursor.[asyncIterator]",
+      href: "/docs/api/classes/FindCursor#async-iterator",
+      kind: "method",
+    },
+    {
+      name: "FindCursor.next",
+      href: "/docs/api/classes/FindCursor#next",
+      kind: "method",
+    },
+    {
+      name: "FindCursor.toArray",
+      href: "/docs/api/classes/FindCursor#to-array",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.findOne",
+      href: "/docs/api/classes/SinterCollection#find-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

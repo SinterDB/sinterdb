@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 272,
   name: "OptionalId",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/OptionalId",
+  since: null,
   description:
     "A document as accepted for insertion: _id is optional, and the server generates one when it is missing.",
   badges: [],
@@ -66,6 +67,7 @@ const page = {
           anchor: "_id",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -110,6 +112,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -118,7 +125,24 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L32",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterCollection.insertMany",
+      href: "/docs/api/classes/SinterCollection#insert-many",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.insertOne",
+      href: "/docs/api/classes/SinterCollection#insert-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.replaceOne",
+      href: "/docs/api/classes/SinterCollection#replace-one",
+      kind: "method",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

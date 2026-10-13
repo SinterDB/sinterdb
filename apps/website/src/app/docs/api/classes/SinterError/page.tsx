@@ -3,15 +3,16 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 476,
   name: "SinterError",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/SinterError",
+  since: null,
   description:
     "The base class of every error the driver throws on its own. Check code to tell them apart.",
-  badges: ["deprecated"],
+  badges: [],
   declaration: [
     ["class ", "kw"],
     ["SinterError", "name"],
@@ -23,7 +24,7 @@ const page = {
       "<p>The base class of every error the driver throws on its own. Check <code>code</code> to\ntell them apart.</p>",
     short:
       "The base class of every error the driver throws on its own. Check <code>code</code> to tell them apart.",
-    deprecated: "<p>This is a test</p>",
+    deprecated: null,
     modifiers: [],
     blocks: [],
   },
@@ -39,7 +40,7 @@ const page = {
         name: "SinterError",
         href: null,
         kind: "class",
-        deprecated: true,
+        deprecated: false,
         current: true,
         children: [
           {
@@ -122,9 +123,10 @@ const page = {
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
-          deprecated: true,
+          deprecated: false,
+          since: null,
           label: "Constructor",
-          badges: ["deprecated"],
+          badges: [],
           code: null,
           comment: null,
           signatures: [
@@ -189,8 +191,8 @@ const page = {
               sources: [
                 {
                   path: "packages/driver/src/errors.ts",
-                  line: 62,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L62",
+                  line: 60,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L60",
                 },
               ],
             },
@@ -200,8 +202,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 62,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L62",
+              line: 60,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L60",
             },
           ],
         },
@@ -216,9 +218,10 @@ const page = {
           name: "code",
           anchor: "code",
           kind: "property",
-          deprecated: true,
+          deprecated: false,
+          since: null,
           label: "Property",
-          badges: ["deprecated"],
+          badges: [],
           code: [
             ["readonly ", "kw"],
             ["code", "name"],
@@ -240,8 +243,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 60,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L60",
+              line: 58,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L58",
             },
           ],
         },
@@ -257,7 +260,7 @@ const page = {
           anchor: "constructor",
           name: "constructor",
           kind: "constructor",
-          deprecated: true,
+          deprecated: false,
         },
       ],
     },
@@ -269,19 +272,146 @@ const page = {
           anchor: "code",
           name: "code",
           kind: "property",
-          deprecated: true,
+          deprecated: false,
         },
       ],
+    },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
     },
   ],
   sources: [
     {
       path: "packages/driver/src/errors.ts",
-      line: 56,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L56",
+      line: 54,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L54",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClientOptionsError",
+      href: "/docs/api/classes/SinterClientOptionsError",
+      kind: "class",
+    },
+    {
+      name: "SinterClientOptionsError.code",
+      href: "/docs/api/classes/SinterClientOptionsError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterClientOptionsError.constructor",
+      href: "/docs/api/classes/SinterClientOptionsError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterClientStateError",
+      href: "/docs/api/classes/SinterClientStateError",
+      kind: "class",
+    },
+    {
+      name: "SinterClientStateError.code",
+      href: "/docs/api/classes/SinterClientStateError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterClientStateError.constructor",
+      href: "/docs/api/classes/SinterClientStateError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterConnectionError",
+      href: "/docs/api/classes/SinterConnectionError",
+      kind: "class",
+    },
+    {
+      name: "SinterConnectionError.code",
+      href: "/docs/api/classes/SinterConnectionError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterConnectionError.constructor",
+      href: "/docs/api/classes/SinterConnectionError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterConnectionStringError",
+      href: "/docs/api/classes/SinterConnectionStringError",
+      kind: "class",
+    },
+    {
+      name: "SinterConnectionStringError.code",
+      href: "/docs/api/classes/SinterConnectionStringError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterConnectionStringError.constructor",
+      href: "/docs/api/classes/SinterConnectionStringError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterDocumentError",
+      href: "/docs/api/classes/SinterDocumentError",
+      kind: "class",
+    },
+    {
+      name: "SinterDocumentError.code",
+      href: "/docs/api/classes/SinterDocumentError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterDocumentError.constructor",
+      href: "/docs/api/classes/SinterDocumentError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterProtocolError",
+      href: "/docs/api/classes/SinterProtocolError",
+      kind: "class",
+    },
+    {
+      name: "SinterProtocolError.code",
+      href: "/docs/api/classes/SinterProtocolError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterProtocolError.constructor",
+      href: "/docs/api/classes/SinterProtocolError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterRequestTimeoutError",
+      href: "/docs/api/classes/SinterRequestTimeoutError",
+      kind: "class",
+    },
+    {
+      name: "SinterRequestTimeoutError.code",
+      href: "/docs/api/classes/SinterRequestTimeoutError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterRequestTimeoutError.constructor",
+      href: "/docs/api/classes/SinterRequestTimeoutError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterServerError",
+      href: "/docs/api/classes/SinterServerError",
+      kind: "class",
+    },
+    {
+      name: "SinterServerError.code",
+      href: "/docs/api/classes/SinterServerError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterServerError.constructor",
+      href: "/docs/api/classes/SinterServerError#constructor",
+      kind: "constructor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 26,
   name: "Document",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/Document",
+  since: null,
   description: "",
   badges: [],
   declaration: [
@@ -31,6 +32,7 @@ const page = {
           anchor: "index-signature",
           kind: "index-signature",
           deprecated: false,
+          since: null,
           label: "Index Signature",
           badges: [],
           code: [
@@ -69,6 +71,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -77,7 +84,74 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/document.ts#L3",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "CursorExecutor",
+      href: "/docs/api/types/CursorExecutor",
+      kind: "type-alias",
+    },
+    {
+      name: "FindCursor",
+      href: "/docs/api/classes/FindCursor",
+      kind: "class",
+    },
+    {
+      name: "FindCursor.constructor",
+      href: "/docs/api/classes/FindCursor#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "FindOptions",
+      href: "/docs/api/interfaces/FindOptions",
+      kind: "interface",
+    },
+    {
+      name: "IndexDefinition",
+      href: "/docs/api/interfaces/IndexDefinition",
+      kind: "interface",
+    },
+    {
+      name: "SinterClient.executeCommand",
+      href: "/docs/api/classes/SinterClient#execute-command",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection",
+      href: "/docs/api/classes/SinterCollection",
+      kind: "class",
+    },
+    {
+      name: "SinterCollection.constructor",
+      href: "/docs/api/classes/SinterCollection#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterCompatibilityError.details",
+      href: "/docs/api/classes/SinterCompatibilityError#details",
+      kind: "property",
+    },
+    {
+      name: "SinterDatabase.collection",
+      href: "/docs/api/classes/SinterDatabase#collection",
+      kind: "method",
+    },
+    {
+      name: "SinterInsertManyError.details",
+      href: "/docs/api/classes/SinterInsertManyError#details",
+      kind: "property",
+    },
+    {
+      name: "SinterServerError.details",
+      href: "/docs/api/classes/SinterServerError#details",
+      kind: "property",
+    },
+    {
+      name: "SinterServerErrorOptions.details",
+      href: "/docs/api/interfaces/SinterServerErrorOptions#details",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

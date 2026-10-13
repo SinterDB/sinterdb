@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 598,
   name: "SinterSocketTimeoutError",
   kind: "class",
   label: "Class",
   href: "/docs/api/classes/SinterSocketTimeoutError",
+  since: null,
   description: "The connection was idle for longer than socketTimeoutMS.",
   badges: [],
   declaration: [
@@ -38,7 +39,7 @@ const page = {
         name: "SinterError",
         href: "/docs/api/classes/SinterError",
         kind: "class",
-        deprecated: true,
+        deprecated: false,
         current: false,
         children: [
           {
@@ -75,6 +76,7 @@ const page = {
           anchor: "constructor",
           kind: "constructor",
           deprecated: false,
+          since: null,
           label: "Constructor",
           badges: [],
           code: null,
@@ -123,8 +125,8 @@ const page = {
               sources: [
                 {
                   path: "packages/driver/src/errors.ts",
-                  line: 128,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L128",
+                  line: 126,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L126",
                 },
               ],
             },
@@ -140,8 +142,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 128,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L128",
+              line: 126,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L126",
             },
           ],
         },
@@ -157,6 +159,7 @@ const page = {
           anchor: "code",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -184,8 +187,8 @@ const page = {
           sources: [
             {
               path: "packages/driver/src/errors.ts",
-              line: 143,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L143",
+              line: 141,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L141",
             },
           ],
         },
@@ -221,11 +224,12 @@ const page = {
   sources: [
     {
       path: "packages/driver/src/errors.ts",
-      line: 141,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L141",
+      line: 139,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L139",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 510,
   name: "SinterErrorCode",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/SinterErrorCode",
+  since: null,
   description: "A value of SinterErrorCode.",
   badges: [],
   declaration: [
@@ -36,7 +37,13 @@ const page = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/errors.ts",
@@ -49,7 +56,69 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L35",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "SinterClientOptionsError.code",
+      href: "/docs/api/classes/SinterClientOptionsError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterClientStateError.code",
+      href: "/docs/api/classes/SinterClientStateError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterConnectionError.code",
+      href: "/docs/api/classes/SinterConnectionError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterConnectionStringError.code",
+      href: "/docs/api/classes/SinterConnectionStringError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterDocumentError.code",
+      href: "/docs/api/classes/SinterDocumentError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterError.code",
+      href: "/docs/api/classes/SinterError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterError.constructor",
+      href: "/docs/api/classes/SinterError#constructor",
+      kind: "constructor",
+    },
+    {
+      name: "SinterInsertManyError.code",
+      href: "/docs/api/classes/SinterInsertManyError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterNamespaceError.code",
+      href: "/docs/api/classes/SinterNamespaceError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterProtocolError.code",
+      href: "/docs/api/classes/SinterProtocolError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterRequestTimeoutError.code",
+      href: "/docs/api/classes/SinterRequestTimeoutError#code",
+      kind: "property",
+    },
+    {
+      name: "SinterServerError.code",
+      href: "/docs/api/classes/SinterServerError#code",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

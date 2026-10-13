@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 321,
   name: "FindQueryOptions",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/FindQueryOptions",
+  since: null,
   description:
     "The query parts of a find that are sent with the first request.",
   badges: [],
@@ -39,6 +40,7 @@ const page = {
           anchor: "limit",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -71,6 +73,7 @@ const page = {
           anchor: "skip",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -103,6 +106,7 @@ const page = {
           anchor: "sort",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: [],
           code: [
@@ -165,6 +169,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -173,7 +182,14 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L18",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "FindCursor.constructor",
+      href: "/docs/api/classes/FindCursor#constructor",
+      kind: "constructor",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

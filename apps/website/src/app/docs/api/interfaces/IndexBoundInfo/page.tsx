@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 675,
   name: "IndexBoundInfo",
   kind: "interface",
   label: "Interface",
   href: "/docs/api/interfaces/IndexBoundInfo",
+  since: null,
   description: "One end of an index range in an ExplainResult.",
   badges: ["beta"],
   declaration: [
@@ -39,6 +40,7 @@ const page = {
           anchor: "inclusive",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -72,6 +74,7 @@ const page = {
           anchor: "value",
           kind: "property",
           deprecated: false,
+          since: null,
           label: "Property",
           badges: ["beta"],
           code: [
@@ -120,6 +123,11 @@ const page = {
         },
       ],
     },
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
   ],
   sources: [
     {
@@ -128,7 +136,19 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L60",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [
+    {
+      name: "ExplainResult.lower",
+      href: "/docs/api/interfaces/ExplainResult#lower",
+      kind: "property",
+    },
+    {
+      name: "ExplainResult.upper",
+      href: "/docs/api/interfaces/ExplainResult#upper",
+      kind: "property",
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   title: page.name,

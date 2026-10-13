@@ -3,7 +3,7 @@
   "name": "SinterDB driver API",
   "entryPoints": ["../../packages/driver/dist/index.d.ts"],
   "tsconfig": "./tsconfig.json",
-  "plugin": ["./react-output/index.js"],
+  "plugin": ["@sinterdb/typedoc-react-output"],
   "outputs": [
     {
       "name": "html",

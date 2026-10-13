@@ -354,12 +354,9 @@ importers:
 
   tools/api-docs:
     devDependencies:
-      markdown-it:
-        specifier: ^15.0.2
-        version: 15.0.2
-      shiki:
-        specifier: ^4.5.0
-        version: 4.5.0
+      '@sinterdb/typedoc-react-output':
+        specifier: workspace:^
+        version: link:../typedoc-react-output
       sinterdb:
         specifier: workspace:^
         version: link:../../packages/driver
@@ -388,6 +385,31 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.5
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.4)(vite@8.3.1(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))
+
+  tools/typedoc-react-output:
+    dependencies:
+      markdown-it:
+        specifier: ^15.0.2
+        version: 15.0.2
+      shiki:
+        specifier: ^4.5.0
+        version: 4.5.0
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 26.6.5
+      prettier:
+        specifier: ^3.9.10
+        version: 3.9.10
+      typedoc:
+        specifier: ^0.28.20
+        version: 0.28.20(typescript@6.0.3)
+      typescript:
+        specifier: ~6.0.0
+        version: 6.0.3
       vitest:
         specifier: 'catalog:'
         version: 5.0.4(@types/node@26.6.5)(@vitest/coverage-v8@5.0.4)(vite@8.3.1(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1))

@@ -27,6 +27,11 @@ import {
  * @property {string} kind
  * @property {string} reason Plain text from `@deprecated`, may be empty.
  * @property {string | null} inheritedFrom Set when only the parent is deprecated.
+ *
+ * @typedef {object} Usage
+ * @property {string} name Qualified name of the page or member using a type.
+ * @property {string} href
+ * @property {string} kind
  */
 
 /**
@@ -42,6 +47,13 @@ export class ModelContext {
 
   /** @type {Map<number, Deprecation>} */
   #deprecations = new Map();
+
+  /** What is being written right now, so references know who uses them. */
+  /** @type {(Usage | null)[]} */
+  #owners = [];
+
+  /** @type {Map<string, Map<string, Usage>>} Page href -> users by href. */
+  #usages = new Map();
 
   /** @type {PagePlan[]} */
   pages = [];
@@ -113,6 +125,31 @@ export class ModelContext {
     }
 
     return null;
+  }
+
+  /**
+   * Version from `@since`, on the reflection or its first signature.
+   *
+   * @param {import("typedoc").DeclarationReflection} reflection
+   * @returns {string | null}
+   */
+  sinceFor(reflection) {
+    const tag =
+      reflection.comment?.getTag("@since") ??
+      [
+        ...(reflection.signatures ?? []),
+        reflection.getSignature,
+        reflection.setSignature,
+      ]
+        .filter(Boolean)
+        .map((signature) => signature.comment?.getTag("@since"))
+        .find(Boolean);
+
+    if (!tag) {
+      return null;
+    }
+
+    return toPlainText(tag.content).replace(/^v/u, "") || null;
   }
 
   /** @param {PagePlan} plan */
@@ -209,10 +246,70 @@ export class ModelContext {
     const target = type.reflection;
 
     if (target) {
-      return this.hrefForReflection(target);
+      const href = this.hrefForReflection(target);
+
+      if (href) {
+        this.#recordUsage(href);
+      }
+
+      return href;
     }
 
     return type.externalUrl ?? null;
+  }
+
+  /**
+   * Runs `build` with `owner` as the page or member that any type references
+   * belong to. `null` pauses recording, e.g. for the inheritance tree.
+   *
+   * @template T
+   * @param {Usage | null} owner
+   * @param {() => T} build
+   * @returns {T}
+   */
+  withOwner(owner, build) {
+    this.#owners.push(owner);
+
+    try {
+      return build();
+    } finally {
+      this.#owners.pop();
+    }
+  }
+
+  /** The page or member currently being written, if any. */
+  get owner() {
+    return this.#owners.at(-1) ?? null;
+  }
+
+  /**
+   * Pages and members whose signatures or declarations mention this page.
+   *
+   * @param {string} pageHref
+   * @returns {Usage[]}
+   */
+  usedBy(pageHref) {
+    return [...(this.#usages.get(pageHref)?.values() ?? [])].toSorted((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }
+
+  #recordUsage(href) {
+    const owner = this.owner;
+    const page = href.split("#")[0];
+
+    if (!owner || owner.href.split("#")[0] === page) {
+      return;
+    }
+
+    let users = this.#usages.get(page);
+
+    if (!users) {
+      users = new Map();
+      this.#usages.set(page, users);
+    }
+
+    users.set(owner.href, owner);
   }
 
   /**

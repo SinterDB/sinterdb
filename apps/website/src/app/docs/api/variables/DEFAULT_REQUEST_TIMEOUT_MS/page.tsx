@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
-const page = {
+const page: ApiPage = {
   id: 30,
   name: "DEFAULT_REQUEST_TIMEOUT_MS",
   kind: "variable",
   label: "Variable",
   href: "/docs/api/variables/DEFAULT_REQUEST_TIMEOUT_MS",
+  since: null,
   description: "The default requestTimeoutMS: 10 seconds.",
   badges: [],
   declaration: [
@@ -37,7 +38,8 @@ const page = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L33",
     },
   ],
-} satisfies ApiPage;
+  usedBy: [],
+};
 
 export const metadata: Metadata = {
   title: page.name,

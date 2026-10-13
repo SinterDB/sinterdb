@@ -9,10 +9,11 @@ export function renderGeneratedProjectTemplate(model) {
     hierarchyHref: model.hierarchyHref,
     navigation: model.navigation,
     deprecated: model.deprecated,
+    newIn: model.newIn,
   };
 
   return `import type { ApiProject } from "./model";
 
-export const project = ${JSON.stringify(project, null, 2)} satisfies ApiProject;
+export const project: ApiProject = ${JSON.stringify(project, null, 2)};
 `;
 }
