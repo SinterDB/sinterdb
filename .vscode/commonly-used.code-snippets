@@ -16,4 +16,29 @@
     "body": "interface ${1:Name} {$2};",
     "description": "Insert a interface",
   },
+  "TODO": {
+    "scope": "typescript",
+    "prefix": "todo",
+    "body": "// TODO: $1",
+  },
+  "FIXME": {
+    "scope": "typescript",
+    "prefix": "fixme",
+    "body": "// FIXME: $1",
+  },
+  "FINDME": {
+    "scope": "typescript",
+    "prefix": "findme",
+    "body": "// FINDME: $1",
+  },
+  "IDEA": {
+    "scope": "typescript",
+    "prefix": "idea",
+    "body": "// IDEA: $1",
+  },
+  "DEPRECATED": {
+    "scope": "typescript",
+    "prefix": "deprecated",
+    "body": "// DEPRECATED: $1",
+  },
 }
