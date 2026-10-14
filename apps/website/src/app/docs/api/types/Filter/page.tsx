@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 634,
+  id: 644,
   name: "Filter",
   kind: "type-alias",
   label: "Type Alias",
@@ -38,6 +38,16 @@ const page: ApiPage = {
     [", ", "pn"],
     ["Path", "tp"],
     [">", "pn"],
+    ["\n    "],
+    ["| ", "pn"],
+    ["ElementOf", "ref", "/docs/api/types/ElementOf"],
+    ["<", "pn"],
+    ["FilterPathValue", "ref", "/docs/api/types/FilterPathValue"],
+    ["<", "pn"],
+    ["TDocument", "tp"],
+    [", ", "pn"],
+    ["Path", "tp"],
+    [">>", "pn"],
     ["\n    "],
     ["| ", "pn"],
     ["FilterOperators", "ref", "/docs/api/types/FilterOperators"],
@@ -119,7 +129,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 636,
+          id: 646,
           name: "_id",
           anchor: "_id",
           kind: "property",
@@ -151,13 +161,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 109,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L109",
+              line: 174,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L174",
             },
           ],
         },
         {
-          id: 637,
+          id: 647,
           name: "$and",
           anchor: "and",
           kind: "property",
@@ -188,13 +198,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 111,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L111",
+              line: 176,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L176",
             },
           ],
         },
         {
-          id: 639,
+          id: 649,
           name: "$nor",
           anchor: "nor",
           kind: "property",
@@ -225,13 +235,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 115,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L115",
+              line: 180,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L180",
             },
           ],
         },
         {
-          id: 638,
+          id: 648,
           name: "$or",
           anchor: "or",
           kind: "property",
@@ -262,8 +272,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 113,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L113",
+              line: 178,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L178",
             },
           ],
         },
@@ -310,11 +320,16 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 103,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L103",
+      line: 167,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L167",
     },
   ],
   usedBy: [
+    {
+      name: "ElementMatch",
+      href: "/docs/api/types/ElementMatch",
+      kind: "type-alias",
+    },
     {
       name: "SinterCollection.deleteMany",
       href: "/docs/api/classes/SinterCollection#delete-many",

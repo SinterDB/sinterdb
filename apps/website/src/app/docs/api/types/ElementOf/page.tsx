@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 632,
+  id: 639,
   name: "ElementOf",
   kind: "type-alias",
   label: "Type Alias",
@@ -63,9 +63,29 @@ const page: ApiPage = {
   ],
   usedBy: [
     {
+      name: "ArrayOperators",
+      href: "/docs/api/types/ArrayOperators",
+      kind: "type-alias",
+    },
+    {
+      name: "ComparisonOperators",
+      href: "/docs/api/types/ComparisonOperators",
+      kind: "type-alias",
+    },
+    {
+      name: "Filter",
+      href: "/docs/api/types/Filter",
+      kind: "type-alias",
+    },
+    {
       name: "FilterOperators",
       href: "/docs/api/types/FilterOperators",
       kind: "type-alias",
+    },
+    {
+      name: "FilterOperators.$eq",
+      href: "/docs/api/types/FilterOperators#eq",
+      kind: "property",
     },
     {
       name: "FilterOperators.$in",
@@ -73,9 +93,19 @@ const page: ApiPage = {
       kind: "property",
     },
     {
+      name: "FilterOperators.$ne",
+      href: "/docs/api/types/FilterOperators#ne",
+      kind: "property",
+    },
+    {
       name: "FilterOperators.$nin",
       href: "/docs/api/types/FilterOperators#nin",
       kind: "property",
+    },
+    {
+      name: "PathChild",
+      href: "/docs/api/types/PathChild",
+      kind: "type-alias",
     },
     {
       name: "UpdateFilter",

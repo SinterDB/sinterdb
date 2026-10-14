@@ -4,14 +4,14 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 641,
+  id: 651,
   name: "FilterOperators",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/FilterOperators",
   since: null,
   description:
-    "The operators that can be applied to a single field: $eq, $ne, $in, $nin, $exists, $not, plus the range operators for comparable values.",
+    "The operators that can be applied to a single field: $eq, $ne, $in, $nin, $exists, $not, plus the range operators for comparable values and $size and $elemMatch for arrays.",
   badges: [],
   declaration: [
     ["type ", "kw"],
@@ -24,7 +24,11 @@ const page: ApiPage = {
     ["$eq", "prop", "/docs/api/types/FilterOperators#eq"],
     ["?: ", "pn"],
     ["TValue", "tp"],
-    [";", "pn"],
+    [" | ", "pn"],
+    ["ElementOf", "ref", "/docs/api/types/ElementOf"],
+    ["<", "pn"],
+    ["TValue", "tp"],
+    [">;", "pn"],
     ["\n  "],
     ["readonly ", "kw"],
     ["$exists", "prop", "/docs/api/types/FilterOperators#exists"],
@@ -48,7 +52,11 @@ const page: ApiPage = {
     ["$ne", "prop", "/docs/api/types/FilterOperators#ne"],
     ["?: ", "pn"],
     ["TValue", "tp"],
-    [";", "pn"],
+    [" | ", "pn"],
+    ["ElementOf", "ref", "/docs/api/types/ElementOf"],
+    ["<", "pn"],
+    ["TValue", "tp"],
+    [">;", "pn"],
     ["\n  "],
     ["readonly ", "kw"],
     ["$nin", "prop", "/docs/api/types/FilterOperators#nin"],
@@ -74,13 +82,17 @@ const page: ApiPage = {
     ["ComparisonOperators", "ref", "/docs/api/types/ComparisonOperators"],
     ["<", "pn"],
     ["TValue", "tp"],
+    ["> & ", "pn"],
+    ["ArrayOperators", "ref", "/docs/api/types/ArrayOperators"],
+    ["<", "pn"],
+    ["TValue", "tp"],
     [">", "pn"],
   ],
   comment: {
     summary:
-      "<p>The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>,\n<code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values.</p>",
+      "<p>The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>,\n<code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values and\n<code>$size</code> and <code>$elemMatch</code> for arrays.</p>",
     short:
-      "The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>, <code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values.",
+      "The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>, <code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values and <code>$size</code> and <code>$elemMatch</code> for arrays.",
     deprecated: null,
     modifiers: [],
     blocks: [],
@@ -101,7 +113,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 643,
+          id: 653,
           name: "$eq",
           anchor: "eq",
           kind: "property",
@@ -114,10 +126,17 @@ const page: ApiPage = {
             ["$eq", "name"],
             ["?: ", "pn"],
             ["TValue", "tp"],
+            [" | ", "pn"],
+            ["ElementOf", "ref", "/docs/api/types/ElementOf"],
+            ["<", "pn"],
+            ["TValue", "tp"],
+            [">", "pn"],
           ],
           comment: {
-            summary: "<p>Equal to the value.</p>",
-            short: "Equal to the value.",
+            summary:
+              "<p>Equal to the value. For an array field, matches when any element equals it.</p>",
+            short:
+              "Equal to the value. For an array field, matches when any element equals it.",
             deprecated: null,
             modifiers: [],
             blocks: [],
@@ -128,13 +147,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 46,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L46",
+              line: 76,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L76",
             },
           ],
         },
         {
-          id: 647,
+          id: 657,
           name: "$exists",
           anchor: "exists",
           kind: "property",
@@ -161,13 +180,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 54,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L54",
+              line: 84,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L84",
             },
           ],
         },
         {
-          id: 645,
+          id: 655,
           name: "$in",
           anchor: "in",
           kind: "property",
@@ -203,13 +222,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 50,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L50",
+              line: 80,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L80",
             },
           ],
         },
         {
-          id: 644,
+          id: 654,
           name: "$ne",
           anchor: "ne",
           kind: "property",
@@ -222,10 +241,17 @@ const page: ApiPage = {
             ["$ne", "name"],
             ["?: ", "pn"],
             ["TValue", "tp"],
+            [" | ", "pn"],
+            ["ElementOf", "ref", "/docs/api/types/ElementOf"],
+            ["<", "pn"],
+            ["TValue", "tp"],
+            [">", "pn"],
           ],
           comment: {
-            summary: "<p>Not equal to the value.</p>",
-            short: "Not equal to the value.",
+            summary:
+              "<p>Not equal to the value. For an array field, no element may equal it.</p>",
+            short:
+              "Not equal to the value. For an array field, no element may equal it.",
             deprecated: null,
             modifiers: [],
             blocks: [],
@@ -236,13 +262,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 48,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L48",
+              line: 78,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L78",
             },
           ],
         },
         {
-          id: 646,
+          id: 656,
           name: "$nin",
           anchor: "nin",
           kind: "property",
@@ -264,8 +290,10 @@ const page: ApiPage = {
             [">)[]", "pn"],
           ],
           comment: {
-            summary: "<p>Equal to none of the listed values.</p>",
-            short: "Equal to none of the listed values.",
+            summary:
+              "<p>Equal to none of the listed values. For an array field, no element may equal one.</p>",
+            short:
+              "Equal to none of the listed values. For an array field, no element may equal one.",
             deprecated: null,
             modifiers: [],
             blocks: [],
@@ -276,13 +304,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 52,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L52",
+              line: 82,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L82",
             },
           ],
         },
         {
-          id: 648,
+          id: 658,
           name: "$not",
           anchor: "not",
           kind: "property",
@@ -312,8 +340,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/filter.ts",
-              line: 56,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L56",
+              line: 86,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L86",
             },
           ],
         },
@@ -372,11 +400,16 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 44,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L44",
+      line: 74,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L74",
     },
   ],
   usedBy: [
+    {
+      name: "ElementMatch",
+      href: "/docs/api/types/ElementMatch",
+      kind: "type-alias",
+    },
     {
       name: "Filter",
       href: "/docs/api/types/Filter",

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 656,
+  id: 666,
   name: "MaxPathDepth",
   kind: "type-alias",
   label: "Type Alias",
@@ -43,11 +43,16 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 63,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L63",
+      line: 94,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L94",
     },
   ],
   usedBy: [
+    {
+      name: "FieldPaths",
+      href: "/docs/api/types/FieldPaths",
+      kind: "type-alias",
+    },
     {
       name: "FilterPaths",
       href: "/docs/api/types/FilterPaths",

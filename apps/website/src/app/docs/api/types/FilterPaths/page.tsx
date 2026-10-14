@@ -4,14 +4,14 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 650,
+  id: 660,
   name: "FilterPaths",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/FilterPaths",
   since: null,
   description:
-    "Every dotted field path of a document type, such as profile.name. Arrays and atomic values end a path.",
+    "Every dotted field path of a document type, such as profile.name, or items.sku for an array of documents. Atomic values and arrays of atomic values end a path.",
   badges: [],
   declaration: [
     ["type ", "kw"],
@@ -52,7 +52,7 @@ const page: ApiPage = {
     ["Key", "tp"],
     ["\n        "],
     ["| (", "pn"],
-    ["NonNullable", "ref"],
+    ["PathChild", "ref", "/docs/api/types/PathChild"],
     ["<", "pn"],
     ["TDocument", "tp"],
     ["[", "pn"],
@@ -67,7 +67,7 @@ const page: ApiPage = {
     ["never", "prim"],
     ["\n          "],
     [": ", "pn"],
-    ["NonNullable", "ref"],
+    ["PathChild", "ref", "/docs/api/types/PathChild"],
     ["<", "pn"],
     ["TDocument", "tp"],
     ["[", "pn"],
@@ -85,7 +85,7 @@ const page: ApiPage = {
     ["${", "pn"],
     ["FilterPaths", "ref", "/docs/api/types/FilterPaths"],
     ["<", "pn"],
-    ["NonNullable", "ref"],
+    ["PathChild", "ref", "/docs/api/types/PathChild"],
     ["<", "pn"],
     ["TDocument", "tp"],
     ["[", "pn"],
@@ -113,9 +113,9 @@ const page: ApiPage = {
   ],
   comment: {
     summary:
-      "<p>Every dotted field path of a document type, such as <code>profile.name</code>. Arrays\nand atomic values end a path.</p>",
+      "<p>Every dotted field path of a document type, such as <code>profile.name</code>, or\n<code>items.sku</code> for an array of documents. Atomic values and arrays of atomic\nvalues end a path.</p>",
     short:
-      "Every dotted field path of a document type, such as <code>profile.name</code>. Arrays and atomic values end a path.",
+      "Every dotted field path of a document type, such as <code>profile.name</code>, or <code>items.sku</code> for an array of documents. Atomic values and arrays of atomic values end a path.",
     deprecated: null,
     modifiers: [],
     blocks: [],
@@ -151,29 +151,14 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 69,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L69",
+      line: 107,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L107",
     },
   ],
   usedBy: [
     {
       name: "Filter",
       href: "/docs/api/types/Filter",
-      kind: "type-alias",
-    },
-    {
-      name: "IndexablePath",
-      href: "/docs/api/types/IndexablePath",
-      kind: "type-alias",
-    },
-    {
-      name: "Sort",
-      href: "/docs/api/types/Sort",
-      kind: "type-alias",
-    },
-    {
-      name: "UpdatePaths",
-      href: "/docs/api/types/UpdatePaths",
       kind: "type-alias",
     },
   ],

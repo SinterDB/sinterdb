@@ -4,13 +4,14 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 653,
+  id: 663,
   name: "FilterPathValue",
   kind: "type-alias",
   label: "Type Alias",
   href: "/docs/api/types/FilterPathValue",
   since: null,
-  description: "The type of the value at a dotted field path.",
+  description:
+    "The type of the value at a dotted field path. A path through an array reads the type of the elements.",
   badges: [],
   declaration: [
     ["type ", "kw"],
@@ -55,7 +56,7 @@ const page: ApiPage = {
     ["? ", "pn"],
     ["FilterPathValue", "ref", "/docs/api/types/FilterPathValue"],
     ["<", "pn"],
-    ["NonNullable", "ref"],
+    ["PathChild", "ref", "/docs/api/types/PathChild"],
     ["<", "pn"],
     ["TDocument", "tp"],
     ["[", "pn"],
@@ -71,8 +72,10 @@ const page: ApiPage = {
     ["never", "prim"],
   ],
   comment: {
-    summary: "<p>The type of the value at a dotted field path.</p>",
-    short: "The type of the value at a dotted field path.",
+    summary:
+      "<p>The type of the value at a dotted field path. A path through an array reads\nthe type of the elements.</p>",
+    short:
+      "The type of the value at a dotted field path. A path through an array reads the type of the elements.",
     deprecated: null,
     modifiers: [],
     blocks: [],
@@ -107,8 +110,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 88,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L88",
+      line: 152,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L152",
     },
   ],
   usedBy: [

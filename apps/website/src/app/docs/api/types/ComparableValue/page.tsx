@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 624,
+  id: 629,
   name: "ComparableValue",
   kind: "type-alias",
   label: "Type Alias",

@@ -10,6 +10,14 @@ import { DocumentValue } from 'sinterdb-protocol';
 import { EventEmitter } from 'node:events';
 
 // @public
+export type ArrayOperators<TValue> = [
+Extract<TValue, readonly unknown[]>
+] extends [never] ? unknown : {
+    readonly $size?: number;
+    readonly $elemMatch?: ElementMatch<ElementOf<Extract<TValue, readonly unknown[]>>>;
+};
+
+// @public
 export type ArrayPaths<TDocument extends object> = PathsMatching<TDocument, readonly unknown[]>;
 
 // @public
@@ -23,12 +31,12 @@ export type ComparableValue = string | number | bigint | Date | Uint8Array | Cus
 
 // @public
 export type ComparisonOperators<TValue> = [
-Extract<TValue, ComparableValue>
+Extract<ElementOf<TValue>, ComparableValue>
 ] extends [never] ? unknown : {
-    readonly $gt?: Extract<TValue, ComparableValue>;
-    readonly $gte?: Extract<TValue, ComparableValue>;
-    readonly $lt?: Extract<TValue, ComparableValue>;
-    readonly $lte?: Extract<TValue, ComparableValue>;
+    readonly $gt?: Extract<ElementOf<TValue>, ComparableValue>;
+    readonly $gte?: Extract<ElementOf<TValue>, ComparableValue>;
+    readonly $lt?: Extract<ElementOf<TValue>, ComparableValue>;
+    readonly $lte?: Extract<ElementOf<TValue>, ComparableValue>;
 };
 
 // @public
@@ -64,6 +72,11 @@ export interface DeleteResult {
 export { Document }
 
 // @public
+export type ElementMatch<TElement> = [Extract<TElement, AtomicValue>] extends [
+never
+] ? TElement extends object ? Filter<TElement> : never : FilterOperators<TElement>;
+
+// @public
 export type ElementOf<TValue> = TValue extends readonly (infer TElement)[] ? TElement : TValue;
 
 // @public
@@ -84,8 +97,13 @@ export interface ExplainResult {
 }
 
 // @public
+export type FieldPaths<TDocument, TDepth extends readonly unknown[] = []> = TDepth["length"] extends MaxPathDepth ? never : TDocument extends object ? {
+    [Key in keyof TDocument & string]: Key | (NonNullable<TDocument[Key]> extends readonly unknown[] | AtomicValue ? never : NonNullable<TDocument[Key]> extends object ? `${Key}.${FieldPaths<NonNullable<TDocument[Key]>, [...TDepth, unknown]>}` : never);
+}[keyof TDocument & string] : never;
+
+// @public
 export type Filter<TDocument extends object> = {
-    readonly [Path in FilterPaths<TDocument>]?: FilterPathValue<TDocument, Path> | FilterOperators<FilterPathValue<TDocument, Path>>;
+    readonly [Path in FilterPaths<TDocument>]?: FilterPathValue<TDocument, Path> | ElementOf<FilterPathValue<TDocument, Path>> | FilterOperators<FilterPathValue<TDocument, Path>>;
 } & {
     readonly _id?: CustomId | FilterOperators<CustomId>;
     readonly $and?: readonly Filter<TDocument>[];
@@ -95,21 +113,21 @@ export type Filter<TDocument extends object> = {
 
 // @public
 export type FilterOperators<TValue> = {
-    readonly $eq?: TValue;
-    readonly $ne?: TValue;
+    readonly $eq?: TValue | ElementOf<TValue>;
+    readonly $ne?: TValue | ElementOf<TValue>;
     readonly $in?: readonly (TValue | ElementOf<TValue>)[];
     readonly $nin?: readonly (TValue | ElementOf<TValue>)[];
     readonly $exists?: boolean;
     readonly $not?: FilterOperators<TValue>;
-} & ComparisonOperators<TValue>;
+} & ComparisonOperators<TValue> & ArrayOperators<TValue>;
 
 // @public
 export type FilterPaths<TDocument, TDepth extends readonly unknown[] = []> = TDepth["length"] extends MaxPathDepth ? never : TDocument extends object ? {
-    [Key in keyof TDocument & string]: Key | (NonNullable<TDocument[Key]> extends readonly unknown[] | AtomicValue ? never : NonNullable<TDocument[Key]> extends object ? `${Key}.${FilterPaths<NonNullable<TDocument[Key]>, [...TDepth, unknown]>}` : never);
+    [Key in keyof TDocument & string]: Key | (PathChild<TDocument[Key]> extends readonly unknown[] | AtomicValue ? never : PathChild<TDocument[Key]> extends object ? `${Key}.${FilterPaths<PathChild<TDocument[Key]>, [...TDepth, unknown]>}` : never);
 }[keyof TDocument & string] : never;
 
 // @public
-export type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? THead extends keyof TDocument ? FilterPathValue<NonNullable<TDocument[THead]>, TRest> : never : never;
+export type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? THead extends keyof TDocument ? FilterPathValue<PathChild<TDocument[THead]>, TRest> : never : never;
 
 // @public
 export class FindCursor<TDocument extends object = Document> implements AsyncIterable<WithId<TDocument>> {
@@ -139,7 +157,7 @@ export interface FindQueryOptions {
 }
 
 // @public
-export type IndexablePath<TDocument extends object> = Exclude<FilterPaths<TDocument>, "_id" | `_id.${string}`>;
+export type IndexablePath<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>;
 
 // @beta
 export interface IndexBoundInfo {
@@ -210,6 +228,9 @@ export interface ParsedSinterConnectionString {
     readonly host: string;
     readonly port: number;
 }
+
+// @public
+export type PathChild<TValue> = NonNullable<ElementOf<NonNullable<TValue>>>;
 
 // @public
 export type PathsMatching<TDocument extends object, TKind> = {
@@ -422,7 +443,7 @@ export class SinterSocketTimeoutError extends SinterConnectionError {
 
 // @public
 export type Sort<TDocument extends object> = readonly (readonly [
-path: FilterPaths<TDocument> | "_id",
+path: FieldPaths<TDocument> | "_id",
 direction: SortDirection
 ])[];
 
@@ -463,7 +484,7 @@ export interface UpdateOptions {
 }
 
 // @public
-export type UpdatePaths<TDocument extends object> = Exclude<FilterPaths<TDocument>, "_id" | `_id.${string}`>;
+export type UpdatePaths<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>;
 
 // @public
 export interface UpdateResult {

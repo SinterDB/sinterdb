@@ -3,7 +3,7 @@ import type { CustomId } from "sinterdb-protocol";
 import type {
   ComparableValue,
   ElementOf,
-  FilterPaths,
+  FieldPaths,
   FilterPathValue,
 } from "./filter.js";
 
@@ -12,7 +12,7 @@ import type {
  * immutable.
  */
 export type UpdatePaths<TDocument extends object> = Exclude<
-  FilterPaths<TDocument>,
+  FieldPaths<TDocument>,
   "_id" | `_id.${string}`
 >;
 

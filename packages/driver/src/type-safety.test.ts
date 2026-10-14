@@ -25,6 +25,71 @@ interface User {
   profile: { bio: string; stats: { level: number; badges: string[] } };
 }
 
+interface Order {
+  _id: CustomId;
+  tags: string[];
+  scores: number[];
+  items: { sku: string; qty: number; options: { color: string }[] }[];
+  note?: string;
+}
+
+describe("Filter<TDocument> types for arrays", () => {
+  it("accepts element matches, array operators, and paths through arrays", () => {
+    const filters: Filter<Order>[] = [
+      { tags: "db" },
+      { tags: ["db", "fast"] },
+      { tags: { $eq: "db" } },
+      { tags: { $ne: "db" } },
+      { scores: { $gt: 90 } },
+      { scores: { $gte: 1, $lt: 5 } },
+      { tags: { $size: 2 } },
+      { scores: { $elemMatch: { $gt: 1, $lt: 5 } } },
+      { items: { $elemMatch: { sku: "a", qty: { $gt: 1 } } } },
+      { "items.sku": "a", "items.qty": { $gte: 2 } },
+      { "items.options.color": { $in: ["red"] } },
+      { items: { $elemMatch: { options: { $elemMatch: { color: "red" } } } } },
+    ];
+
+    expect(filters).toHaveLength(12);
+  });
+
+  it("rejects what arrays cannot do", () => {
+    // @ts-expect-error $size is only for arrays
+    const sizeOnScalar: Filter<Order> = { note: { $size: 1 } };
+    // @ts-expect-error $elemMatch is only for arrays
+    const elemMatchOnScalar: Filter<Order> = { note: { $elemMatch: {} } };
+    // @ts-expect-error an element of a number array is a number
+    const wrongElement: Filter<Order> = { scores: "high" };
+    // @ts-expect-error range operators take the element type
+    const wrongRange: Filter<Order> = { scores: { $gt: "1" } };
+    // @ts-expect-error $elemMatch filters use the element's fields
+    const wrongField: Filter<Order> = { items: { $elemMatch: { nope: 1 } } };
+    // @ts-expect-error a path through an array reads the element's field type
+    const wrongPathValue: Filter<Order> = { "items.qty": "many" };
+    // @ts-expect-error unknown field behind an array
+    const unknownBehindArray: Filter<Order> = { "items.nope": 1 };
+
+    expect([
+      sizeOnScalar,
+      elemMatchOnScalar,
+      wrongElement,
+      wrongRange,
+      wrongField,
+      wrongPathValue,
+      unknownBehindArray,
+    ]).toHaveLength(7);
+  });
+
+  it("does not offer paths through arrays for sorting", () => {
+    const sorts: Sort<Order>[] = [[["note", 1]], [["_id", -1]]];
+    // @ts-expect-error sorting treats a path through an array as missing
+    const throughArray: Sort<Order> = [["items.sku", 1]];
+
+    expect(sorts).toHaveLength(2);
+    expect(throughArray).toHaveLength(1);
+  });
+});
+
 describe("Filter<TDocument> types", () => {
   it("accepts valid filters", () => {
     const filters: Filter<User>[] = [

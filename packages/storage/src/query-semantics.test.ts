@@ -44,7 +44,7 @@ describe("the examples in docs/query-semantics.md", () => {
   }));
 
   it("has examples to run", () => {
-    expect(rows.length).toBeGreaterThanOrEqual(30);
+    expect(rows.length).toBeGreaterThanOrEqual(55);
   });
 
   it.each(rows.map((row) => [JSON.stringify(row), row] as const))(
@@ -314,5 +314,123 @@ describe("indexes agree with scans", () => {
 
       expect(ids(indexed), JSON.stringify(filter)).toEqual(ids(plain));
     }
+  });
+});
+
+describe("array operators", () => {
+  function invalid(filter: Document): void {
+    expect(() => compileFilter(filter)).toThrow(
+      expect.objectContaining({ code: StorageErrorCode.InvalidFilter }),
+    );
+  }
+
+  it("rejects a $size that is not a non-negative integer", () => {
+    for (const size of [-1, 1.5, Number.NaN, Infinity, "2", null, [2]]) {
+      invalid({ a: { $size: size as DocumentValue } });
+    }
+  });
+
+  it("rejects an $elemMatch that is not a document", () => {
+    for (const operand of [1, "x", null, [1], true]) {
+      invalid({ a: { $elemMatch: operand as DocumentValue } });
+    }
+  });
+
+  it("rejects a bad operator inside $elemMatch", () => {
+    invalid({ a: { $elemMatch: { $gt: 1, $bad: 2 } } });
+    invalid({ a: { $elemMatch: { $gt: 1, b: 2 } } });
+    invalid({ a: { $elemMatch: { $gt: null } } });
+  });
+
+  it("nests $elemMatch", () => {
+    const filter = { a: { $elemMatch: { b: { $elemMatch: { $gt: 5 } } } } };
+
+    expect(matches(filter, { a: [{ b: [1, 9] }] })).toBe(true);
+    expect(matches(filter, { a: [{ b: [1, 2] }] })).toBe(false);
+    expect(matches(filter, { a: [{ b: 9 }] })).toBe(false);
+  });
+
+  it("combines logical operators inside an $elemMatch filter", () => {
+    const filter = {
+      a: { $elemMatch: { $or: [{ b: 1 }, { c: { $gt: 5 } }] } },
+    };
+
+    expect(matches(filter, { a: [{ b: 2 }, { c: 9 }] })).toBe(true);
+    expect(matches(filter, { a: [{ b: 2 }, { c: 3 }] })).toBe(false);
+  });
+
+  it("ignores elements that are not documents in an $elemMatch filter", () => {
+    expect(
+      matches({ a: { $elemMatch: { b: 1 } } }, { a: [1, "x", null] }),
+    ).toBe(false);
+  });
+
+  it("never matches $elemMatch or $size on a missing field", () => {
+    expect(matches({ a: { $elemMatch: { $gt: 1 } } }, {})).toBe(false);
+    expect(matches({ a: { $size: 0 } }, {})).toBe(false);
+    expect(matches({ a: { $not: { $size: 0 } } }, {})).toBe(true);
+  });
+
+  it("selects an element by position without searching the others", () => {
+    expect(matches({ "a.0": 1 }, { a: [1, 2] })).toBe(true);
+    expect(matches({ "a.0": 2 }, { a: [1, 2] })).toBe(false);
+    expect(matches({ "a.0.b": 1 }, { a: [{ b: 1 }, { b: 2 }] })).toBe(true);
+    expect(matches({ "a.0.b": 2 }, { a: [{ b: 1 }, { b: 2 }] })).toBe(false);
+  });
+
+  it("reads a numeric field name from a document", () => {
+    expect(matches({ "a.0": 1 }, { a: { "0": 1 } })).toBe(true);
+  });
+
+  it("collects the values of every element for a path through an array", () => {
+    const document = { a: [{ b: 1 }, { b: 5 }, { c: 9 }] };
+
+    expect(matches({ "a.b": { $gt: 4 } }, document)).toBe(true);
+    expect(matches({ "a.b": { $gt: 9 } }, document)).toBe(false);
+    expect(matches({ "a.b": { $in: [5] } }, document)).toBe(true);
+    expect(matches({ "a.b": { $ne: 1 } }, document)).toBe(false);
+    expect(matches({ "a.c": { $exists: true } }, document)).toBe(true);
+    expect(matches({ "a.d": { $exists: false } }, document)).toBe(true);
+  });
+
+  it("searches one level of an array, not nested arrays", () => {
+    expect(matches({ a: 1 }, { a: [[1, 2]] })).toBe(false);
+    expect(matches({ a: [1, 2] }, { a: [[1, 2]] })).toBe(true);
+    expect(matches({ a: { $gt: 0 } }, { a: [[1, 2]] })).toBe(false);
+  });
+
+  it("finds documents through a collection", () => {
+    const collection = new InMemoryCollection();
+
+    collection.insertMany([
+      { n: 1, tags: ["a", "b"], items: [{ sku: "x", qty: 1 }] },
+      {
+        n: 2,
+        tags: ["b"],
+        items: [
+          { sku: "x", qty: 5 },
+          { sku: "y", qty: 1 },
+        ],
+      },
+      { n: 3, tags: [], items: [] },
+      { n: 4 },
+    ]);
+
+    const find = (filter: Document): unknown[] =>
+      [...collection.find(filter, { sort: [["n", 1]] })].map(
+        (document) => document["n"],
+      );
+
+    expect(find({ tags: "b" })).toEqual([1, 2]);
+    expect(find({ tags: { $ne: "a" } })).toEqual([2, 3, 4]);
+    expect(find({ tags: { $size: 0 } })).toEqual([3]);
+    expect(find({ "items.sku": "y" })).toEqual([2]);
+    expect(
+      find({ items: { $elemMatch: { sku: "x", qty: { $gt: 2 } } } }),
+    ).toEqual([2]);
+    expect(find({ "items.qty": { $gt: 2 }, "items.sku": "y" })).toEqual([2]);
+    expect(
+      find({ items: { $elemMatch: { sku: "y", qty: { $gt: 2 } } } }),
+    ).toEqual([]);
   });
 });

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 657,
+  id: 669,
   name: "Sort",
   kind: "type-alias",
   label: "Type Alias",
@@ -27,7 +27,7 @@ const page: ApiPage = {
     ["[", "pn"],
     ["path", "param"],
     [": ", "pn"],
-    ["FilterPaths", "ref", "/docs/api/types/FilterPaths"],
+    ["FieldPaths", "ref", "/docs/api/types/FieldPaths"],
     ["<", "pn"],
     ["TDocument", "tp"],
     ["> | ", "pn"],
@@ -72,8 +72,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 124,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L124",
+      line: 189,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L189",
     },
   ],
   usedBy: [

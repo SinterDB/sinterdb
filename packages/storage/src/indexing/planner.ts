@@ -233,6 +233,12 @@ function planId(constraints: Constraint[] | undefined): QueryPlan | undefined {
 function planIndex(index: FieldIndex, constraints: Constraint[]): QueryPlan[] {
   const plans: QueryPlan[] = [];
 
+  // A query matches an array by its elements, and an index holds the array as
+  // one entry, so the index cannot be trusted once any document has an array.
+  if (index.hasArrayValues) {
+    return plans;
+  }
+
   for (const constraint of constraints) {
     if (constraint.kind === "equal") {
       plans.push({
@@ -242,7 +248,7 @@ function planIndex(index: FieldIndex, constraints: Constraint[]): QueryPlan[] {
         viaMembership: false,
         estimated: index.estimateEqual(constraint.value),
       });
-    } else if (constraint.kind === "in" && !index.hasArrayValues) {
+    } else if (constraint.kind === "in") {
       const distinct = new Map<string, DocumentValue>();
 
       for (const value of constraint.values) {

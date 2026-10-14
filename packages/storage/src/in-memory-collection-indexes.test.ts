@@ -249,7 +249,7 @@ describe("query planning", () => {
     ).toMatchObject({ stage: "IXSCAN", access: "in", estimatedCandidates: 2 });
   });
 
-  it("does not use an index for $in once an array value is indexed", () => {
+  it("does not use an index once an array value is indexed", () => {
     const collection = new InMemoryCollection();
 
     collection.insertMany(
@@ -263,7 +263,31 @@ describe("query planning", () => {
 
     expect(collection.explain({ tag: { $in: ["t1"] } }).stage).toBe("COLLSCAN");
     expect([...collection.find({ tag: { $in: ["t2"] } })]).toHaveLength(2);
+    expect(collection.explain({ tag: "t1" }).stage).toBe("COLLSCAN");
+    expect([...collection.find({ tag: "t1" })]).toHaveLength(2);
+    expect(collection.explain({ tag: { $gt: "t1" } }).stage).toBe("COLLSCAN");
+
+    collection.deleteOne({ tag: ["t1", "t2"] });
+
     expect(collection.explain({ tag: "t1" }).stage).toBe("IXSCAN");
+  });
+
+  it("does not use an index on a path that runs through an array", () => {
+    const collection = new InMemoryCollection();
+
+    collection.insertMany(
+      Array.from({ length: 10 }, (_, index) => ({
+        item: { sku: `s${index}` },
+      })),
+    );
+    collection.createIndex({ field: "item.sku" });
+
+    expect(collection.explain({ "item.sku": "s1" }).stage).toBe("IXSCAN");
+
+    collection.insertOne({ item: [{ sku: "s1" }, { sku: "s2" }] });
+
+    expect(collection.explain({ "item.sku": "s1" }).stage).toBe("COLLSCAN");
+    expect([...collection.find({ "item.sku": "s2" })]).toHaveLength(2);
   });
 
   it("uses the _id index for _id lookups", () => {
@@ -468,7 +492,7 @@ describe("indexed queries return what a scan returns", () => {
     valid(indexed);
   });
 
-  it("matches whole-value equality for arrays and documents", () => {
+  it("matches whole values, and array elements, the way a scan does", () => {
     const collection = new InMemoryCollection();
 
     collection.insertMany([
@@ -484,7 +508,7 @@ describe("indexed queries return what a scan returns", () => {
     expect([...collection.find({ v: [1, 2] })]).toHaveLength(1);
     expect([...collection.find({ v: { a: 1 } })]).toHaveLength(1);
     expect([...collection.find({ v: null })]).toHaveLength(1);
-    expect([...collection.find({ v: 1 })]).toHaveLength(1);
+    expect([...collection.find({ v: 1 })]).toHaveLength(3);
   });
 });
 

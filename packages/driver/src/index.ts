@@ -58,15 +58,19 @@ export {
 export type { SinterServerErrorOptions } from "./errors.js";
 
 export type {
+  ArrayOperators,
   AtomicValue,
   ComparableValue,
   ComparisonOperators,
+  ElementMatch,
   ElementOf,
+  FieldPaths,
   Filter,
   FilterOperators,
   FilterPaths,
   FilterPathValue,
   MaxPathDepth,
+  PathChild,
   Sort,
   SortDirection,
 } from "./filter.js";

@@ -113,10 +113,12 @@ knows, such as the name length, come back as a `SinterServerError`.
 ## Queries
 
 Supported filter operators: `$eq`, `$ne`, `$in`, `$nin`, `$exists`, `$not`,
-`$gt`, `$gte`, `$lt`, `$lte`, `$and`, `$or`, and `$nor`.
+`$gt`, `$gte`, `$lt`, `$lte`, `$elemMatch`, `$size`, `$and`, `$or`, and `$nor`.
+How they compare values, and how they treat arrays, is in
+[query-semantics.md](./query-semantics.md).
 
-Not supported, and rejected with `DocumentValidationFailed`: `$regex`,
-`$elemMatch`, `$size`, `$all`, `$type`, `$mod`, `$expr`, `$text`, and `$where`.
+Not supported, and rejected with `DocumentValidationFailed`: `$regex`, `$all`,
+`$type`, `$mod`, `$expr`, `$text`, and `$where`.
 
 Also missing:
 

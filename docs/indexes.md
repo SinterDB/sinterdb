@@ -82,9 +82,12 @@ How matching works (the full comparison rules are in
 - **Ranges compare values of the same kind.** `{ $gt: 5 }` matches numbers,
   `{ $gt: "a" }` matches strings. A range never matches a value of another kind,
   and mixing kinds in one range uses a scan.
-- **`$in` and arrays.** `$in` also matches array elements, which indexes do not
-  hold, so once any indexed document has an array in the field, `$in` on that
-  field falls back to a scan. Plain equality is unaffected.
+- **Arrays turn an index off.** A filter matches an array by its elements, and
+  an index holds each document's array as one entry. So once any indexed
+  document has an array in the field, or an array on the way to it (as in
+  `items.sku` when `items` is an array), queries on that field scan the
+  collection instead. Deleting or changing those documents turns the index
+  back on. An index on an array field is not useful today.
 - **One index per query.** The server picks the candidate with the fewest
   expected documents and uses it only if that is fewer than the collection
   holds. An index on a field where every document has the same value is not

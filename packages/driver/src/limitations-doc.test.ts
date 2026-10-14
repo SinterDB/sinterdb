@@ -49,8 +49,6 @@ async function serverError(
 describe("docs/limitations.md: queries", () => {
   const unsupportedFilters = [
     "$regex",
-    "$elemMatch",
-    "$size",
     "$all",
     "$type",
     "$mod",
@@ -85,7 +83,7 @@ describe("docs/limitations.md: queries", () => {
       ...(section.split("\n\n")[0] ?? "").matchAll(/`(\$[a-zA-Z]+)`/g),
     ];
 
-    expect(listed.length).toBeGreaterThanOrEqual(13);
+    expect(listed.length).toBeGreaterThanOrEqual(15);
 
     await inDatabase(async (client) => {
       const items = client.db().collection<Record<string, unknown>>("items");
@@ -102,7 +100,9 @@ describe("docs/limitations.md: queries", () => {
                 ? { n: { [operator as string]: [1] } }
                 : operator === "$exists"
                   ? { n: { $exists: true } }
-                  : { n: { [operator as string]: 1 } };
+                  : operator === "$elemMatch"
+                    ? { n: { $elemMatch: { $gt: 0 } } }
+                    : { n: { [operator as string]: 1 } };
 
         await expect(
           items.find(filter as never).toArray(),

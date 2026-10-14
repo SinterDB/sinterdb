@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 623,
+  id: 628,
   name: "AtomicValue",
   kind: "type-alias",
   label: "Type Alias",
@@ -52,6 +52,16 @@ const page: ApiPage = {
     },
   ],
   usedBy: [
+    {
+      name: "ElementMatch",
+      href: "/docs/api/types/ElementMatch",
+      kind: "type-alias",
+    },
+    {
+      name: "FieldPaths",
+      href: "/docs/api/types/FieldPaths",
+      kind: "type-alias",
+    },
     {
       name: "FilterPaths",
       href: "/docs/api/types/FilterPaths",

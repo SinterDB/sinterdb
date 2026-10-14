@@ -155,7 +155,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 700,
+        id: 712,
         name: "SinterNamespaceError",
         href: "/docs/api/classes/SinterNamespaceError",
         kind: "class",
@@ -215,7 +215,7 @@ const groups: readonly ApiIndexGroup[] = [
     title: "Interfaces",
     items: [
       {
-        id: 660,
+        id: 672,
         name: "CreateIndexResult",
         href: "/docs/api/interfaces/CreateIndexResult",
         kind: "interface",
@@ -226,7 +226,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 723,
+        id: 735,
         name: "DeleteResult",
         href: "/docs/api/interfaces/DeleteResult",
         kind: "interface",
@@ -246,7 +246,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 664,
+        id: 676,
         name: "ExplainResult",
         href: "/docs/api/interfaces/ExplainResult",
         kind: "interface",
@@ -279,7 +279,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 675,
+        id: 687,
         name: "IndexBoundInfo",
         href: "/docs/api/interfaces/IndexBoundInfo",
         kind: "interface",
@@ -290,7 +290,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 678,
+        id: 690,
         name: "IndexDefinition",
         href: "/docs/api/interfaces/IndexDefinition",
         kind: "interface",
@@ -301,7 +301,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 685,
+        id: 697,
         name: "IndexInfo",
         href: "/docs/api/interfaces/IndexInfo",
         kind: "interface",
@@ -312,7 +312,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 691,
+        id: 703,
         name: "IndexIssue",
         href: "/docs/api/interfaces/IndexIssue",
         kind: "interface",
@@ -323,7 +323,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 695,
+        id: 707,
         name: "IndexValidationResult",
         href: "/docs/api/interfaces/IndexValidationResult",
         kind: "interface",
@@ -421,7 +421,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 742,
+        id: 754,
         name: "UpdateOptions",
         href: "/docs/api/interfaces/UpdateOptions",
         kind: "interface",
@@ -431,7 +431,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 746,
+        id: 758,
         name: "UpdateResult",
         href: "/docs/api/interfaces/UpdateResult",
         kind: "interface",
@@ -447,7 +447,18 @@ const groups: readonly ApiIndexGroup[] = [
     title: "Type Aliases",
     items: [
       {
-        id: 719,
+        id: 623,
+        name: "ArrayOperators",
+        href: "/docs/api/types/ArrayOperators",
+        kind: "type-alias",
+        label: "Type Alias",
+        short:
+          "What a filter can say about the elements of an array: <code>$size</code> and <code>$elemMatch</code>. They are available only when the value type is an array.",
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 731,
         name: "ArrayPaths",
         href: "/docs/api/types/ArrayPaths",
         kind: "type-alias",
@@ -458,7 +469,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 623,
+        id: 628,
         name: "AtomicValue",
         href: "/docs/api/types/AtomicValue",
         kind: "type-alias",
@@ -469,7 +480,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 721,
+        id: 733,
         name: "ComparablePaths",
         href: "/docs/api/types/ComparablePaths",
         kind: "type-alias",
@@ -480,7 +491,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 624,
+        id: 629,
         name: "ComparableValue",
         href: "/docs/api/types/ComparableValue",
         kind: "type-alias",
@@ -491,7 +502,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 625,
+        id: 630,
         name: "ComparisonOperators",
         href: "/docs/api/types/ComparisonOperators",
         kind: "type-alias",
@@ -513,7 +524,18 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 632,
+        id: 637,
+        name: "ElementMatch",
+        href: "/docs/api/types/ElementMatch",
+        kind: "type-alias",
+        label: "Type Alias",
+        short:
+          "What <code>$elemMatch</code> accepts for an array whose elements have this type.",
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 639,
         name: "ElementOf",
         href: "/docs/api/types/ElementOf",
         kind: "type-alias",
@@ -534,7 +556,18 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 634,
+        id: 641,
+        name: "FieldPaths",
+        href: "/docs/api/types/FieldPaths",
+        kind: "type-alias",
+        label: "Type Alias",
+        short:
+          'Every dotted field path that names a single field: like <a href="/docs/api/types/FilterPaths">FilterPaths</a>, but a path never runs through an array. Sorting, updates, and indexes use these paths, because they treat a path through an array as missing or do not support it.',
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 644,
         name: "Filter",
         href: "/docs/api/types/Filter",
         kind: "type-alias",
@@ -545,39 +578,40 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 641,
+        id: 651,
         name: "FilterOperators",
         href: "/docs/api/types/FilterOperators",
         kind: "type-alias",
         label: "Type Alias",
         short:
-          "The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>, <code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values.",
+          "The operators that can be applied to a single field: <code>$eq</code>, <code>$ne</code>, <code>$in</code>, <code>$nin</code>, <code>$exists</code>, <code>$not</code>, plus the range operators for comparable values and <code>$size</code> and <code>$elemMatch</code> for arrays.",
         deprecated: false,
         since: null,
       },
       {
-        id: 650,
+        id: 660,
         name: "FilterPaths",
         href: "/docs/api/types/FilterPaths",
         kind: "type-alias",
         label: "Type Alias",
         short:
-          "Every dotted field path of a document type, such as <code>profile.name</code>. Arrays and atomic values end a path.",
+          "Every dotted field path of a document type, such as <code>profile.name</code>, or <code>items.sku</code> for an array of documents. Atomic values and arrays of atomic values end a path.",
         deprecated: false,
         since: null,
       },
       {
-        id: 653,
+        id: 663,
         name: "FilterPathValue",
         href: "/docs/api/types/FilterPathValue",
         kind: "type-alias",
         label: "Type Alias",
-        short: "The type of the value at a dotted field path.",
+        short:
+          "The type of the value at a dotted field path. A path through an array reads the type of the elements.",
         deprecated: false,
         since: null,
       },
       {
-        id: 673,
+        id: 685,
         name: "IndexablePath",
         href: "/docs/api/types/IndexablePath",
         kind: "type-alias",
@@ -588,7 +622,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 656,
+        id: 666,
         name: "MaxPathDepth",
         href: "/docs/api/types/MaxPathDepth",
         kind: "type-alias",
@@ -599,7 +633,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 726,
+        id: 738,
         name: "NumericPaths",
         href: "/docs/api/types/NumericPaths",
         kind: "type-alias",
@@ -621,7 +655,18 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 728,
+        id: 667,
+        name: "PathChild",
+        href: "/docs/api/types/PathChild",
+        kind: "type-alias",
+        label: "Type Alias",
+        short:
+          "What a dotted path steps into: the value itself, or the elements of an array. <code>items.sku</code> is a valid path when <code>items</code> is an array of documents.",
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 740,
         name: "PathsMatching",
         href: "/docs/api/types/PathsMatching",
         kind: "type-alias",
@@ -654,7 +699,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 657,
+        id: 669,
         name: "Sort",
         href: "/docs/api/types/Sort",
         kind: "type-alias",
@@ -665,7 +710,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 659,
+        id: 671,
         name: "SortDirection",
         href: "/docs/api/types/SortDirection",
         kind: "type-alias",
@@ -676,7 +721,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 731,
+        id: 743,
         name: "UpdateFilter",
         href: "/docs/api/types/UpdateFilter",
         kind: "type-alias",
@@ -687,7 +732,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 744,
+        id: 756,
         name: "UpdatePaths",
         href: "/docs/api/types/UpdatePaths",
         kind: "type-alias",

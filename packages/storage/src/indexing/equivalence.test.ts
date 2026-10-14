@@ -89,7 +89,14 @@ class Generator {
     }
 
     if (this.int(8) !== 0) {
-      document["n"] = this.int(4) === 0 ? 5 : { x: this.scalar() };
+      const roll = this.int(8);
+
+      document["n"] =
+        roll === 0
+          ? 5
+          : roll === 1
+            ? [{ x: this.scalar() }, { x: this.scalar() }]
+            : { x: this.scalar() };
     }
 
     document["pad"] = this.int(3);

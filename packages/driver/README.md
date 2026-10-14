@@ -242,7 +242,26 @@ bigints, strings, binary values, `CustomId`, booleans, then dates.
 | `$in`, `$nin`                | Membership, including array items |
 | `$exists`                    | Field presence                    |
 | `$not`                       | Negates a field operator document |
+| `$size`                      | An array with exactly this length |
+| `$elemMatch`                 | One array element meets all of it |
 | `$and`, `$or`, `$nor`        | Logical combination of filters    |
+
+A filter on a field that holds an array matches the array's elements:
+`{ tags: "db" }` matches `{ tags: ["db", "fast"] }`, and `{ scores: { $gt: 90 } }`
+matches when any element is above 90. A dotted path steps through arrays of
+documents (`"items.sku"`) or picks an element by position (`"items.0"`, which
+TypeScript does not check). Use `$elemMatch` when one element has to satisfy
+several conditions:
+
+```ts
+await orders
+  .find({
+    items: { $elemMatch: { sku: "a", qty: { $gt: 1 } } },
+  })
+  .toArray();
+```
+
+The exact rules are in [query semantics](../../docs/query-semantics.md).
 
 ## Update
 

@@ -22,7 +22,12 @@ export type ResolvedField =
       readonly found: false;
     };
 
-type FieldPredicate = (field: ResolvedField) => boolean;
+/**
+ * A test of one field. It receives every value the field path reaches in the
+ * document: none when the field is missing, one for an ordinary path, and one
+ * per element when the path runs through an array of documents.
+ */
+type FieldPredicate = (values: readonly DocumentValue[]) => boolean;
 
 type ComparisonOperator = "$gt" | "$gte" | "$lt" | "$lte";
 
@@ -152,6 +157,12 @@ function compileOperatorDocument(
       case "$not":
         return compileNotPredicate(path, operand);
 
+      case "$elemMatch":
+        return compileElementMatchPredicate(path, operand);
+
+      case "$size":
+        return compileSizePredicate(path, operand);
+
       default:
         throw invalidFilter(
           `Filter field ${JSON.stringify(path)} uses unsupported operator ${JSON.stringify(name)}.`,
@@ -163,25 +174,14 @@ function compileOperatorDocument(
 function compileEqualityPredicate(expected: DocumentValue): FieldPredicate {
   const encodedExpected = encodeDocumentValue(expected);
 
-  return (field) => {
-    if (!field.found) {
-      return false;
-    }
-
-    return canonicalEquals(field.value, encodedExpected);
-  };
+  return (values) =>
+    anyMatch(values, (value) => canonicalEquals(value, encodedExpected));
 }
 
 function compileInequalityPredicate(expected: DocumentValue): FieldPredicate {
-  const encodedExpected = encodeDocumentValue(expected);
+  const equals = compileEqualityPredicate(expected);
 
-  return (field) => {
-    if (!field.found) {
-      return true;
-    }
-
-    return !canonicalEquals(field.value, encodedExpected);
-  };
+  return (values) => !equals(values);
 }
 
 function compileComparisonPredicate(
@@ -194,31 +194,28 @@ function compileComparisonPredicate(
     );
   }
 
-  return (field) => {
-    if (!field.found) {
-      return false;
-    }
+  return (values) =>
+    anyMatch(values, (value) => {
+      const comparison = compareValues(value, expected);
 
-    const comparison = compareValues(field.value, expected);
+      if (comparison === undefined) {
+        return false;
+      }
 
-    if (comparison === undefined) {
-      return false;
-    }
+      switch (operator) {
+        case "$gt":
+          return comparison > 0;
 
-    switch (operator) {
-      case "$gt":
-        return comparison > 0;
+        case "$gte":
+          return comparison >= 0;
 
-      case "$gte":
-        return comparison >= 0;
+        case "$lt":
+          return comparison < 0;
 
-      case "$lt":
-        return comparison < 0;
-
-      case "$lte":
-        return comparison <= 0;
-    }
-  };
+        case "$lte":
+          return comparison <= 0;
+      }
+    });
 }
 
 function compileMembershipPredicate(
@@ -237,24 +234,10 @@ function compileMembershipPredicate(
     encodeDocumentValue(candidate),
   );
 
-  return (field) => {
-    if (!field.found) {
-      return negate;
-    }
-
-    const directMatch = encodedCandidates.some((candidate) =>
-      canonicalEquals(field.value, candidate),
+  return (values) => {
+    const matched = anyMatch(values, (value) =>
+      encodedCandidates.some((candidate) => canonicalEquals(value, candidate)),
     );
-
-    const elementMatch =
-      Array.isArray(field.value) &&
-      field.value.some((element) =>
-        encodedCandidates.some((candidate) =>
-          canonicalEquals(element, candidate),
-        ),
-      );
-
-    const matched = directMatch || elementMatch;
 
     return negate ? !matched : matched;
   };
@@ -270,7 +253,7 @@ function compileExistsPredicate(
     );
   }
 
-  return (field) => field.found === operand;
+  return (values) => values.length > 0 === operand;
 }
 
 function compileNotPredicate(
@@ -285,7 +268,100 @@ function compileNotPredicate(
 
   const predicates = compileOperatorDocument(path, operand);
 
-  return (field) => !predicates.every((predicate) => predicate(field));
+  return (values) => !predicates.every((predicate) => predicate(values));
+}
+
+const COMPARISON_OPERATORS: ReadonlySet<string> = new Set([
+  "$eq",
+  "$ne",
+  "$gt",
+  "$gte",
+  "$lt",
+  "$lte",
+  "$in",
+  "$nin",
+  "$exists",
+  "$not",
+  "$elemMatch",
+  "$size",
+]);
+
+/**
+ * `$elemMatch` takes either operators, which each element must satisfy as a
+ * value (`{ $gt: 5, $lt: 10 }`), or a filter, which each element that is a
+ * document must match (`{ price: { $gt: 5 }, qty: 1 }`). One element has to
+ * satisfy all of it.
+ */
+function compileElementMatchPredicate(
+  path: string,
+  operand: DocumentValue,
+): FieldPredicate {
+  if (!isPlainDocument(operand)) {
+    throw invalidFilter(
+      `Filter operator $elemMatch for field ${JSON.stringify(path)} requires a document.`,
+    );
+  }
+
+  const keys = Object.keys(operand);
+  let matchesElement: (element: DocumentValue) => boolean;
+
+  if (keys.length > 0 && keys.every((key) => COMPARISON_OPERATORS.has(key))) {
+    const predicates = compileOperatorDocument(path, operand);
+
+    matchesElement = (element) =>
+      predicates.every((predicate) => predicate([element]));
+  } else {
+    const matches = compileClauses(operand);
+
+    matchesElement = (element) => isPlainDocument(element) && matches(element);
+  }
+
+  return (values) =>
+    values.some(
+      (value) =>
+        Array.isArray(value) &&
+        value.some((element) => matchesElement(element as DocumentValue)),
+    );
+}
+
+function compileSizePredicate(
+  path: string,
+  operand: DocumentValue,
+): FieldPredicate {
+  if (
+    typeof operand !== "number" ||
+    !Number.isSafeInteger(operand) ||
+    operand < 0
+  ) {
+    throw invalidFilter(
+      `Filter operator $size for field ${JSON.stringify(path)} requires a non-negative integer.`,
+    );
+  }
+
+  return (values) =>
+    values.some((value) => Array.isArray(value) && value.length === operand);
+}
+
+/**
+ * Whether `test` holds for any of the values or, for a value that is an
+ * array, for any element of it. This is how a field that holds an array
+ * matches a single value, and how `$in` has always worked.
+ */
+function anyMatch(
+  values: readonly DocumentValue[],
+  test: (value: DocumentValue) => boolean,
+): boolean {
+  for (const value of values) {
+    if (test(value)) {
+      return true;
+    }
+
+    if (Array.isArray(value) && value.some((element) => test(element))) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function compileFieldPath(path: string): readonly string[] {
@@ -317,10 +393,10 @@ function matchesCompiledFilter(
   fields: readonly CompiledField[],
 ): boolean {
   for (const field of fields) {
-    const resolved = resolveField(document, field.segments);
+    const values = resolveFieldValues(document, field.segments);
 
     for (const predicate of field.predicates) {
-      if (!predicate(resolved)) {
+      if (!predicate(values)) {
         return false;
       }
     }
@@ -365,6 +441,76 @@ export function resolveField(
   return {
     found: false,
   };
+}
+
+const ARRAY_POSITION = /^(?:0|[1-9]\d*)$/;
+
+/**
+ * Every value a field path reaches. A path steps into a document by field
+ * name and into an array of documents by field name too (visiting each
+ * element), or by position when the segment is a number, as in `items.0`.
+ * The result is empty when the field is missing.
+ */
+export function resolveFieldValues(
+  document: Document,
+  segments: readonly string[],
+): DocumentValue[] {
+  return walkPath(document, segments).values;
+}
+
+/**
+ * Whether the path holds an array, or runs through one. An index cannot answer
+ * a query for such a document, because it stores one entry per document.
+ */
+export function pathTouchesArray(
+  document: Document,
+  segments: readonly string[],
+): boolean {
+  const { values, crossed } = walkPath(document, segments);
+
+  return crossed || values.some((value) => Array.isArray(value));
+}
+
+function walkPath(
+  document: Document,
+  segments: readonly string[],
+): { readonly values: DocumentValue[]; readonly crossed: boolean } {
+  let current: DocumentValue[] = [document];
+  let crossed = false;
+
+  for (const segment of segments) {
+    const next: DocumentValue[] = [];
+
+    for (const value of current) {
+      if (isPlainDocument(value)) {
+        if (Object.hasOwn(value, segment)) {
+          next.push(value[segment] as DocumentValue);
+        }
+      } else if (Array.isArray(value)) {
+        crossed = true;
+
+        if (ARRAY_POSITION.test(segment)) {
+          if (Number(segment) < value.length) {
+            next.push(value[Number(segment)] as DocumentValue);
+          }
+        } else {
+          for (const element of value) {
+            if (isPlainDocument(element) && Object.hasOwn(element, segment)) {
+              next.push(element[segment] as DocumentValue);
+            }
+          }
+        }
+      }
+    }
+
+    current = next;
+
+    if (current.length === 0) {
+      break;
+    }
+  }
+
+  return { values: current, crossed };
 }
 
 function canonicalEquals(

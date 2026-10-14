@@ -2124,6 +2124,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     since: null,
   },
   {
+    name: "ArrayOperators",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/ArrayOperators",
+    summary:
+      "What a filter can say about the elements of an array: $size and $elemMatch. They are available only when the value type is an array.",
+    code: "type ArrayOperators<TValue> = [Extract<TValue, readonly unknown[]>] extends [never] ? unknown : { readonly $elemMatch?: ElementMatch<ElementOf<Extract<TValue...",
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "ArrayPaths",
     parent: null,
     kind: "type-alias",
@@ -2173,7 +2184,7 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     href: "/docs/api/types/ComparisonOperators",
     summary:
       "The range operators $gt, $gte, $lt and $lte. They are available only when the value type includes a comparable type.",
-    code: "type ComparisonOperators<TValue> = [Extract<TValue, ComparableValue>] extends [never] ? unknown : { readonly $gt?: Extract<TValue, ComparableValue>; readonly...",
+    code: "type ComparisonOperators<TValue> = [Extract<ElementOf<TValue>, ComparableValue>] extends [never] ? unknown : { readonly $gt?: Extract<ElementOf<TValue>, Comp...",
     deprecated: false,
     since: null,
   },
@@ -2185,6 +2196,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     summary:
       "The function a FindCursor uses to reach the server. Cursors are created by SinterCollection.find; do not construct them directly.",
     code: "type CursorExecutor = (command: string, parameters: Document) => Promise<DocumentValue>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "ElementMatch",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/ElementMatch",
+    summary:
+      "What $elemMatch accepts for an array whose elements have this type.",
+    code: "type ElementMatch<TElement> = [Extract<TElement, AtomicValue>] extends [never] ? TElement extends object ? Filter<TElement> : never : FilterOperators<TElement>",
     deprecated: false,
     since: null,
   },
@@ -2210,13 +2232,24 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     since: null,
   },
   {
+    name: "FieldPaths",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/FieldPaths",
+    summary:
+      "Every dotted field path that names a single field: like FilterPaths, but a path never runs through an array. Sorting, updates, and indexes use these paths, because they treat a path through an array as missing or do not support it.",
+    code: 'type FieldPaths<TDocument, TDepth extends readonly unknown[] = []> = TDepth["length"] extends MaxPathDepth ? never : TDocument extends object ? { [Key in key...',
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "Filter",
     parent: null,
     kind: "type-alias",
     href: "/docs/api/types/Filter",
     summary:
       "A query filter: field paths mapped to a value or to operators, combined with $and, $or and $nor. An empty filter matches every document.",
-    code: "type Filter<TDocument extends object> = { readonly [Path in FilterPaths<TDocument>]?: | FilterPathValue<TDocument, Path> | FilterOperators<FilterPathValue<TD...",
+    code: "type Filter<TDocument extends object> = { readonly [Path in FilterPaths<TDocument>]?: | FilterPathValue<TDocument, Path> | ElementOf<FilterPathValue<TDocumen...",
     deprecated: false,
     since: null,
   },
@@ -2266,8 +2299,8 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     kind: "type-alias",
     href: "/docs/api/types/FilterOperators",
     summary:
-      "The operators that can be applied to a single field: $eq, $ne, $in, $nin, $exists, $not, plus the range operators for comparable values.",
-    code: "type FilterOperators<TValue> = { readonly $eq?: TValue; readonly $exists?: boolean; readonly $in?: readonly (TValue | ElementOf<TValue>)[]; readonly $ne?: TV...",
+      "The operators that can be applied to a single field: $eq, $ne, $in, $nin, $exists, $not, plus the range operators for comparable values and $size and $elemMatch for arrays.",
+    code: "type FilterOperators<TValue> = { readonly $eq?: TValue | ElementOf<TValue>; readonly $exists?: boolean; readonly $in?: readonly (TValue | ElementOf<TValue>)[...",
     deprecated: false,
     since: null,
   },
@@ -2276,8 +2309,9 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     parent: "FilterOperators",
     kind: "property",
     href: "/docs/api/types/FilterOperators#eq",
-    summary: "Equal to the value.",
-    code: "readonly $eq?: TValue",
+    summary:
+      "Equal to the value. For an array field, matches when any element equals it.",
+    code: "readonly $eq?: TValue | ElementOf<TValue>",
     deprecated: false,
     since: null,
   },
@@ -2307,8 +2341,9 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     parent: "FilterOperators",
     kind: "property",
     href: "/docs/api/types/FilterOperators#ne",
-    summary: "Not equal to the value.",
-    code: "readonly $ne?: TValue",
+    summary:
+      "Not equal to the value. For an array field, no element may equal it.",
+    code: "readonly $ne?: TValue | ElementOf<TValue>",
     deprecated: false,
     since: null,
   },
@@ -2317,7 +2352,8 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     parent: "FilterOperators",
     kind: "property",
     href: "/docs/api/types/FilterOperators#nin",
-    summary: "Equal to none of the listed values.",
+    summary:
+      "Equal to none of the listed values. For an array field, no element may equal one.",
     code: "readonly $nin?: readonly (TValue | ElementOf<TValue>)[]",
     deprecated: false,
     since: null,
@@ -2338,7 +2374,7 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     kind: "type-alias",
     href: "/docs/api/types/FilterPaths",
     summary:
-      "Every dotted field path of a document type, such as profile.name. Arrays and atomic values end a path.",
+      "Every dotted field path of a document type, such as profile.name, or items.sku for an array of documents. Atomic values and arrays of atomic values end a path.",
     code: 'type FilterPaths<TDocument, TDepth extends readonly unknown[] = []> = TDepth["length"] extends MaxPathDepth ? never : TDocument extends object ? { [Key in ke...',
     deprecated: false,
     since: null,
@@ -2348,7 +2384,8 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     parent: null,
     kind: "type-alias",
     href: "/docs/api/types/FilterPathValue",
-    summary: "The type of the value at a dotted field path.",
+    summary:
+      "The type of the value at a dotted field path. A path through an array reads the type of the elements.",
     code: "type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? TH...",
     deprecated: false,
     since: null,
@@ -2360,7 +2397,7 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     href: "/docs/api/types/IndexablePath",
     summary:
       "Field paths that can be indexed: every known path except _id, which always has its own unique index.",
-    code: 'type IndexablePath<TDocument extends object> = Exclude<FilterPaths<TDocument>, "_id" | `_id.${string}`>',
+    code: 'type IndexablePath<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>',
     deprecated: false,
     since: null,
   },
@@ -2408,6 +2445,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     since: null,
   },
   {
+    name: "PathChild",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/PathChild",
+    summary:
+      "What a dotted path steps into: the value itself, or the elements of an array. items.sku is a valid path when items is an array of documents.",
+    code: "type PathChild<TValue> = NonNullable<ElementOf<NonNullable<TValue>>>",
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "PathsMatching",
     parent: null,
     kind: "type-alias",
@@ -2444,7 +2492,7 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     href: "/docs/api/types/Sort",
     summary:
       "A sort order: [path, direction] pairs, where earlier pairs take priority.",
-    code: 'type Sort<TDocument extends object> = readonly (readonly [path: FilterPaths<TDocument> | "_id", direction: SortDirection])[]',
+    code: 'type Sort<TDocument extends object> = readonly (readonly [path: FieldPaths<TDocument> | "_id", direction: SortDirection])[]',
     deprecated: false,
     since: null,
   },
@@ -2561,7 +2609,7 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     href: "/docs/api/types/UpdatePaths",
     summary:
       "The field paths an update can change: every path except _id, which is immutable.",
-    code: 'type UpdatePaths<TDocument extends object> = Exclude<FilterPaths<TDocument>, "_id" | `_id.${string}`>',
+    code: 'type UpdatePaths<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>',
     deprecated: false,
     since: null,
   },

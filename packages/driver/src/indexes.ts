@@ -1,14 +1,14 @@
 import type { Document, DocumentValue } from "sinterdb-protocol";
 
 import { SinterProtocolError } from "./errors.js";
-import type { FilterPaths } from "./filter.js";
+import type { FieldPaths } from "./filter.js";
 
 /**
  * Field paths that can be indexed: every known path except `_id`, which
  * always has its own unique index.
  */
 export type IndexablePath<TDocument extends object> = Exclude<
-  FilterPaths<TDocument>,
+  FieldPaths<TDocument>,
   "_id" | `_id.${string}`
 >;
 
