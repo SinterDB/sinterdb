@@ -106,7 +106,7 @@ knows, such as the name length, come back as a `SinterServerError`.
   it cannot be changed afterwards. Plain strings and numbers are not accepted
   as `_id`.
 - **Values are compared by their stored form.** `1` and `1n` are different,
-  and so are `0` and `-0`. See [indexes.md](./indexes.md).
+  and so are `0` and `-0`. See [query-semantics.md](./query-semantics.md).
 - The database does not validate documents against a schema. The type you give
   `collection<T>()` is checked by TypeScript only.
 

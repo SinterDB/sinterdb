@@ -73,7 +73,8 @@ returns, including the order, which is always insertion order.
 | `$or`, `$nor`, `$ne`, `$nin`, `$exists`, `$not` | No: a scan, with the filter still applied                    |
 | `sort`, `skip`, `limit`                         | Applied after the index narrows the candidates               |
 
-How matching works:
+How matching works (the full comparison rules are in
+[Query semantics](./query-semantics.md)):
 
 - **Equality is exact.** Values are compared by their stored form, so `1` and
   `1n` are different, `0` and `-0` are different, and an array or document only

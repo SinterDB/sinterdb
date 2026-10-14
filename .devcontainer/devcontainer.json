@@ -22,8 +22,12 @@
   "containerEnv": {
     "FORCE_COLOR": "1"
   },
-  "forwardPorts": [4721],
+  "forwardPorts": [3000, 4721],
   "portsAttributes": {
+    "3000": {
+      "label": "SinterDB Website",
+      "onAutoForward": "openBrowserOnce"
+    },
     "4721": {
       "label": "SinterDB Server",
       "onAutoForward": "notify"

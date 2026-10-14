@@ -399,7 +399,7 @@ export function compareValues(
       return undefined;
     }
 
-    return comparePrimitive(actual, expected);
+    return compareStrings(actual, expected);
   }
 
   if (typeof expected === "number") {
@@ -453,6 +453,22 @@ export function compareValues(
   return undefined;
 }
 
+export function compareStrings(left: string, right: string): number {
+  const length = Math.min(left.length, right.length);
+
+  for (let index = 0; index < length; index += 1) {
+    const difference =
+      foldSurrogate(left.charCodeAt(index)) -
+      foldSurrogate(right.charCodeAt(index));
+
+    if (difference !== 0) {
+      return difference < 0 ? -1 : 1;
+    }
+  }
+
+  return comparePrimitive(left.length, right.length);
+}
+
 function comparePrimitive(
   left: string | number | bigint,
   right: string | number | bigint,
@@ -485,6 +501,19 @@ function compareBytes(left: Uint8Array, right: Uint8Array): number {
   }
 
   return comparePrimitive(left.byteLength, right.byteLength);
+}
+
+/**
+ * Moves the surrogate code units (U+D800 to U+DFFF) above the rest of the
+ * range, so that comparing units gives the same answer as comparing code
+ * points.
+ */
+function foldSurrogate(unit: number): number {
+  if (unit >= 0xe000) {
+    return unit - 0x800;
+  }
+
+  return unit >= 0xd800 ? unit + 0x2000 : unit;
 }
 
 export function isOperatorDocument(value: DocumentValue): value is Document {

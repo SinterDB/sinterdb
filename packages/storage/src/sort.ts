@@ -1,6 +1,7 @@
 import { CustomId, type Document, type DocumentValue } from "sinterdb-protocol";
 
 import { StorageError, StorageErrorCode } from "./errors.js";
+import { compareStrings } from "./filter.js";
 
 export type SortDirection = 1 | -1;
 
@@ -191,7 +192,7 @@ function compareSortValues(left: SortValue, right: SortValue): number {
       return compareNumbers(a as number | bigint, b as number | bigint);
 
     case Rank.String:
-      return compareOrdered(a as string, b as string);
+      return compareStrings(a as string, b as string);
 
     case Rank.Boolean:
       return compareOrdered(Number(a as boolean), Number(b as boolean));
