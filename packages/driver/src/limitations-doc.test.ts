@@ -111,7 +111,7 @@ describe("docs/limitations.md: queries", () => {
     });
   });
 
-  it("has no projection, count, distinct or aggregation", async () => {
+  it("has no count, distinct or aggregation", async () => {
     await inDatabase(async (client) => {
       const items = client.db().collection("items");
       const names = Object.getOwnPropertyNames(Object.getPrototypeOf(items));
@@ -130,15 +130,6 @@ describe("docs/limitations.md: queries", () => {
       ]) {
         expect(names, missing).not.toContain(missing);
       }
-
-      // Every query returns whole documents.
-      await items.insertOne({ a: 1, b: 2 });
-
-      const found = await items
-        .find({}, { projection: { a: 1 } } as never)
-        .toArray();
-
-      expect(Object.keys(found[0] ?? {}).sort()).toEqual(["_id", "a", "b"]);
     });
   });
 

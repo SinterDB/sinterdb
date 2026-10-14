@@ -375,6 +375,7 @@ export class ServerSession {
       capabilities: [
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
+        ProtocolCapability.Projection,
       ],
     });
 

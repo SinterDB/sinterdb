@@ -101,9 +101,19 @@ const page: ApiPage = {
       kind: "constructor",
     },
     {
+      name: "FindOneOptions",
+      href: "/docs/api/interfaces/FindOneOptions",
+      kind: "interface",
+    },
+    {
       name: "FindOptions",
       href: "/docs/api/interfaces/FindOptions",
       kind: "interface",
+    },
+    {
+      name: "FindQueryOptions.projection",
+      href: "/docs/api/interfaces/FindQueryOptions#projection",
+      kind: "property",
     },
     {
       name: "IndexDefinition",

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 321,
+  id: 341,
   name: "FindQueryOptions",
   kind: "interface",
   label: "Interface",
@@ -35,7 +35,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 324,
+          id: 344,
           name: "limit",
           anchor: "limit",
           kind: "property",
@@ -68,7 +68,40 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 323,
+          id: 345,
+          name: "projection",
+          anchor: "projection",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["projection", "name"],
+            ["?: ", "pn"],
+            ["Document", "ref", "/docs/api/interfaces/Document"],
+          ],
+          comment: {
+            summary: "<p>Which fields to return.</p>",
+            short: "Which fields to return.",
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [],
+          sources: [
+            {
+              path: "packages/driver/src/cursor.ts",
+              line: 26,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L26",
+            },
+          ],
+        },
+        {
+          id: 343,
           name: "skip",
           anchor: "skip",
           kind: "property",
@@ -101,7 +134,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 322,
+          id: 342,
           name: "sort",
           anchor: "sort",
           kind: "property",
@@ -152,6 +185,12 @@ const page: ApiPage = {
         {
           anchor: "limit",
           name: "limit",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "projection",
+          name: "projection",
           kind: "property",
           deprecated: false,
         },

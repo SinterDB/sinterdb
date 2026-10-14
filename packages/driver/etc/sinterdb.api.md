@@ -130,21 +130,27 @@ export type FilterPaths<TDocument, TDepth extends readonly unknown[] = []> = TDe
 export type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? THead extends keyof TDocument ? FilterPathValue<PathChild<TDocument[THead]>, TRest> : never : never;
 
 // @public
-export class FindCursor<TDocument extends object = Document> implements AsyncIterable<WithId<TDocument>> {
-    [Symbol.asyncIterator](): AsyncGenerator<WithId<TDocument>, void, undefined>;
+export class FindCursor<TDocument extends object = Document, TResult extends object = WithId<TDocument>> implements AsyncIterable<TResult> {
+    [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined>;
     constructor(execute: CursorExecutor, collection: string, filter: Document, batchSize: number | undefined, query?: FindQueryOptions);
     close(): Promise<void>;
     // @beta
     explain(): Promise<ExplainResult>;
     hasNext(): Promise<boolean>;
-    next(): Promise<WithId<TDocument> | null>;
-    toArray(): Promise<WithId<TDocument>[]>;
+    next(): Promise<TResult | null>;
+    toArray(): Promise<TResult[]>;
 }
 
 // @public
-export interface FindOptions<TDocument extends object = Document> {
+export interface FindOneOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> {
+    readonly projection?: TProjection;
+}
+
+// @public
+export interface FindOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> {
     readonly batchSize?: number;
     readonly limit?: number;
+    readonly projection?: TProjection;
     readonly skip?: number;
     readonly sort?: Sort<TDocument>;
 }
@@ -152,6 +158,7 @@ export interface FindOptions<TDocument extends object = Document> {
 // @public
 export interface FindQueryOptions {
     readonly limit?: number;
+    readonly projection?: Document;
     readonly skip?: number;
     readonly sort?: readonly (readonly [string, SortDirection])[];
 }
@@ -239,6 +246,30 @@ export type PathsMatching<TDocument extends object, TKind> = {
     ] extends [TKind] ? Path : never;
 }[UpdatePaths<TDocument>];
 
+// Warning: (ae-forgotten-export) The symbol "UnknownPaths" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "IncludedPaths" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Flagged" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ExcludedPaths" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Simplify" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Drop" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "IdPart" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Keep" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ProjectedDocument<TDocument extends object, TProjection> = [
+TProjection
+] extends [undefined] ? WithId<TDocument> : [UnknownPaths<TProjection>] extends [never] ? [IncludedPaths<TProjection>] extends [never] ? [Flagged<TProjection, 1 | true>] extends [never] ? [ExcludedPaths<TProjection>] extends [never] ? [Flagged<TProjection, 0 | false>] extends [never] ? WithId<TDocument> : Simplify<Omit<TDocument, "_id">> : Simplify<Drop<Omit<TDocument, "_id">, ExcludedPaths<TProjection>> & IdPart<TProjection>> : {
+    readonly _id: CustomId;
+} : Simplify<Keep<Omit<TDocument, "_id">, IncludedPaths<TProjection>> & IdPart<TProjection>> : Partial<WithId<TDocument>>;
+
+// @public
+export type Projection<TDocument extends object> = {
+    readonly [Path in FilterPaths<TDocument> | "_id"]?: ProjectionFlag;
+};
+
+// @public
+export type ProjectionFlag = 0 | 1 | boolean;
+
 // @public
 export class SinterClient extends EventEmitter<SinterClientEvents> {
     constructor(connectionString: string, options?: SinterClientOptions);
@@ -306,8 +337,8 @@ export class SinterCollection<TDocument extends object = Document> {
     deleteOne(filter: Filter<TDocument>): Promise<DeleteResult>;
     protected readonly documentType: TDocument;
     dropIndex(name: string): Promise<void>;
-    find(filter?: Filter<TDocument>, options?: FindOptions<TDocument>): FindCursor<TDocument>;
-    findOne(filter?: Filter<TDocument>): Promise<WithId<TDocument> | null>;
+    find<const TProjection extends Projection<TDocument> | undefined = undefined>(filter?: Filter<TDocument>, options?: FindOptions<TDocument, TProjection>): FindCursor<TDocument, ProjectedDocument<TDocument, TProjection>>;
+    findOne<const TProjection extends Projection<TDocument> | undefined = undefined>(filter?: Filter<TDocument>, options?: FindOneOptions<TDocument, TProjection>): Promise<ProjectedDocument<TDocument, TProjection> | null>;
     indexes(): Promise<IndexInfo[]>;
     insertMany(documents: readonly OptionalId<TDocument>[]): Promise<InsertManyResult>;
     insertOne(document: OptionalId<TDocument>): Promise<InsertOneResult>;

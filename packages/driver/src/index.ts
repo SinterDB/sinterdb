@@ -24,12 +24,18 @@ export type {
 export { SinterCollection } from "./collection.js";
 export type {
   EqualityFilter,
+  FindOneOptions,
   FindOptions,
   InsertManyResult,
   InsertOneResult,
   OptionalId,
   WithId,
 } from "./collection.js";
+export type {
+  ProjectedDocument,
+  Projection,
+  ProjectionFlag,
+} from "./projection.js";
 
 export { DEFAULT_SINTERDB_PORT } from "./connection-string.js";
 export type { ParsedSinterConnectionString } from "./connection-string.js";

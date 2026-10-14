@@ -606,6 +606,11 @@ const page: ApiPage = {
       kind: "property",
     },
     {
+      name: "ProjectedDocument",
+      href: "/docs/api/types/ProjectedDocument",
+      kind: "type-alias",
+    },
+    {
       name: "SinterInsertManyError.constructor",
       href: "/docs/api/classes/SinterInsertManyError#constructor",
       kind: "constructor",

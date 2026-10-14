@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 280,
+  id: 298,
   name: "DEFAULT_SINTERDB_PORT",
   kind: "variable",
   label: "Variable",

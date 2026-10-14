@@ -233,6 +233,48 @@ const page = await users
 Values of different types sort in this order: missing, `null`, numbers and
 bigints, strings, binary values, `CustomId`, booleans, then dates.
 
+### Projection
+
+A projection chooses which fields come back. It works on `find()` and
+`findOne()`, and the type of the result follows it.
+
+```ts
+// Keep only these fields (and _id).
+const names = await users
+  .find({ active: true }, { projection: { name: 1, email: 1 } })
+  .toArray();
+// names[0]: { _id: CustomId; name: string; email?: string }
+
+// Leave _id out.
+const ages = await users.find({}, { projection: { age: 1, _id: 0 } }).toArray();
+// ages[0]: { age: number }
+
+// Keep everything except these fields.
+const safe = await users.findOne(
+  { name: "Ada" },
+  { projection: { passwordHash: 0 } },
+);
+
+// Nested paths, and paths through arrays of documents.
+await users.find({}, { projection: { "profile.bio": 1, "orders.sku": 1 } });
+```
+
+- Use `1` or `true` to include a field and `0` or `false` to exclude one.
+  Include and exclude cannot be mixed, except that `_id` may be excluded from an
+  inclusion projection.
+- `_id` is returned unless you set it to `0`.
+- The projection applies after `sort`, `skip`, and `limit`, so you can sort or
+  filter by a field you do not return.
+- Write the projection inline (or `as const`) so TypeScript can see which fields
+  are in the result. A projection held in a variable typed `Projection<T>` gives
+  every field as optional.
+- Positions such as `"orders.0"` are not supported in a projection.
+- A server older than 0.3.0 would ignore a projection and return whole
+  documents, so the driver throws `SinterCompatibilityError` instead of sending
+  one.
+
+The exact rules are in [query semantics](../../docs/query-semantics.md#projection).
+
 ### Filter operators
 
 | Operator                     | Meaning                           |

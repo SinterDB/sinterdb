@@ -13,6 +13,7 @@ describe("protocol message envelopes", () => {
     expect(ProtocolCapability).toEqual({
       TypedDocuments: "typed-documents",
       Streaming: "streaming",
+      Projection: "projection",
     });
   });
 

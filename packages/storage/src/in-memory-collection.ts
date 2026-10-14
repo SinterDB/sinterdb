@@ -25,6 +25,7 @@ import {
   type IndexSpec,
   type QueryPlan,
 } from "./indexing/index.js";
+import { compileProjection } from "./projection.js";
 import { compileSort, type SortSpecification } from "./sort.js";
 import {
   compileUpdate,
@@ -44,6 +45,15 @@ export interface StorageFindOptions {
   readonly sort?: SortSpecification;
   readonly skip?: number;
   readonly limit?: number;
+  /**
+   * Which fields the returned documents keep. Applied after sort, skip and
+   * limit, so queries can sort by fields that are not returned.
+   */
+  readonly projection?: Document;
+}
+
+export interface StorageFindOneOptions {
+  readonly projection?: Document;
 }
 
 export interface StorageUpdateOptions {
@@ -246,7 +256,22 @@ export class InMemoryCollection {
     };
   }
 
-  public findOne(filter: Document): Document | undefined {
+  public findOne(
+    filter: Document,
+    options: StorageFindOneOptions = {},
+  ): Document | undefined {
+    const project =
+      options.projection === undefined
+        ? undefined
+        : compileProjection(options.projection);
+    const found = this.findFirst(filter);
+
+    return found === undefined || project === undefined
+      ? found
+      : project(found);
+  }
+
+  private findFirst(filter: Document): Document | undefined {
     const matches = compileFilter(filter);
     const id = filter["_id"];
 
@@ -281,7 +306,13 @@ export class InMemoryCollection {
     const skip = validateSkip(options.skip);
     const limit = validateLimit(options.limit);
 
-    return this.scan(filter, matches, sorter, skip, limit);
+    const project =
+      options.projection === undefined
+        ? undefined
+        : compileProjection(options.projection);
+    const results = this.scan(filter, matches, sorter, skip, limit);
+
+    return project === undefined ? results : projectAll(results, project);
   }
 
   public deleteOne(filter: Document): StorageDeleteResult {
@@ -876,6 +907,15 @@ export class InMemoryCollection {
     const ordered = sorter(matched);
 
     yield* ordered.slice(skip, limit === undefined ? undefined : skip + limit);
+  }
+}
+
+function* projectAll(
+  documents: Iterable<Document>,
+  project: (document: Document) => Document,
+): IterableIterator<Document> {
+  for (const document of documents) {
+    yield project(document);
   }
 }
 

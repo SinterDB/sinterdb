@@ -99,6 +99,17 @@ breaking change.
 
 Each breaking change lands here in the release that makes it.
 
+### 0.3.0
+
+- **Projection needs a 0.3.0 server.** The server advertises a new `projection`
+  capability. A 0.3.0 driver refuses to send a projection to a server without
+  it (`SinterCompatibilityError`) instead of getting whole documents back.
+  Queries without a projection work against any server of the same protocol
+  version. The protocol version is still 1 and data files are unchanged.
+- **A query result may not contain `_id`.** With `projection: { _id: 0 }` the
+  returned documents have no `_id`. The result type says so, but code that reads
+  `_id` from a cursor of projected documents needs to allow for it.
+
 ### 0.2.0
 
 - **Write concerns replace durability modes.** `--write-concern <level>` and

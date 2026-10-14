@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { StorageErrorCode } from "./errors.js";
 import { compareStrings, compileFilter } from "./filter.js";
 import { InMemoryCollection } from "./in-memory-collection.js";
+import { compileProjection } from "./projection.js";
 import { compileSort } from "./sort.js";
 
 // docs/query-semantics.md defines how values compare. The example table and
@@ -433,4 +434,41 @@ describe("array operators", () => {
       find({ items: { $elemMatch: { sku: "y", qty: { $gt: 2 } } } }),
     ).toEqual([]);
   });
+});
+
+describe("the projection examples in docs/query-semantics.md", () => {
+  const rows = [
+    ...markdown.matchAll(
+      /^\|\s*`(\{.*?\})`\s*\|\s*`(\{.*?\})`\s*\|\s*(`\{.*\}`|error)\s*\|$/gm,
+    ),
+  ].map((row) => ({
+    projection: JSON.parse(row[1] as string) as Document,
+    document: JSON.parse(row[2] as string) as Document,
+    expected: row[3] === "error" ? undefined : (row[3] as string).slice(1, -1),
+  }));
+
+  it("has examples to run", () => {
+    expect(rows.length).toBeGreaterThanOrEqual(40);
+    expect(rows.some((row) => row.expected === undefined)).toBe(true);
+  });
+
+  it.each(rows.map((row) => [JSON.stringify(row), row] as const))(
+    "%s",
+    (_name, row) => {
+      if (row.expected === undefined) {
+        expect(() => compileProjection(row.projection)).toThrowError(
+          expect.objectContaining({
+            code: StorageErrorCode.InvalidFindOptions,
+          }),
+        );
+
+        return;
+      }
+
+      // Comparing the JSON text also checks that the field order is kept.
+      expect(
+        JSON.stringify(compileProjection(row.projection)(row.document)),
+      ).toBe(row.expected);
+    },
+  );
 });

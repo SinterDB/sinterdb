@@ -184,6 +184,7 @@ export class CommandDispatcher {
       capabilities: [
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
+        ProtocolCapability.Projection,
       ],
     };
   }
@@ -563,6 +564,10 @@ export class CommandDispatcher {
       "collection",
     );
     const filter = requireDocumentParameter(command.parameters, "filter");
+    const projection = optionalDocumentParameter(
+      command.parameters,
+      "projection",
+    );
 
     try {
       const collection = this.catalog.getCollection(
@@ -577,7 +582,11 @@ export class CommandDispatcher {
       }
 
       return {
-        document: collection.findOne(filter) ?? null,
+        document:
+          collection.findOne(
+            filter,
+            projection === undefined ? {} : { projection },
+          ) ?? null,
       };
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
@@ -979,6 +988,7 @@ function parseFindOptions(parameters: Document): StorageFindOptions {
   const sort = parameters["sort"];
   const skip = optionalIntegerParameter(parameters, "skip", 0);
   const limit = optionalIntegerParameter(parameters, "limit", 1);
+  const projection = optionalDocumentParameter(parameters, "projection");
 
   if (sort !== undefined && !Array.isArray(sort)) {
     throw new CommandExecutionError(
@@ -995,7 +1005,30 @@ function parseFindOptions(parameters: Document): StorageFindOptions {
       : { sort: sort as unknown as SortSpecification }),
     ...(skip === undefined ? {} : { skip }),
     ...(limit === undefined ? {} : { limit }),
+    ...(projection === undefined ? {} : { projection }),
   };
+}
+
+function optionalDocumentParameter(
+  parameters: Document,
+  name: string,
+): Document | undefined {
+  const value = parameters[name];
+
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (!isPlainDocument(value)) {
+    throw new CommandExecutionError(
+      WireErrorCode.InvalidRequest,
+      "InvalidRequest",
+      `Command parameter ${JSON.stringify(name)} must be a document.`,
+      { details: { field: name } },
+    );
+  }
+
+  return value;
 }
 
 function optionalIntegerParameter(

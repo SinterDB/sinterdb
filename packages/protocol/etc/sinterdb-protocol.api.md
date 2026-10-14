@@ -269,6 +269,7 @@ export const PROTOCOL_VERSION = 1;
 const ProtocolCapability: {
     readonly TypedDocuments: "typed-documents";
     readonly Streaming: "streaming";
+    readonly Projection: "projection";
 };
 
 // @public (undocumented)

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 651,
+  id: 672,
   name: "FilterOperators",
   kind: "type-alias",
   label: "Type Alias",
@@ -113,7 +113,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 653,
+          id: 674,
           name: "$eq",
           anchor: "eq",
           kind: "property",
@@ -153,7 +153,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 657,
+          id: 678,
           name: "$exists",
           anchor: "exists",
           kind: "property",
@@ -186,7 +186,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 655,
+          id: 676,
           name: "$in",
           anchor: "in",
           kind: "property",
@@ -228,7 +228,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 654,
+          id: 675,
           name: "$ne",
           anchor: "ne",
           kind: "property",
@@ -268,7 +268,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 656,
+          id: 677,
           name: "$nin",
           anchor: "nin",
           kind: "property",
@@ -310,7 +310,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 658,
+          id: 679,
           name: "$not",
           anchor: "not",
           kind: "property",

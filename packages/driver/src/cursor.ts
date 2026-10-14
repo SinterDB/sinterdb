@@ -22,6 +22,8 @@ export interface FindQueryOptions {
   readonly skip?: number;
   /** The maximum number of documents to return. */
   readonly limit?: number;
+  /** Which fields to return. */
+  readonly projection?: Document;
 }
 
 /**
@@ -34,8 +36,9 @@ export interface FindQueryOptions {
  */
 export class FindCursor<
   TDocument extends object = Document,
-> implements AsyncIterable<WithId<TDocument>> {
-  private buffer: WithId<TDocument>[] = [];
+  TResult extends object = WithId<TDocument>,
+> implements AsyncIterable<TResult> {
+  private buffer: TResult[] = [];
   private cursorId: number | null | undefined = undefined;
   private closed = false;
 
@@ -81,7 +84,7 @@ export class FindCursor<
    * Returns the next document, or `null` when the results are exhausted or
    * the cursor is closed.
    */
-  public async next(): Promise<WithId<TDocument> | null> {
+  public async next(): Promise<TResult | null> {
     if (!(await this.hasNext())) {
       return null;
     }
@@ -93,8 +96,8 @@ export class FindCursor<
    * Reads all remaining documents into an array and closes the cursor. Large
    * result sets are held in memory; iterate instead when they may be large.
    */
-  public async toArray(): Promise<WithId<TDocument>[]> {
-    const results: WithId<TDocument>[] = [];
+  public async toArray(): Promise<TResult[]> {
+    const results: TResult[] = [];
 
     try {
       for (let doc = await this.next(); doc !== null; doc = await this.next()) {
@@ -131,7 +134,7 @@ export class FindCursor<
    * Iterates the remaining documents, closing the cursor when the loop ends.
    */
   public async *[Symbol.asyncIterator](): AsyncGenerator<
-    WithId<TDocument>,
+    TResult,
     void,
     undefined
   > {
@@ -166,24 +169,31 @@ export class FindCursor<
             ...(this.query.limit === undefined
               ? {}
               : { limit: this.query.limit }),
+            ...(this.query.projection === undefined
+              ? {}
+              : { projection: this.query.projection }),
           })
         : await this.execute("getMore", {
             cursorId: this.cursorId as number,
             ...size,
           });
 
-    const batch = parseBatch<TDocument>(value);
+    const batch = parseBatch<TResult>(
+      value,
+      this.query.projection === undefined,
+    );
 
     this.cursorId = batch.cursorId;
     this.buffer.push(...batch.documents);
   }
 }
 
-function parseBatch<TDocument extends object>(
+function parseBatch<TResult extends object>(
   value: DocumentValue,
+  requireId: boolean,
 ): {
   cursorId: number | null;
-  documents: WithId<TDocument>[];
+  documents: TResult[];
 } {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw invalidBatch();
@@ -207,7 +217,7 @@ function parseBatch<TDocument extends object>(
         typeof doc === "object" &&
         doc !== null &&
         !Array.isArray(doc) &&
-        (doc as Document)["_id"] instanceof CustomId,
+        (!requireId || (doc as Document)["_id"] instanceof CustomId),
     )
   ) {
     throw invalidBatch();
@@ -215,7 +225,7 @@ function parseBatch<TDocument extends object>(
 
   return {
     cursorId: cursorId as number | null,
-    documents: documents as unknown as WithId<TDocument>[],
+    documents: documents as unknown as TResult[],
   };
 }
 

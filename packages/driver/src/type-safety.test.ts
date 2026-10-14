@@ -1,7 +1,7 @@
 import type { CustomId } from "sinterdb-protocol";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import type { SinterCollection } from "./collection.js";
+import type { SinterCollection, WithId } from "./collection.js";
 import type { Filter, Sort } from "./filter.js";
 import type {
   CreateIndexResult,
@@ -10,6 +10,7 @@ import type {
   IndexInfo,
   IndexValidationResult,
 } from "./indexes.js";
+import type { ProjectedDocument, Projection } from "./projection.js";
 import type { DeleteResult, UpdateFilter, UpdateResult } from "./update.js";
 
 interface User {
@@ -328,5 +329,132 @@ describe("collection method types", () => {
 
       expect(typeof neverCalled).toBe("function");
     });
+  });
+});
+
+interface Account {
+  _id: CustomId;
+  name: string;
+  nickname?: string;
+  address?: { city: string; zip: string };
+  owner: { name: string; tags: string[] } | null;
+  lines: { sku: string; qty: number }[];
+}
+
+describe("ProjectedDocument types", () => {
+  it("is the whole document without a projection", () => {
+    expectTypeOf<ProjectedDocument<Account, undefined>>().toEqualTypeOf<
+      WithId<Account>
+    >();
+    expectTypeOf<ProjectedDocument<Account, {}>>().toEqualTypeOf<
+      WithId<Account>
+    >();
+  });
+
+  it("keeps only included fields and _id", () => {
+    type Result = ProjectedDocument<Account, { name: 1; nickname: true }>;
+
+    expectTypeOf<Result>().toEqualTypeOf<{
+      readonly _id: CustomId;
+      name: string;
+      nickname?: string;
+    }>();
+  });
+
+  it("leaves _id out when it is set to 0", () => {
+    expectTypeOf<
+      ProjectedDocument<Account, { name: 1; _id: 0 }>
+    >().toEqualTypeOf<{
+      name: string;
+    }>();
+    expectTypeOf<
+      ProjectedDocument<Account, { name: 1; _id: false }>
+    >().toEqualTypeOf<{
+      name: string;
+    }>();
+  });
+
+  it("returns only the id for { _id: 1 }", () => {
+    expectTypeOf<ProjectedDocument<Account, { _id: 1 }>>().toEqualTypeOf<{
+      readonly _id: CustomId;
+    }>();
+  });
+
+  it("removes excluded fields", () => {
+    type Result = ProjectedDocument<
+      Account,
+      { nickname: 0; address: false; owner: 0; lines: 0 }
+    >;
+
+    expectTypeOf<Result>().toEqualTypeOf<{
+      name: string;
+      readonly _id: CustomId;
+    }>();
+    expectTypeOf<ProjectedDocument<Account, { _id: 0 }>>().toEqualTypeOf<{
+      name: string;
+      nickname?: string;
+      address?: { city: string; zip: string };
+      owner: { name: string; tags: string[] } | null;
+      lines: { sku: string; qty: number }[];
+    }>();
+  });
+
+  it("follows nested paths and arrays of documents", () => {
+    type Result = ProjectedDocument<
+      Account,
+      { "lines.sku": 1; "address.city": 1; _id: 0 }
+    >;
+
+    expectTypeOf<Result>().toEqualTypeOf<{
+      address?: { city: string };
+      lines: { sku: string }[];
+    }>();
+  });
+
+  it("makes a nested field optional when its parent can be null", () => {
+    expectTypeOf<
+      ProjectedDocument<Account, { "owner.name": 1; _id: 0 }>
+    >().toEqualTypeOf<{ owner?: { name: string } }>();
+  });
+
+  it("removes nested fields", () => {
+    expectTypeOf<
+      ProjectedDocument<Account, { "address.zip": 0; "lines.qty": 0; _id: 0 }>
+    >().toEqualTypeOf<{
+      name: string;
+      nickname?: string;
+      address?: { city: string };
+      owner: { name: string; tags: string[] } | null;
+      lines: { sku: string }[];
+    }>();
+  });
+
+  it("makes everything optional when the flags are not literals", () => {
+    expectTypeOf<ProjectedDocument<Account, { name: boolean }>>().toEqualTypeOf<
+      Partial<WithId<Account>>
+    >();
+    expectTypeOf<ProjectedDocument<Account, { name: number }>>().toEqualTypeOf<
+      Partial<WithId<Account>>
+    >();
+  });
+
+  it("only accepts real paths and flags", () => {
+    const valid: Projection<Account> = {
+      name: 1,
+      "address.city": true,
+      "lines.sku": 1,
+      _id: 0,
+    };
+
+    expectTypeOf(valid).not.toBeAny();
+
+    // @ts-expect-error unknown path
+    const unknown: Projection<Account> = { nope: 1 };
+    // @ts-expect-error positions are not supported
+    const position: Projection<Account> = { "lines.0": 1 };
+    // @ts-expect-error flags are 0, 1, true or false
+    const flag: Projection<Account> = { name: 2 };
+
+    void [unknown, position, flag];
   });
 });

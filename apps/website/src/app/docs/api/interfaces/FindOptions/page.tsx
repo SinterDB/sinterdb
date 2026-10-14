@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 259,
+  id: 267,
   name: "FindOptions",
   kind: "interface",
   label: "Interface",
@@ -21,6 +21,16 @@ const page: ApiPage = {
     ["object", "prim"],
     [" = ", "pn"],
     ["Document", "ref", "/docs/api/interfaces/Document"],
+    [", ", "pn"],
+    ["TProjection", "tp"],
+    [" extends ", "kw"],
+    ["Projection", "ref", "/docs/api/types/Projection"],
+    ["<", "pn"],
+    ["TDocument", "tp"],
+    ["> | ", "pn"],
+    ["undefined", "prim"],
+    [" = ", "pn"],
+    ["undefined", "prim"],
     [">", "pn"],
   ],
   comment: {
@@ -44,6 +54,21 @@ const page: ApiPage = {
       ],
       comment: null,
     },
+    {
+      name: "TProjection",
+      code: [
+        ["TProjection", "tp"],
+        [" extends ", "kw"],
+        ["Projection", "ref", "/docs/api/types/Projection"],
+        ["<", "pn"],
+        ["TDocument", "tp"],
+        ["> | ", "pn"],
+        ["undefined", "prim"],
+        [" = ", "pn"],
+        ["undefined", "prim"],
+      ],
+      comment: null,
+    },
   ],
   hierarchy: null,
   signatureSection: null,
@@ -54,7 +79,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 261,
+          id: 270,
           name: "batchSize",
           anchor: "batch-size",
           kind: "property",
@@ -83,13 +108,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 53,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L53",
+              line: 75,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L75",
             },
           ],
         },
         {
-          id: 264,
+          id: 273,
           name: "limit",
           anchor: "limit",
           kind: "property",
@@ -116,13 +141,48 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 62,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L62",
+              line: 84,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L84",
             },
           ],
         },
         {
-          id: 263,
+          id: 274,
+          name: "projection",
+          anchor: "projection",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["projection", "name"],
+            ["?: ", "pn"],
+            ["TProjection", "tp"],
+          ],
+          comment: {
+            summary:
+              '<p>The fields to return. See <a href="/docs/api/types/Projection">Projection</a>. It is applied after sorting,\nso a query can sort by a field it does not return. The cursor\'s result\ntype follows the projection when it is written inline.</p>',
+            short:
+              'The fields to return. See <a href="/docs/api/types/Projection">Projection</a>. It is applied after sorting, so a query can sort by a field it does not return. The cursor\'s result type follows the projection when it is written inline.',
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [],
+          sources: [
+            {
+              path: "packages/driver/src/collection.ts",
+              line: 90,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L90",
+            },
+          ],
+        },
+        {
+          id: 272,
           name: "skip",
           anchor: "skip",
           kind: "property",
@@ -150,13 +210,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 60,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L60",
+              line: 82,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L82",
             },
           ],
         },
         {
-          id: 262,
+          id: 271,
           name: "sort",
           anchor: "sort",
           kind: "property",
@@ -188,8 +248,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 58,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L58",
+              line: 80,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L80",
             },
           ],
         },
@@ -210,6 +270,12 @@ const page: ApiPage = {
         {
           anchor: "limit",
           name: "limit",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "projection",
+          name: "projection",
           kind: "property",
           deprecated: false,
         },
@@ -236,8 +302,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 49,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L49",
+      line: 68,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L68",
     },
   ],
   usedBy: [

@@ -167,6 +167,89 @@ Values that compare equal keep their existing order, so a sort is stable. A
 sort with several fields compares the first field, then the second for ties,
 and so on.
 
+## Projection
+
+A projection chooses which fields a query returns. It is applied to each
+result after sorting, skipping, and limiting, so a query can sort or filter by
+a field it does not return.
+
+- A projection maps field paths to `1` or `true` (include) or `0` or `false`
+  (exclude). Any other value is an error.
+- An **inclusion** projection returns only the listed fields. An **exclusion**
+  projection returns every field except the listed ones. The two cannot be mixed.
+- `_id` is the one exception. It is returned unless it is set to `0`, so
+  `{"a":1,"_id":0}` is valid and `{"a":0,"_id":1}` is too. `{"_id":1}` alone
+  returns only the ids, and `{"_id":0}` alone returns everything but the ids.
+  Only the top-level `_id` is special: an `_id` field inside a nested document
+  is an ordinary field, and a path that goes inside `_id` is an error.
+- An empty projection `{}` returns every field.
+- A listed field that a document does not have is skipped. Fields keep the
+  order of the document being projected, so stored documents come back sorted
+  by field name (see "Key order is not preserved" in `limitations.md`).
+- A dotted path `"a.b"` reaches field `b` of the document in `a`. It keeps the
+  nesting: including `"a.b"` returns `{"a":{"b":...}}`, and a document in `a`
+  without a `b` becomes `{"a":{}}`. If `a` is not a document or an array, `a` is
+  left out.
+- A dotted path steps into an array of documents by field name and applies to
+  every element. For inclusion, elements that are not documents are dropped and
+  the array keeps its remaining elements, which may be none. For exclusion, the
+  other elements are kept as they are. Positions such as `"a.0"` are not
+  supported in a projection; they are treated as a field name, so they match
+  nothing.
+- Two paths may not overlap (`"a"` and `"a.b"`), and a path may not have an
+  empty segment or a segment starting with `$`.
+
+Each row is a projection, a document, and the result, or `error` when the
+projection is rejected with `INVALID_FIND_OPTIONS`.
+
+| Projection            | Document                                  | Result                              |
+| --------------------- | ----------------------------------------- | ----------------------------------- |
+| `{"a":1}`             | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1,"a":2}`                   |
+| `{"a":true}`          | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1,"a":2}`                   |
+| `{"a":1,"_id":0}`     | `{"_id":1,"a":2,"b":3}`                   | `{"a":2}`                           |
+| `{"a":0}`             | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1,"b":3}`                   |
+| `{"a":false}`         | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1,"b":3}`                   |
+| `{"a":0,"_id":0}`     | `{"_id":1,"a":2,"b":3}`                   | `{"b":3}`                           |
+| `{"a":0,"_id":1}`     | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1,"b":3}`                   |
+| `{"_id":0}`           | `{"_id":1,"a":2,"b":3}`                   | `{"a":2,"b":3}`                     |
+| `{"_id":1}`           | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1}`                         |
+| `{}`                  | `{"_id":1,"a":2,"b":3}`                   | `{"_id":1,"a":2,"b":3}`             |
+| `{"z":1}`             | `{"_id":1,"a":2}`                         | `{"_id":1}`                         |
+| `{"z":0}`             | `{"_id":1,"a":2}`                         | `{"_id":1,"a":2}`                   |
+| `{"a.b":1}`           | `{"_id":1,"a":{"b":1,"c":2},"d":3}`       | `{"_id":1,"a":{"b":1}}`             |
+| `{"a.b":0}`           | `{"_id":1,"a":{"b":1,"c":2},"d":3}`       | `{"_id":1,"a":{"c":2},"d":3}`       |
+| `{"a.b":1}`           | `{"_id":1,"a":{"c":2}}`                   | `{"_id":1,"a":{}}`                  |
+| `{"a.b":1}`           | `{"_id":1,"a":5}`                         | `{"_id":1}`                         |
+| `{"a.b":1}`           | `{"_id":1,"a":null}`                      | `{"_id":1}`                         |
+| `{"a.b":0}`           | `{"_id":1,"a":5}`                         | `{"_id":1,"a":5}`                   |
+| `{"a.b.c":1}`         | `{"_id":1,"a":{"b":{"c":1,"d":2},"e":3}}` | `{"_id":1,"a":{"b":{"c":1}}}`       |
+| `{"a.b":1,"a.c":1}`   | `{"_id":1,"a":{"b":1,"c":2,"d":3}}`       | `{"_id":1,"a":{"b":1,"c":2}}`       |
+| `{"a":1}`             | `{"_id":1,"a":[1,2],"b":3}`               | `{"_id":1,"a":[1,2]}`               |
+| `{"a.b":1}`           | `{"_id":1,"a":[{"b":1,"c":2},{"c":3},7]}` | `{"_id":1,"a":[{"b":1},{}]}`        |
+| `{"a.b":0}`           | `{"_id":1,"a":[{"b":1,"c":2},{"c":3},7]}` | `{"_id":1,"a":[{"c":2},{"c":3},7]}` |
+| `{"a.0":1}`           | `{"_id":1,"a":["x","y"]}`                 | `{"_id":1,"a":[]}`                  |
+| `{"a.0":0}`           | `{"_id":1,"a":["x","y"]}`                 | `{"_id":1,"a":["x","y"]}`           |
+| `{"a.b":1}`           | `{"_id":1,"a":[[{"b":1}]]}`               | `{"_id":1,"a":[]}`                  |
+| `{"a._id":1}`         | `{"_id":1,"a":{"_id":2,"b":3}}`           | `{"_id":1,"a":{"_id":2}}`           |
+| `{"a.b":1}`           | `{"_id":1,"a":{"_id":2,"b":3}}`           | `{"_id":1,"a":{"b":3}}`             |
+| `{"a._id":0}`         | `{"_id":1,"a":{"_id":2,"b":3}}`           | `{"_id":1,"a":{"b":3}}`             |
+| `{"a":1,"b":0}`       | `{}`                                      | error                               |
+| `{"a":0,"b":1}`       | `{}`                                      | error                               |
+| `{"a":2}`             | `{}`                                      | error                               |
+| `{"a":"yes"}`         | `{}`                                      | error                               |
+| `{"a":null}`          | `{}`                                      | error                               |
+| `{"a":1,"a.b":1}`     | `{}`                                      | error                               |
+| `{"a.b":1,"a":1}`     | `{}`                                      | error                               |
+| `{"a.b":1,"a.b.c":1}` | `{}`                                      | error                               |
+| `{"":1}`              | `{}`                                      | error                               |
+| `{"a.":1}`            | `{}`                                      | error                               |
+| `{".a":1}`            | `{}`                                      | error                               |
+| `{"a..b":1}`          | `{}`                                      | error                               |
+| `{"$a":1}`            | `{}`                                      | error                               |
+| `{"a.$b":1}`          | `{}`                                      | error                               |
+| `{"__proto__":1}`     | `{}`                                      | error                               |
+| `{"_id.x":1}`         | `{}`                                      | error                               |
+
 ## Examples
 
 Each row is a filter, a document, and whether the filter matches it.

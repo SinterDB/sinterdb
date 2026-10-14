@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 496,
+  id: 517,
   name: "SinterErrorCode",
   kind: "variable",
   label: "Variable",
@@ -155,7 +155,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 501,
+          id: 522,
           name: "ClientClosed",
           anchor: "client-closed",
           kind: "property",
@@ -188,7 +188,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 502,
+          id: 523,
           name: "ClientNotConnected",
           anchor: "client-not-connected",
           kind: "property",
@@ -223,7 +223,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 503,
+          id: 524,
           name: "ConnectionFailed",
           anchor: "connection-failed",
           kind: "property",
@@ -257,7 +257,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 504,
+          id: 525,
           name: "ConnectionTimeout",
           anchor: "connection-timeout",
           kind: "property",
@@ -291,7 +291,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 507,
+          id: 528,
           name: "IncompatibleProtocol",
           anchor: "incompatible-protocol",
           kind: "property",
@@ -325,7 +325,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 499,
+          id: 520,
           name: "InvalidClientOptions",
           anchor: "invalid-client-options",
           kind: "property",
@@ -360,7 +360,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 498,
+          id: 519,
           name: "InvalidConnectionString",
           anchor: "invalid-connection-string",
           kind: "property",
@@ -393,7 +393,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 500,
+          id: 521,
           name: "InvalidDocument",
           anchor: "invalid-document",
           kind: "property",
@@ -428,7 +428,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 508,
+          id: 529,
           name: "ProtocolViolation",
           anchor: "protocol-violation",
           kind: "property",
@@ -462,7 +462,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 506,
+          id: 527,
           name: "RequestTimeout",
           anchor: "request-timeout",
           kind: "property",
@@ -495,7 +495,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 509,
+          id: 530,
           name: "ServerError",
           anchor: "server-error",
           kind: "property",
@@ -530,7 +530,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 505,
+          id: 526,
           name: "SocketTimeout",
           anchor: "socket-timeout",
           kind: "property",

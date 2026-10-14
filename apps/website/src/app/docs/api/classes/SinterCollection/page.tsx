@@ -139,8 +139,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 97,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L97",
+                  line: 125,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L125",
                 },
               ],
             },
@@ -150,8 +150,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 97,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L97",
+              line: 125,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L125",
             },
           ],
         },
@@ -189,8 +189,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 99,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L99",
+              line: 127,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L127",
             },
           ],
         },
@@ -222,8 +222,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 95,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L95",
+              line: 123,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L123",
             },
           ],
         },
@@ -271,8 +271,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 109,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L109",
+                  line: 137,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L137",
                 },
               ],
             },
@@ -282,8 +282,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 109,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L109",
+              line: 137,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L137",
             },
           ],
         },
@@ -294,7 +294,7 @@ const page: ApiPage = {
       title: "Methods",
       members: [
         {
-          id: 241,
+          id: 243,
           name: "createIndex",
           anchor: "create-index",
           kind: "method",
@@ -306,7 +306,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 242,
+              id: 244,
               code: [
                 ["createIndex", "name"],
                 ["(", "pn"],
@@ -374,8 +374,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 264,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L264",
+                  line: 297,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L297",
                 },
               ],
             },
@@ -385,13 +385,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 264,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L264",
+              line: 297,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L297",
             },
           ],
         },
         {
-          id: 223,
+          id: 225,
           name: "deleteMany",
           anchor: "delete-many",
           kind: "method",
@@ -403,7 +403,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 224,
+              id: 226,
               code: [
                 ["deleteMany", "name"],
                 ["(", "pn"],
@@ -454,8 +454,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 195,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L195",
+                  line: 228,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L228",
                 },
               ],
             },
@@ -465,13 +465,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 195,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L195",
+              line: 228,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L228",
             },
           ],
         },
         {
-          id: 220,
+          id: 222,
           name: "deleteOne",
           anchor: "delete-one",
           kind: "method",
@@ -483,7 +483,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 221,
+              id: 223,
               code: [
                 ["deleteOne", "name"],
                 ["(", "pn"],
@@ -534,8 +534,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 190,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L190",
+                  line: 223,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L223",
                 },
               ],
             },
@@ -545,13 +545,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 190,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L190",
+              line: 223,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L223",
             },
           ],
         },
         {
-          id: 244,
+          id: 246,
           name: "dropIndex",
           anchor: "drop-index",
           kind: "method",
@@ -563,7 +563,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 245,
+              id: 247,
               code: [
                 ["dropIndex", "name"],
                 ["(", "pn"],
@@ -610,8 +610,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 280,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L280",
+                  line: 313,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L313",
                 },
               ],
             },
@@ -621,13 +621,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 280,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L280",
+              line: 313,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L313",
             },
           ],
         },
         {
-          id: 251,
+          id: 253,
           name: "find",
           anchor: "find",
           kind: "method",
@@ -639,10 +639,21 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 252,
+              id: 254,
               code: [
                 ["find", "name"],
-                ["(", "pn"],
+                ["<", "pn"],
+                ["const ", "kw"],
+                ["TProjection", "tp"],
+                [" extends ", "kw"],
+                ["Projection", "ref", "/docs/api/types/Projection"],
+                ["<", "pn"],
+                ["TDocument", "tp"],
+                ["> | ", "pn"],
+                ["undefined", "prim"],
+                [" = ", "pn"],
+                ["undefined", "prim"],
+                [">(", "pn"],
                 ["\n  "],
                 ["filter", "param"],
                 ["?: ", "pn"],
@@ -656,13 +667,25 @@ const page: ApiPage = {
                 ["FindOptions", "ref", "/docs/api/interfaces/FindOptions"],
                 ["<", "pn"],
                 ["TDocument", "tp"],
+                [", ", "pn"],
+                ["TProjection", "tp"],
                 [">,", "pn"],
                 ["\n"],
                 ["): ", "pn"],
                 ["FindCursor", "ref", "/docs/api/classes/FindCursor"],
                 ["<", "pn"],
                 ["TDocument", "tp"],
-                [">", "pn"],
+                [", ", "pn"],
+                [
+                  "ProjectedDocument",
+                  "ref",
+                  "/docs/api/types/ProjectedDocument",
+                ],
+                ["<", "pn"],
+                ["TDocument", "tp"],
+                [", ", "pn"],
+                ["TProjection", "tp"],
+                [">>", "pn"],
               ],
               comment: {
                 summary:
@@ -673,7 +696,24 @@ const page: ApiPage = {
                 modifiers: [],
                 blocks: [],
               },
-              typeParameters: [],
+              typeParameters: [
+                {
+                  name: "TProjection",
+                  code: [
+                    ["const ", "kw"],
+                    ["TProjection", "tp"],
+                    [" extends ", "kw"],
+                    ["Projection", "ref", "/docs/api/types/Projection"],
+                    ["<", "pn"],
+                    ["TDocument", "tp"],
+                    ["> | ", "pn"],
+                    ["undefined", "prim"],
+                    [" = ", "pn"],
+                    ["undefined", "prim"],
+                  ],
+                  comment: null,
+                },
+              ],
               parameters: [
                 {
                   name: "filter",
@@ -696,6 +736,8 @@ const page: ApiPage = {
                     ["FindOptions", "ref", "/docs/api/interfaces/FindOptions"],
                     ["<", "pn"],
                     ["TDocument", "tp"],
+                    [", ", "pn"],
+                    ["TProjection", "tp"],
                     [">", "pn"],
                   ],
                   comment: null,
@@ -707,15 +749,25 @@ const page: ApiPage = {
                   ["FindCursor", "ref", "/docs/api/classes/FindCursor"],
                   ["<", "pn"],
                   ["TDocument", "tp"],
-                  [">", "pn"],
+                  [", ", "pn"],
+                  [
+                    "ProjectedDocument",
+                    "ref",
+                    "/docs/api/types/ProjectedDocument",
+                  ],
+                  ["<", "pn"],
+                  ["TDocument", "tp"],
+                  [", ", "pn"],
+                  ["TProjection", "tp"],
+                  [">>", "pn"],
                 ],
                 html: null,
               },
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 317,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L317",
+                  line: 350,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L350",
                 },
               ],
             },
@@ -725,8 +777,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 317,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L317",
+              line: 350,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L350",
             },
           ],
         },
@@ -746,18 +798,51 @@ const page: ApiPage = {
               id: 218,
               code: [
                 ["findOne", "name"],
-                ["(", "pn"],
+                ["<", "pn"],
+                ["const ", "kw"],
+                ["TProjection", "tp"],
+                [" extends ", "kw"],
+                ["Projection", "ref", "/docs/api/types/Projection"],
+                ["<", "pn"],
+                ["TDocument", "tp"],
+                ["> | ", "pn"],
+                ["undefined", "prim"],
+                [" = ", "pn"],
+                ["undefined", "prim"],
+                [">(", "pn"],
+                ["\n  "],
                 ["filter", "param"],
                 ["?: ", "pn"],
                 ["Filter", "ref", "/docs/api/types/Filter"],
                 ["<", "pn"],
                 ["TDocument", "tp"],
-                [">): ", "pn"],
-                ["Promise", "ref"],
-                ["<", "pn"],
-                ["WithId", "ref", "/docs/api/types/WithId"],
+                [">,", "pn"],
+                ["\n  "],
+                ["options", "param"],
+                ["?: ", "pn"],
+                [
+                  "FindOneOptions",
+                  "ref",
+                  "/docs/api/interfaces/FindOneOptions",
+                ],
                 ["<", "pn"],
                 ["TDocument", "tp"],
+                [", ", "pn"],
+                ["TProjection", "tp"],
+                [">,", "pn"],
+                ["\n"],
+                ["): ", "pn"],
+                ["Promise", "ref"],
+                ["<", "pn"],
+                [
+                  "ProjectedDocument",
+                  "ref",
+                  "/docs/api/types/ProjectedDocument",
+                ],
+                ["<", "pn"],
+                ["TDocument", "tp"],
+                [", ", "pn"],
+                ["TProjection", "tp"],
                 ["> | ", "pn"],
                 ["null", "lit"],
                 [">", "pn"],
@@ -771,7 +856,24 @@ const page: ApiPage = {
                 modifiers: [],
                 blocks: [],
               },
-              typeParameters: [],
+              typeParameters: [
+                {
+                  name: "TProjection",
+                  code: [
+                    ["const ", "kw"],
+                    ["TProjection", "tp"],
+                    [" extends ", "kw"],
+                    ["Projection", "ref", "/docs/api/types/Projection"],
+                    ["<", "pn"],
+                    ["TDocument", "tp"],
+                    ["> | ", "pn"],
+                    ["undefined", "prim"],
+                    [" = ", "pn"],
+                    ["undefined", "prim"],
+                  ],
+                  comment: null,
+                },
+              ],
               parameters: [
                 {
                   name: "filter",
@@ -786,14 +888,39 @@ const page: ApiPage = {
                   comment: null,
                   members: [],
                 },
+                {
+                  name: "options",
+                  code: [
+                    ["options", "param"],
+                    ["?: ", "pn"],
+                    [
+                      "FindOneOptions",
+                      "ref",
+                      "/docs/api/interfaces/FindOneOptions",
+                    ],
+                    ["<", "pn"],
+                    ["TDocument", "tp"],
+                    [", ", "pn"],
+                    ["TProjection", "tp"],
+                    [">", "pn"],
+                  ],
+                  comment: null,
+                  members: [],
+                },
               ],
               returns: {
                 code: [
                   ["Promise", "ref"],
                   ["<", "pn"],
-                  ["WithId", "ref", "/docs/api/types/WithId"],
+                  [
+                    "ProjectedDocument",
+                    "ref",
+                    "/docs/api/types/ProjectedDocument",
+                  ],
                   ["<", "pn"],
                   ["TDocument", "tp"],
+                  [", ", "pn"],
+                  ["TProjection", "tp"],
                   ["> | ", "pn"],
                   ["null", "lit"],
                   [">", "pn"],
@@ -803,8 +930,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 174,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L174",
+                  line: 202,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L202",
                 },
               ],
             },
@@ -814,13 +941,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 174,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L174",
+              line: 202,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L202",
             },
           ],
         },
         {
-          id: 247,
+          id: 249,
           name: "indexes",
           anchor: "indexes",
           kind: "method",
@@ -832,7 +959,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 248,
+              id: 250,
               code: [
                 ["indexes", "name"],
                 ["(): ", "pn"],
@@ -864,8 +991,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 288,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L288",
+                  line: 321,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L321",
                 },
               ],
             },
@@ -875,8 +1002,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 288,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L288",
+              line: 321,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L321",
             },
           ],
         },
@@ -957,8 +1084,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 147,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L147",
+                  line: 175,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L175",
                 },
               ],
             },
@@ -968,8 +1095,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 147,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L147",
+              line: 175,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L175",
             },
           ],
         },
@@ -1051,8 +1178,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 123,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L123",
+                  line: 151,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L151",
                 },
               ],
             },
@@ -1062,13 +1189,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 123,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L123",
+              line: 151,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L151",
             },
           ],
         },
         {
-          id: 226,
+          id: 228,
           name: "replaceOne",
           anchor: "replace-one",
           kind: "method",
@@ -1080,7 +1207,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 227,
+              id: 229,
               code: [
                 ["replaceOne", "name"],
                 ["(", "pn"],
@@ -1174,8 +1301,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 206,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L206",
+                  line: 239,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L239",
                 },
               ],
             },
@@ -1185,13 +1312,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 206,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L206",
+              line: 239,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L239",
             },
           ],
         },
         {
-          id: 236,
+          id: 238,
           name: "updateMany",
           anchor: "update-many",
           kind: "method",
@@ -1203,7 +1330,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 237,
+              id: 239,
               code: [
                 ["updateMany", "name"],
                 ["(", "pn"],
@@ -1296,8 +1423,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 251,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L251",
+                  line: 284,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L284",
                 },
               ],
             },
@@ -1307,13 +1434,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 251,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L251",
+              line: 284,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L284",
             },
           ],
         },
         {
-          id: 231,
+          id: 233,
           name: "updateOne",
           anchor: "update-one",
           kind: "method",
@@ -1325,7 +1452,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 232,
+              id: 234,
               code: [
                 ["updateOne", "name"],
                 ["(", "pn"],
@@ -1418,8 +1545,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 234,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L234",
+                  line: 267,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L267",
                 },
               ],
             },
@@ -1429,13 +1556,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 234,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L234",
+              line: 267,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L267",
             },
           ],
         },
         {
-          id: 249,
+          id: 251,
           name: "validateIndexes",
           anchor: "validate-indexes",
           kind: "method",
@@ -1447,7 +1574,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 250,
+              id: 252,
               code: [
                 ["validateIndexes", "name"],
                 ["(): ", "pn"],
@@ -1487,8 +1614,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 299,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L299",
+                  line: 332,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L332",
                 },
               ],
             },
@@ -1498,8 +1625,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 299,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L299",
+              line: 332,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L332",
             },
           ],
         },
@@ -1642,8 +1769,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 90,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L90",
+      line: 118,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L118",
     },
   ],
   usedBy: [

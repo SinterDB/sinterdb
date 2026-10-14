@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 510,
+  id: 531,
   name: "SinterErrorCode",
   kind: "type-alias",
   label: "Type Alias",

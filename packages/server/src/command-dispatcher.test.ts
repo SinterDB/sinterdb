@@ -33,6 +33,7 @@ describe("CommandDispatcher", () => {
       capabilities: [
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
+        ProtocolCapability.Projection,
       ],
     });
   });
@@ -605,6 +606,103 @@ describe("CommandDispatcher", () => {
         sessionB,
       ),
     ).toThrow(/does not exist/);
+  });
+
+  describe("projection", () => {
+    function seeded(): CommandDispatcher {
+      const dispatcher = createDispatcher();
+
+      dispatcher.dispatch({
+        command: "insertMany",
+        database: "app",
+        parameters: {
+          collection: "users",
+          documents: [
+            { n: 1, name: "Ada", secret: "x" },
+            { n: 2, name: "Grace", secret: "y" },
+          ],
+        },
+      });
+
+      return dispatcher;
+    }
+
+    it("projects find results", () => {
+      const result = seeded().dispatch(
+        {
+          command: "find",
+          database: "app",
+          parameters: {
+            collection: "users",
+            filter: {},
+            sort: [["n", -1]],
+            projection: { name: 1, _id: 0 },
+          },
+        },
+        new CursorManager(),
+      );
+
+      expect(result).toEqual({
+        cursorId: null,
+        documents: [{ name: "Grace" }, { name: "Ada" }],
+      });
+    });
+
+    it("projects findOne results", () => {
+      const result = seeded().dispatch({
+        command: "findOne",
+        database: "app",
+        parameters: {
+          collection: "users",
+          filter: { n: 1 },
+          projection: { secret: 0, _id: 0 },
+        },
+      });
+
+      expect(result).toEqual({ document: { n: 1, name: "Ada" } });
+    });
+
+    it("rejects a projection that is not a document", () => {
+      for (const command of ["find", "findOne"]) {
+        expectCommandError(
+          () =>
+            seeded().dispatch(
+              {
+                command,
+                database: "app",
+                parameters: {
+                  collection: "users",
+                  filter: {},
+                  projection: [["name", 1]],
+                },
+              },
+              new CursorManager(),
+            ),
+          WireErrorCode.InvalidRequest,
+        );
+      }
+    });
+
+    it("rejects an invalid projection", () => {
+      for (const command of ["find", "findOne"]) {
+        expectCommandError(
+          () =>
+            seeded().dispatch(
+              {
+                command,
+                database: "app",
+                parameters: {
+                  collection: "users",
+                  filter: {},
+                  projection: { name: 1, secret: 0 },
+                },
+              },
+              new CursorManager(),
+            ),
+          WireErrorCode.DocumentValidationFailed,
+        );
+      }
+    });
   });
 });
 

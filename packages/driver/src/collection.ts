@@ -1,8 +1,14 @@
-import { CustomId, type Document, type DocumentValue } from "sinterdb-protocol";
+import {
+  CustomId,
+  ProtocolCapability,
+  type Document,
+  type DocumentValue,
+} from "sinterdb-protocol";
 
 import { FindCursor } from "./cursor.js";
 import type { SinterDatabase } from "./database.js";
 import {
+  SinterCompatibilityError,
   SinterInsertManyError,
   SinterProtocolError,
   SinterServerError,
@@ -18,6 +24,7 @@ import {
   type IndexValidationResult,
 } from "./indexes.js";
 import { validateCollectionName } from "./namespace.js";
+import type { ProjectedDocument, Projection } from "./projection.js";
 import type {
   DeleteResult,
   UpdateFilter,
@@ -45,8 +52,23 @@ export type EqualityFilter<TDocument extends object> = {
   readonly [Key in keyof TDocument]?: TDocument[Key];
 };
 
+/** Options for {@link SinterCollection.findOne}. */
+export interface FindOneOptions<
+  TDocument extends object = Document,
+  TProjection extends Projection<TDocument> | undefined = undefined,
+> {
+  /**
+   * The fields to return. See {@link Projection}. The result type follows the
+   * projection when it is written inline.
+   */
+  readonly projection?: TProjection;
+}
+
 /** Options for {@link SinterCollection.find}. */
-export interface FindOptions<TDocument extends object = Document> {
+export interface FindOptions<
+  TDocument extends object = Document,
+  TProjection extends Projection<TDocument> | undefined = undefined,
+> {
   /**
    * How many documents the cursor fetches from the server per round trip.
    */
@@ -60,6 +82,12 @@ export interface FindOptions<TDocument extends object = Document> {
   readonly skip?: number;
   /** The maximum number of documents to return. */
   readonly limit?: number;
+  /**
+   * The fields to return. See {@link Projection}. It is applied after sorting,
+   * so a query can sort by a field it does not return. The cursor's result
+   * type follows the projection when it is written inline.
+   */
+  readonly projection?: TProjection;
 }
 
 /** The result of {@link SinterCollection.insertOne}. */
@@ -171,19 +199,24 @@ export class SinterCollection<TDocument extends object = Document> {
    * Finds the first document that matches the filter, or `null`. Without a
    * filter, it returns the first document in the collection.
    */
-  public async findOne(
+  public async findOne<
+    const TProjection extends Projection<TDocument> | undefined = undefined,
+  >(
     filter: Filter<TDocument> = {} as Filter<TDocument>,
-  ): Promise<WithId<TDocument> | null> {
-    const value = await this.database.client.executeCommand(
-      this.database.name,
-      "findOne",
-      {
-        collection: this.name,
-        filter: filter as unknown as Document,
-      },
-    );
+    options: FindOneOptions<TDocument, TProjection> = {},
+  ): Promise<ProjectedDocument<TDocument, TProjection> | null> {
+    const value = await this.execute("findOne", {
+      collection: this.name,
+      filter: filter as unknown as Document,
+      ...(options.projection === undefined
+        ? {}
+        : { projection: options.projection as unknown as Document }),
+    });
 
-    return parseFindOneResult<TDocument>(value);
+    return parseFindOneResult<ProjectedDocument<TDocument, TProjection>>(
+      value,
+      options.projection === undefined,
+    );
   }
 
   /** Deletes the first document that matches the filter. */
@@ -314,17 +347,14 @@ export class SinterCollection<TDocument extends object = Document> {
    * iterated with `for await`. Always finish or `close()` it so the server
    * can release it.
    */
-  public find(
+  public find<
+    const TProjection extends Projection<TDocument> | undefined = undefined,
+  >(
     filter: Filter<TDocument> = {} as Filter<TDocument>,
-    options: FindOptions<TDocument> = {},
-  ): FindCursor<TDocument> {
-    return new FindCursor<TDocument>(
-      (command, parameters) =>
-        this.database.client.executeCommand(
-          this.database.name,
-          command,
-          parameters,
-        ),
+    options: FindOptions<TDocument, TProjection> = {},
+  ): FindCursor<TDocument, ProjectedDocument<TDocument, TProjection>> {
+    return new FindCursor<TDocument, ProjectedDocument<TDocument, TProjection>>(
+      (command, parameters) => this.execute(command, parameters),
       this.name,
       filter as unknown as Document,
       options.batchSize,
@@ -332,7 +362,39 @@ export class SinterCollection<TDocument extends object = Document> {
         ...(options.sort === undefined ? {} : { sort: options.sort }),
         ...(options.skip === undefined ? {} : { skip: options.skip }),
         ...(options.limit === undefined ? {} : { limit: options.limit }),
+        ...(options.projection === undefined
+          ? {}
+          : { projection: options.projection as unknown as Document }),
       },
+    );
+  }
+
+  /**
+   * Sends a command, first checking that the server understands a projection
+   * if the command carries one. An older server would ignore it and return
+   * whole documents.
+   */
+  private execute(
+    command: string,
+    parameters: Document,
+  ): Promise<DocumentValue> {
+    if (
+      parameters["projection"] !== undefined &&
+      this.database.client.serverInfo?.capabilities.includes(
+        ProtocolCapability.Projection,
+      ) === false
+    ) {
+      return Promise.reject(
+        new SinterCompatibilityError(
+          "The server does not support projection. Upgrade the server to 0.3.0 or later, or remove the projection option.",
+        ),
+      );
+    }
+
+    return this.database.client.executeCommand(
+      this.database.name,
+      command,
+      parameters,
     );
   }
 
@@ -421,9 +483,10 @@ function parseInsertManyResult(value: DocumentValue): InsertManyResult {
   });
 }
 
-function parseFindOneResult<TDocument extends object>(
+function parseFindOneResult<TResult extends object>(
   value: DocumentValue,
-): WithId<TDocument> | null {
+  requireId: boolean,
+): TResult | null {
   if (!isPlainDocument(value) || !Object.hasOwn(value, "document")) {
     throw invalidFindResult();
   }
@@ -434,11 +497,14 @@ function parseFindOneResult<TDocument extends object>(
     return null;
   }
 
-  if (!isPlainDocument(document) || !(document["_id"] instanceof CustomId)) {
+  if (
+    !isPlainDocument(document) ||
+    (requireId && !(document["_id"] instanceof CustomId))
+  ) {
     throw invalidFindResult();
   }
 
-  return document as unknown as WithId<TDocument>;
+  return document as unknown as TResult;
 }
 
 function parseUpdateResult(

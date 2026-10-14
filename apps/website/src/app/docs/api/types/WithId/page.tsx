@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 276,
+  id: 286,
   name: "WithId",
   kind: "type-alias",
   label: "Type Alias",
@@ -61,7 +61,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 278,
+          id: 288,
           name: "_id",
           anchor: "_id",
           kind: "property",
@@ -88,8 +88,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 40,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L40",
+              line: 47,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L47",
             },
           ],
         },
@@ -118,8 +118,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 38,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L38",
+      line: 45,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L45",
     },
   ],
   usedBy: [
@@ -129,24 +129,14 @@ const page: ApiPage = {
       kind: "class",
     },
     {
-      name: "FindCursor.[asyncIterator]",
-      href: "/docs/api/classes/FindCursor#async-iterator",
-      kind: "method",
+      name: "FindCursor.constructor",
+      href: "/docs/api/classes/FindCursor#constructor",
+      kind: "constructor",
     },
     {
-      name: "FindCursor.next",
-      href: "/docs/api/classes/FindCursor#next",
-      kind: "method",
-    },
-    {
-      name: "FindCursor.toArray",
-      href: "/docs/api/classes/FindCursor#to-array",
-      kind: "method",
-    },
-    {
-      name: "SinterCollection.findOne",
-      href: "/docs/api/classes/SinterCollection#find-one",
-      kind: "method",
+      name: "ProjectedDocument",
+      href: "/docs/api/types/ProjectedDocument",
+      kind: "type-alias",
     },
   ],
 };

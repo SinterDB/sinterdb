@@ -122,7 +122,6 @@ Not supported, and rejected with `DocumentValidationFailed`: `$regex`, `$all`,
 
 Also missing:
 
-- **No projection.** A query returns whole documents.
 - **No aggregation, no joins, and no `count` or `distinct`.** Count by reading
   the documents, or keep a counter yourself with `$inc`.
 - **No full-text, geospatial, or regular-expression search.**

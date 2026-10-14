@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 660,
+  id: 681,
   name: "FilterPaths",
   kind: "type-alias",
   label: "Type Alias",
@@ -159,6 +159,11 @@ const page: ApiPage = {
     {
       name: "Filter",
       href: "/docs/api/types/Filter",
+      kind: "type-alias",
+    },
+    {
+      name: "Projection",
+      href: "/docs/api/types/Projection",
       kind: "type-alias",
     },
   ],

@@ -6,6 +6,7 @@ export {
   StorageCorruptionError,
 } from "./errors.js";
 export { compileFilter } from "./filter.js";
+export { compileProjection } from "./projection.js";
 export { compileSort } from "./sort.js";
 export { compileUpdate } from "./update.js";
 export {
@@ -53,6 +54,7 @@ export type {
   InMemoryCollectionOptions,
   JournalOperation,
   StorageDeleteResult,
+  StorageFindOneOptions,
   StorageFindOptions,
   StorageInsertManyResult,
   StorageInsertOneResult,

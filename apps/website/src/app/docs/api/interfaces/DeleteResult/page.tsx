@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 735,
+  id: 756,
   name: "DeleteResult",
   kind: "interface",
   label: "Interface",
@@ -33,7 +33,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 736,
+          id: 757,
           name: "acknowledged",
           anchor: "acknowledged",
           kind: "property",
@@ -67,7 +67,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 737,
+          id: 758,
           name: "deletedCount",
           anchor: "deleted-count",
           kind: "property",
