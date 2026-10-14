@@ -109,6 +109,13 @@ Each breaking change lands here in the release that makes it.
 - **A query result may not contain `_id`.** With `projection: { _id: 0 }` the
   returned documents have no `_id`. The result type says so, but code that reads
   `_id` from a cursor of projected documents needs to allow for it.
+- **`countDocuments`, `estimatedDocumentCount` and `distinct` need a 0.3.0
+  server.** They use the new `count` and `distinct` commands, which an older
+  server answers with `UnknownCommand` (a `SinterServerError`).
+- **An invalid filter is always an error.** Before, `find` and `findOne` on a
+  collection that did not exist returned nothing for a filter such as
+  `{ a: { $nope: 1 } }`. They now fail with `DocumentValidationFailed`, like
+  every other command that takes a filter.
 
 ### 0.2.0
 

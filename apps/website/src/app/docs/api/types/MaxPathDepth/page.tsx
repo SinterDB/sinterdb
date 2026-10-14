@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 687,
+  id: 700,
   name: "MaxPathDepth",
   kind: "type-alias",
   label: "Type Alias",

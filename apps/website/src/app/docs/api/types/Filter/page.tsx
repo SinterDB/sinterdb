@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 665,
+  id: 678,
   name: "Filter",
   kind: "type-alias",
   label: "Type Alias",
@@ -129,7 +129,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 667,
+          id: 680,
           name: "_id",
           anchor: "_id",
           kind: "property",
@@ -167,7 +167,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 668,
+          id: 681,
           name: "$and",
           anchor: "and",
           kind: "property",
@@ -204,7 +204,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 670,
+          id: 683,
           name: "$nor",
           anchor: "nor",
           kind: "property",
@@ -241,7 +241,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 669,
+          id: 682,
           name: "$or",
           anchor: "or",
           kind: "property",
@@ -331,6 +331,11 @@ const page: ApiPage = {
       kind: "type-alias",
     },
     {
+      name: "SinterCollection.countDocuments",
+      href: "/docs/api/classes/SinterCollection#count-documents",
+      kind: "method",
+    },
+    {
       name: "SinterCollection.deleteMany",
       href: "/docs/api/classes/SinterCollection#delete-many",
       kind: "method",
@@ -338,6 +343,11 @@ const page: ApiPage = {
     {
       name: "SinterCollection.deleteOne",
       href: "/docs/api/classes/SinterCollection#delete-one",
+      kind: "method",
+    },
+    {
+      name: "SinterCollection.distinct",
+      href: "/docs/api/classes/SinterCollection#distinct",
       kind: "method",
     },
     {

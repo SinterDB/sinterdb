@@ -457,6 +457,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     since: null,
   },
   {
+    name: "countDocuments",
+    parent: "SinterCollection",
+    kind: "method",
+    href: "/docs/api/classes/SinterCollection#count-documents",
+    summary:
+      "Counts the documents that match the filter, on the server, without transferring them. Without a filter it counts the whole collection. A collection that does not exist has no documents.",
+    code: "countDocuments(filter?: Filter<TDocument>): Promise<number>",
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "createIndex",
     parent: "SinterCollection",
     kind: "method",
@@ -488,12 +499,34 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     since: null,
   },
   {
+    name: "distinct",
+    parent: "SinterCollection",
+    kind: "method",
+    href: "/docs/api/classes/SinterCollection#distinct",
+    summary:
+      "Returns the distinct values of a field among the documents that match the filter, in the order described in docs/query-semantics.md.",
+    code: "distinct<TField extends string>( field: TField, filter?: Filter<TDocument>, ): Promise<DistinctValue<TDocument, TField>[]>",
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "dropIndex",
     parent: "SinterCollection",
     kind: "method",
     href: "/docs/api/classes/SinterCollection#drop-index",
     summary: "Drops an index by name. The _id index cannot be dropped.",
     code: "dropIndex(name: string): Promise<void>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "estimatedDocumentCount",
+    parent: "SinterCollection",
+    kind: "method",
+    href: "/docs/api/classes/SinterCollection#estimated-document-count",
+    summary:
+      "Counts every document in the collection. It needs no scan: the server answers from the size of the collection.",
+    code: "estimatedDocumentCount(): Promise<number>",
     deprecated: false,
     since: null,
   },
@@ -2238,6 +2271,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     summary:
       "The function a FindCursor uses to reach the server. Cursors are created by SinterCollection.find; do not construct them directly.",
     code: "type CursorExecutor = (command: string, parameters: Document) => Promise<DocumentValue>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "DistinctValue",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/DistinctValue",
+    summary:
+      "The type of one value returned by SinterCollection.distinct for a field: the element type when the field holds and array.",
+    code: 'type DistinctValue<TDocument extends object, TField extends string> = TField extends "_id" ? CustomId : Exclude<ElementOf<FilterPathValue<TDocument, TField>>...',
     deprecated: false,
     since: null,
   },

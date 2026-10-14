@@ -1,4 +1,14 @@
 {
+  "Public Async Method Definition": {
+    "scope": "typescript",
+    "prefix": "public async",
+    "body": "public async ${1:name}($2) {$3};",
+  },
+  "Private Async Method Definition": {
+    "scope": "typescript",
+    "prefix": "private async",
+    "body": "private async ${1:name}($2) {$3};",
+  },
   "Public Get Definition": {
     "scope": "typescript",
     "prefix": "public get",

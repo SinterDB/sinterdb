@@ -2,6 +2,7 @@ import {
   CustomId,
   decodeDocument,
   encodeDocument,
+  encodeDocumentValue,
   type Document,
   type DocumentValue,
 } from "sinterdb-protocol";
@@ -11,7 +12,7 @@ import {
   StorageErrorCode,
   StorageInsertManyError,
 } from "./errors.js";
-import { compileFilter } from "./filter.js";
+import { compileFilter, resolveFieldValues } from "./filter.js";
 import {
   ID_INDEX_NAME,
   IndexSet,
@@ -26,7 +27,11 @@ import {
   type QueryPlan,
 } from "./indexing/index.js";
 import { compileProjection } from "./projection.js";
-import { compileSort, type SortSpecification } from "./sort.js";
+import {
+  compareDocumentValues,
+  compileSort,
+  type SortSpecification,
+} from "./sort.js";
 import {
   compileUpdate,
   seedDocumentFromFilter,
@@ -313,6 +318,65 @@ export class InMemoryCollection {
     const results = this.scan(filter, matches, sorter, skip, limit);
 
     return project === undefined ? results : projectAll(results, project);
+  }
+
+  /**
+   * How many documents match the filter. An empty filter is answered from the
+   * size of the collection without reading any document.
+   */
+  public count(filter: Document): number {
+    const matches = compileFilter(filter);
+
+    if (Object.keys(filter).length === 0) {
+      return this.documents.size;
+    }
+
+    let total = 0;
+
+    for (const [, encoded] of this.candidates(filter)) {
+      if (matches(decodeDocument(encoded))) {
+        total += 1;
+      }
+    }
+
+    return total;
+  }
+
+  /**
+   * The distinct values of a field among the documents that match the filter,
+   * in sort order (see docs/query-semantics.md). An array contributes its
+   * elements instead of itself, and a document without the field contributes
+   * nothing. Values are distinct by canonical equality, so `1` and `1n` are two
+   * values.
+   */
+  public distinct(field: string, filter: Document = {}): DocumentValue[] {
+    const segments = validateDistinctField(field);
+    const matches = compileFilter(filter);
+    const seen = new Set<string>();
+    const values: DocumentValue[] = [];
+
+    for (const [, encoded] of this.candidates(filter)) {
+      const document = decodeDocument(encoded);
+
+      if (!matches(document)) {
+        continue;
+      }
+
+      for (const found of resolveFieldValues(document, segments)) {
+        for (const value of Array.isArray(found) ? found : [found]) {
+          const key = Buffer.from(encodeDocumentValue(value)).toString(
+            "base64",
+          );
+
+          if (!seen.has(key)) {
+            seen.add(key);
+            values.push(value);
+          }
+        }
+      }
+    }
+
+    return values.sort(compareDocumentValues);
   }
 
   public deleteOne(filter: Document): StorageDeleteResult {
@@ -908,6 +972,32 @@ export class InMemoryCollection {
 
     yield* ordered.slice(skip, limit === undefined ? undefined : skip + limit);
   }
+}
+
+export function validateDistinctField(field: string): string[] {
+  if (typeof field !== "string" || field.length === 0) {
+    throw new StorageError(
+      StorageErrorCode.InvalidFindOptions,
+      "The distinct field must be a non-empty string.",
+    );
+  }
+
+  const segments = field.split(".");
+
+  for (const segment of segments) {
+    if (
+      segment.length === 0 ||
+      segment.startsWith("$") ||
+      segment === "__proto__"
+    ) {
+      throw new StorageError(
+        StorageErrorCode.InvalidFindOptions,
+        `The distinct field ${JSON.stringify(field)} contains an empty or reserved segment.`,
+      );
+    }
+  }
+
+  return segments;
 }
 
 function* projectAll(

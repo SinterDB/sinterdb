@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 290,
+  id: 303,
   name: "ProjectedDocument",
   kind: "type-alias",
   label: "Type Alias",

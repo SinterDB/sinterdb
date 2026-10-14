@@ -576,6 +576,11 @@ const page: ApiPage = {
       kind: "type-alias",
     },
     {
+      name: "DistinctValue",
+      href: "/docs/api/types/DistinctValue",
+      kind: "type-alias",
+    },
+    {
       name: "Filter",
       href: "/docs/api/types/Filter",
       kind: "type-alias",

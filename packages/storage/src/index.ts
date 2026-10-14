@@ -1,4 +1,7 @@
-export { InMemoryCollection } from "./in-memory-collection.js";
+export {
+  InMemoryCollection,
+  validateDistinctField,
+} from "./in-memory-collection.js";
 export {
   StorageError,
   StorageErrorCode,

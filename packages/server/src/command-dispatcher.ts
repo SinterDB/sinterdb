@@ -1,5 +1,7 @@
 import {
   compileFilter,
+  compileProjection,
+  validateDistinctField,
   compileUpdate,
   normalizeIndexSpec,
   StorageError,
@@ -45,6 +47,8 @@ export const ServerCommand = {
   UpdateMany: "updateMany",
   FindOne: "findOne",
   Find: "find",
+  Count: "count",
+  Distinct: "distinct",
   GetMore: "getMore",
   CloseCursor: "closeCursor",
   CreateIndex: "createIndex",
@@ -140,6 +144,12 @@ export class CommandDispatcher {
 
       case ServerCommand.Find:
         return this.find(command, cursors);
+
+      case ServerCommand.Count:
+        return this.count(command);
+
+      case ServerCommand.Distinct:
+        return this.distinct(command);
 
       case ServerCommand.GetMore:
         return this.getMore(command, cursors);
@@ -576,6 +586,8 @@ export class CommandDispatcher {
       );
 
       if (collection === undefined) {
+        compileFilter(filter);
+
         return {
           document: null,
         };
@@ -614,12 +626,80 @@ export class CommandDispatcher {
       );
 
       if (collection === undefined) {
+        compileFilter(filter);
+
+        if (findOptions.projection !== undefined) {
+          compileProjection(findOptions.projection);
+        }
+
         return { cursorId: null, documents: [] };
       }
 
       return toBatchDocument(
         cursors.open(collection.find(filter, findOptions), batchSize),
       );
+    } catch (error: unknown) {
+      if (error instanceof CatalogError) {
+        throw translateCatalogError(error);
+      }
+
+      throw translateStorageError(error);
+    }
+  }
+
+  private count(command: CommandEnvelope): Document {
+    const databaseName = requireDatabase(command);
+    const collectionName = requireStringParameter(
+      command.parameters,
+      "collection",
+    );
+    const filter = requireDocumentParameter(command.parameters, "filter");
+
+    try {
+      const collection = this.catalog.getCollection(
+        databaseName,
+        collectionName,
+      );
+
+      if (collection === undefined) {
+        compileFilter(filter);
+
+        return { count: 0 };
+      }
+
+      return { count: collection.count(filter) };
+    } catch (error: unknown) {
+      if (error instanceof CatalogError) {
+        throw translateCatalogError(error);
+      }
+
+      throw translateStorageError(error);
+    }
+  }
+
+  private distinct(command: CommandEnvelope): Document {
+    const databaseName = requireDatabase(command);
+    const collectionName = requireStringParameter(
+      command.parameters,
+      "collection",
+    );
+    const field = requireStringParameter(command.parameters, "field");
+    const filter = requireDocumentParameter(command.parameters, "filter");
+
+    try {
+      const collection = this.catalog.getCollection(
+        databaseName,
+        collectionName,
+      );
+
+      if (collection === undefined) {
+        compileFilter(filter);
+        validateDistinctField(field);
+
+        return { values: [] };
+      }
+
+      return { values: collection.distinct(field, filter) };
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
         throw translateCatalogError(error);

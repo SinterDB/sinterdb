@@ -391,6 +391,8 @@ Database and collection names are created on first write.
 | `insertMany`       | Yes      | `collection`, `documents`                                                           | `acknowledged`, `insertedCount`, `insertedIds`                 |
 | `findOne`          | Yes      | `collection`, `filter`, optional `projection`                                       | `document`: document or `null`                                 |
 | `find`             | Yes      | `collection`, `filter`, optional `batchSize`, `sort`, `skip`, `limit`, `projection` | `cursorId` (number or `null`), `documents`                     |
+| `count`            | Yes      | `collection`, `filter`                                                              | `count`: non-negative integer                                  |
+| `distinct`         | Yes      | `collection`, `field`, `filter`                                                     | `values`: array                                                |
 | `getMore`          | Yes      | `cursorId`, optional `batchSize`                                                    | `cursorId` (number or `null`), `documents`                     |
 | `closeCursor`      | Yes      | `cursorId`                                                                          | `closed`: boolean                                              |
 | `replaceOne`       | Yes      | `collection`, `filter`, `replacement`, optional `upsert`                            | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
@@ -418,6 +420,17 @@ Notes:
   `INVALID_FIND_OPTIONS`, like an invalid `sort`. Result documents carry `_id`
   unless the projection excludes it, so clients must not assume it is
   present.
+- `count` counts the documents that match `filter`; an empty filter counts the
+  whole collection without reading it. `distinct` returns the distinct values of
+  `field` among the matching documents, in sort order, with the elements of any
+  array standing in for the array. Both treat a missing collection as empty and
+  still reject an invalid `filter`. The rules are in `docs/query-semantics.md`.
+  An invalid `field` returns `DocumentValidationFailed` with
+  `details.storageErrorCode` set to `INVALID_FIND_OPTIONS`. A result larger than
+  one message returns `ResultTooLarge`. A server that predates these commands
+  answers `UnknownCommand`.
+- An invalid `filter` is rejected with `DocumentValidationFailed` whether or not
+  the collection exists, for every command that takes one.
 - `skip` is a non-negative integer. `limit` is a positive integer. `batchSize`
   is an integer from 1 to 10,000.
 - A `cursorId` of `null` means the result set is exhausted and no cursor

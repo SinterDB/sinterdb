@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 660,
+  id: 673,
   name: "ElementOf",
   kind: "type-alias",
   label: "Type Alias",
@@ -70,6 +70,11 @@ const page: ApiPage = {
     {
       name: "ComparisonOperators",
       href: "/docs/api/types/ComparisonOperators",
+      kind: "type-alias",
+    },
+    {
+      name: "DistinctValue",
+      href: "/docs/api/types/DistinctValue",
       kind: "type-alias",
     },
     {

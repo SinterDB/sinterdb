@@ -23,6 +23,7 @@ export type {
 
 export { SinterCollection } from "./collection.js";
 export type {
+  DistinctValue,
   EqualityFilter,
   FindOneOptions,
   FindOptions,

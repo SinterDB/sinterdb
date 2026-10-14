@@ -111,16 +111,13 @@ describe("docs/limitations.md: queries", () => {
     });
   });
 
-  it("has no count, distinct or aggregation", async () => {
+  it("has no aggregation, findOneAnd*, bulkWrite or watch", async () => {
     await inDatabase(async (client) => {
       const items = client.db().collection("items");
       const names = Object.getOwnPropertyNames(Object.getPrototypeOf(items));
 
       for (const missing of [
-        "countDocuments",
-        "estimatedDocumentCount",
         "count",
-        "distinct",
         "aggregate",
         "findOneAndUpdate",
         "findOneAndReplace",

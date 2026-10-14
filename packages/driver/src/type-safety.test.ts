@@ -458,3 +458,53 @@ describe("ProjectedDocument types", () => {
     void [unknown, position, flag];
   });
 });
+
+describe("distinct types", () => {
+  interface Shop {
+    _id: CustomId;
+    tags: string[];
+    score?: number;
+    items: { sku: string; qty: number }[];
+    owner: { name: string } | null;
+  }
+
+  // These checks run in the compiler only: the collection is never used.
+  const shop = undefined as unknown as SinterCollection<Shop>;
+
+  it("types the values from the field", () => {
+    const check = (): void => {
+      expectTypeOf(shop.distinct("tags")).resolves.toEqualTypeOf<string[]>();
+      expectTypeOf(shop.distinct("score")).resolves.toEqualTypeOf<number[]>();
+      expectTypeOf(shop.distinct("items.sku")).resolves.toEqualTypeOf<
+        string[]
+      >();
+      expectTypeOf(shop.distinct("items.qty")).resolves.toEqualTypeOf<
+        number[]
+      >();
+      expectTypeOf(shop.distinct("_id")).resolves.toEqualTypeOf<CustomId[]>();
+      expectTypeOf(shop.distinct("owner.name")).resolves.toEqualTypeOf<
+        string[]
+      >();
+    };
+
+    expect(check).toBeTypeOf("function");
+  });
+
+  it("only accepts real fields and a typed filter", () => {
+    const check = (): void => {
+      // @ts-expect-error unknown field
+      void shop.distinct("nope");
+      // @ts-expect-error filter values are typed
+      void shop.distinct("tags", { score: "high" });
+      // @ts-expect-error the filter must be a filter of this collection
+      void shop.countDocuments({ nope: 1 });
+
+      expectTypeOf(shop.countDocuments()).resolves.toEqualTypeOf<number>();
+      expectTypeOf(
+        shop.estimatedDocumentCount(),
+      ).resolves.toEqualTypeOf<number>();
+    };
+
+    expect(check).toBeTypeOf("function");
+  });
+});

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 697,
+  id: 710,
   name: "ExplainResult",
   kind: "interface",
   label: "Interface",
@@ -36,7 +36,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 701,
+          id: 714,
           name: "access",
           anchor: "access",
           kind: "property",
@@ -75,7 +75,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 705,
+          id: 718,
           name: "documents",
           anchor: "documents",
           kind: "property",
@@ -108,7 +108,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 704,
+          id: 717,
           name: "estimatedCandidates",
           anchor: "estimated-candidates",
           kind: "property",
@@ -141,7 +141,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 700,
+          id: 713,
           name: "field",
           anchor: "field",
           kind: "property",
@@ -175,7 +175,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 699,
+          id: 712,
           name: "index",
           anchor: "index-2",
           kind: "property",
@@ -208,7 +208,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 702,
+          id: 715,
           name: "lower",
           anchor: "lower",
           kind: "property",
@@ -241,7 +241,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 698,
+          id: 711,
           name: "stage",
           anchor: "stage",
           kind: "property",
@@ -280,7 +280,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 703,
+          id: 716,
           name: "upper",
           anchor: "upper",
           kind: "property",

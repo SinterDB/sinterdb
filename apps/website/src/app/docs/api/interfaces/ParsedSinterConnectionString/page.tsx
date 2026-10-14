@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 299,
+  id: 312,
   name: "ParsedSinterConnectionString",
   kind: "interface",
   label: "Interface",
@@ -36,7 +36,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 302,
+          id: 315,
           name: "database",
           anchor: "database",
           kind: "property",
@@ -69,7 +69,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 300,
+          id: 313,
           name: "host",
           anchor: "host",
           kind: "property",
@@ -102,7 +102,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 301,
+          id: 314,
           name: "port",
           anchor: "port",
           kind: "property",

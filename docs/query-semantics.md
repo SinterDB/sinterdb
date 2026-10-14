@@ -167,6 +167,50 @@ Values that compare equal keep their existing order, so a sort is stable. A
 sort with several fields compares the first field, then the second for ties,
 and so on.
 
+## Counting and distinct values
+
+`countDocuments` counts the documents that match a filter, using exactly the
+matching rules above. An empty filter counts the whole collection. A collection
+that does not exist has no documents, but an invalid filter is still an error.
+
+`distinct` returns the values of a field among the documents that match a
+filter.
+
+- A value appears once. Values are the same when they are equal under
+  [Equality](#equality), so `1` and `1n` are two values, `0` and `-0` are two
+  values, and `NaN` appears once.
+- Values come back in [sort order](#sort-order), lowest first. Values that
+  compare equal but are not the same, such as `0` and `-0`, keep the order in
+  which the collection first showed them.
+- A field that holds an array contributes its elements, not the array. An
+  element that is itself an array stays an array. An empty array contributes
+  nothing.
+- A document without the field contributes nothing. A field holding `null`
+  contributes `null`.
+- A dotted path reads the same way it does in a filter: through documents, by
+  field name through arrays of documents, and by position (`"a.1"`).
+- The field must be a non-empty path with no empty segment and no segment that
+  starts with `$`.
+
+Each row is a field, the documents in a collection, and the distinct values.
+
+| Field | Documents                                     | Distinct values     |
+| ----- | --------------------------------------------- | ------------------- |
+| `a`   | `[{"a":2},{"a":1},{"a":2}]`                   | `[1,2]`             |
+| `a`   | `[{"a":1},{"b":1}]`                           | `[1]`               |
+| `a`   | `[{"a":null},{"a":1}]`                        | `[null,1]`          |
+| `a`   | `[{"a":"s"},{"a":1},{"a":null},{"a":true}]`   | `[null,1,"s",true]` |
+| `a`   | `[{"a":[2,1]},{"a":[1,3]}]`                   | `[1,2,3]`           |
+| `a`   | `[{"a":[]},{"a":"x"}]`                        | `["x"]`             |
+| `a`   | `[{"a":[[1],2]}]`                             | `[2,[1]]`           |
+| `a`   | `[{"a":1},{"a":"1"},{"a":true}]`              | `[1,"1",true]`      |
+| `a.b` | `[{"a":{"b":1}},{"a":{"b":2}},{"a":{"b":1}}]` | `[1,2]`             |
+| `a.b` | `[{"a":[{"b":2},{"b":1},{"c":1}]}]`           | `[1,2]`             |
+| `a.1` | `[{"a":["x","y"]},{"a":["z","y"]}]`           | `["y"]`             |
+| `a.1` | `[{"a":["x"]}]`                               | `[]`                |
+| `a`   | `[{"a":{"x":1,"y":2}},{"a":{"y":2,"x":1}}]`   | `[{"x":1,"y":2}]`   |
+| `a`   | `[]`                                          | `[]`                |
+
 ## Projection
 
 A projection chooses which fields a query returns. It is applied to each

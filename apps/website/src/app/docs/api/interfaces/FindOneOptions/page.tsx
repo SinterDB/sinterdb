@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 263,
+  id: 276,
   name: "FindOneOptions",
   kind: "interface",
   label: "Interface",
@@ -79,7 +79,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 266,
+          id: 279,
           name: "projection",
           anchor: "projection",
           kind: "property",
@@ -108,8 +108,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 64,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L64",
+              line: 81,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L81",
             },
           ],
         },
@@ -138,8 +138,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 56,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L56",
+      line: 73,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L73",
     },
   ],
   usedBy: [

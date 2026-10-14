@@ -233,6 +233,30 @@ const page = await users
 Values of different types sort in this order: missing, `null`, numbers and
 bigints, strings, binary values, `CustomId`, booleans, then dates.
 
+### Counting and distinct values
+
+```ts
+const total = await users.countDocuments(); // the whole collection
+const adults = await users.countDocuments({ age: { $gte: 18 } });
+const same = await users.estimatedDocumentCount(); // always the whole collection
+
+// Distinct values, lowest first, typed from the field.
+const teams = await users.distinct("team"); // string[]
+const skus = await users.distinct("orders.sku", { active: true }); // string[]
+```
+
+- Counting happens on the server. No documents are transferred.
+- `countDocuments()` takes the same filter as `find()`. A collection that does
+  not exist has no documents, but an invalid filter is still an error.
+- `estimatedDocumentCount()` is the same as `countDocuments()` with no filter.
+  It needs no scan, because the server answers from the size of the collection.
+- `distinct()` returns each value once, in the sort order of
+  [query semantics](../../docs/query-semantics.md#counting-and-distinct-values).
+  A field that holds an array contributes its elements, and `1` and `1n` count
+  as two values.
+- A result larger than one message (16 MiB) fails with `ResultTooLarge`.
+- A server older than 0.3.0 answers these with `UnknownCommand`.
+
 ### Projection
 
 A projection chooses which fields come back. It works on `find()` and

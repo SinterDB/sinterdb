@@ -69,6 +69,9 @@ export interface DeleteResult {
     readonly deletedCount: number;
 }
 
+// @public
+export type DistinctValue<TDocument extends object, TField extends string> = TField extends "_id" ? CustomId : Exclude<ElementOf<FilterPathValue<TDocument, TField>>, undefined>;
+
 export { Document }
 
 // @public
@@ -331,12 +334,15 @@ export class SinterClientStateError extends SinterError {
 export class SinterCollection<TDocument extends object = Document> {
     constructor(
     database: SinterDatabase, name: string);
+    countDocuments(filter?: Filter<TDocument>): Promise<number>;
     createIndex(definition: IndexDefinition<TDocument>): Promise<CreateIndexResult>;
     readonly database: SinterDatabase;
     deleteMany(filter: Filter<TDocument>): Promise<DeleteResult>;
     deleteOne(filter: Filter<TDocument>): Promise<DeleteResult>;
+    distinct<TField extends FilterPaths<TDocument> | "_id">(field: TField, filter?: Filter<TDocument>): Promise<DistinctValue<TDocument, TField>[]>;
     protected readonly documentType: TDocument;
     dropIndex(name: string): Promise<void>;
+    estimatedDocumentCount(): Promise<number>;
     find<const TProjection extends Projection<TDocument> | undefined = undefined>(filter?: Filter<TDocument>, options?: FindOptions<TDocument, TProjection>): FindCursor<TDocument, ProjectedDocument<TDocument, TProjection>>;
     findOne<const TProjection extends Projection<TDocument> | undefined = undefined>(filter?: Filter<TDocument>, options?: FindOneOptions<TDocument, TProjection>): Promise<ProjectedDocument<TDocument, TProjection> | null>;
     indexes(): Promise<IndexInfo[]>;

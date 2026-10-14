@@ -13,7 +13,13 @@ import {
   SinterProtocolError,
   SinterServerError,
 } from "./errors.js";
-import type { Filter, Sort } from "./filter.js";
+import type {
+  ElementOf,
+  Filter,
+  FilterPaths,
+  FilterPathValue,
+  Sort,
+} from "./filter.js";
 import {
   parseCreateIndexResult,
   parseIndexList,
@@ -51,6 +57,17 @@ export type WithId<TDocument extends object> = Omit<TDocument, "_id"> & {
 export type EqualityFilter<TDocument extends object> = {
   readonly [Key in keyof TDocument]?: TDocument[Key];
 };
+
+/**
+ * The type of one value returned by {@link SinterCollection.distinct} for a
+ * field: the element type when the field holds and array.
+ */
+export type DistinctValue<
+  TDocument extends object,
+  TField extends string,
+> = TField extends "_id"
+  ? CustomId
+  : Exclude<ElementOf<FilterPathValue<TDocument, TField>>, undefined>;
 
 /** Options for {@link SinterCollection.findOne}. */
 export interface FindOneOptions<
@@ -217,6 +234,51 @@ export class SinterCollection<TDocument extends object = Document> {
       value,
       options.projection === undefined,
     );
+  }
+
+  /**
+   * Counts the documents that match the filter, on the server, without
+   * transferring them. Without a filter it counts the whole collection. A
+   * collection that does not exist has no documents.
+   */
+  public async countDocuments(
+    filter: Filter<TDocument> = {} as Filter<TDocument>,
+  ): Promise<number> {
+    const value = await this.execute("count", {
+      collection: this.name,
+      filter: filter as unknown as Document,
+    });
+
+    return parseCountResult(value);
+  }
+
+  /**
+   * Counts every document in the collection. It needs no scan: the server
+   * answers from the size of the collection.
+   */
+  public async estimatedDocumentCount(): Promise<number> {
+    return this.countDocuments();
+  }
+
+  /**
+   * Returns the distinct values of a field among the documents that match the
+   * filter, in the order described in `docs/query-semantics.md`.
+   *
+   * A field that holds an array contributes its elements, and a document
+   * without the field contributes nothing. Values are distinct by exact
+   * equality, so `1` and `1n` are two values.
+   */
+  public async distinct<TField extends FilterPaths<TDocument> | "_id">(
+    field: TField,
+    filter: Filter<TDocument> = {} as Filter<TDocument>,
+  ): Promise<DistinctValue<TDocument, TField>[]> {
+    const value = await this.execute("distinct", {
+      collection: this.name,
+      field,
+      filter: filter as unknown as Document,
+    });
+
+    return parseDistinctResult<DistinctValue<TDocument, TField>>(value);
   }
 
   /** Deletes the first document that matches the filter. */
@@ -552,6 +614,22 @@ function parseDeleteResult(
   }
 
   return Object.freeze({ acknowledged: true, deletedCount });
+}
+
+function parseCountResult(value: DocumentValue): number {
+  if (!isPlainDocument(value) || !isCount(value["count"])) {
+    throw invalidWriteResult("count");
+  }
+
+  return value["count"];
+}
+
+function parseDistinctResult<TValue>(value: DocumentValue): TValue[] {
+  if (!isPlainDocument(value) || !Array.isArray(value["values"])) {
+    throw invalidWriteResult("distinct");
+  }
+
+  return value["values"] as unknown as TValue[];
 }
 
 function isCount(value: unknown): value is number {

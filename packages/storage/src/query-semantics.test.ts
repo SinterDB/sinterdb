@@ -472,3 +472,60 @@ describe("the projection examples in docs/query-semantics.md", () => {
     },
   );
 });
+
+describe("the distinct examples in docs/query-semantics.md", () => {
+  const rows = [
+    ...markdown.matchAll(
+      /^\|\s*`([\w.]+)`\s*\|\s*`(\[.*\])`\s*\|\s*`(\[.*\])`\s*\|$/gm,
+    ),
+  ].map((row) => ({
+    field: row[1] as string,
+    documents: JSON.parse(row[2] as string) as Document[],
+    expected: row[3] as string,
+  }));
+
+  it("has examples to run", () => {
+    expect(rows.length).toBeGreaterThanOrEqual(14);
+  });
+
+  it.each(rows.map((row) => [JSON.stringify(row), row] as const))(
+    "%s",
+    (_name, row) => {
+      const collection = new InMemoryCollection();
+
+      if (row.documents.length > 0) {
+        collection.insertMany(row.documents);
+      }
+
+      expect(JSON.stringify(collection.distinct(row.field))).toBe(row.expected);
+    },
+  );
+});
+describe("the distinct examples in docs/query-semantics.md", () => {
+  const rows = [
+    ...markdown.matchAll(
+      /^\|\s*`([\w.]+)`\s*\|\s*`(\[.*\])`\s*\|\s*`(\[.*\])`\s*\|$/gm,
+    ),
+  ].map((row) => ({
+    field: row[1] as string,
+    documents: JSON.parse(row[2] as string) as Document[],
+    expected: row[3] as string,
+  }));
+
+  it("has examples to run", () => {
+    expect(rows.length).toBeGreaterThanOrEqual(14);
+  });
+
+  it.each(rows.map((row) => [JSON.stringify(row), row] as const))(
+    "%s",
+    (_name, row) => {
+      const collection = new InMemoryCollection();
+
+      if (row.documents.length > 0) {
+        collection.insertMany(row.documents);
+      }
+
+      expect(JSON.stringify(collection.distinct(row.field))).toBe(row.expected);
+    },
+  );
+});
