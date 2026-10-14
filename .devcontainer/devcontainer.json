@@ -22,11 +22,10 @@
   "containerEnv": {
     "FORCE_COLOR": "1"
   },
-  "mounts": [
-    "source=sinterdb-pnpm-store,target=/home/vscode/.local/share/pnpm,type=volume"
+  "forwardPorts": [
+    3000,
+    4721
   ],
-  "postCreateCommand": "sudo chown -R vscode:vscode /home/vscode/.local/share/pnpm && corepack enable && pnpm install --frozen-lockfile",
-  "forwardPorts": [3000, 4721],
   "portsAttributes": {
     "3000": {
       "label": "SinterDB Website",
@@ -44,7 +43,10 @@
   },
   "customizations": {
     "codespaces": {
-      "openFiles": ["README.md", "ROADMAP.md"]
+      "openFiles": [
+        "README.md",
+        "ROADMAP.md"
+      ]
     },
     "vscode": {
       "extensions": [
