@@ -4,9 +4,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 import {
-  PREVIEW_DIST_TAG,
   PUBLIC_PACKAGES,
   REPOSITORY_URL,
+  RELEASE_DIST_TAG,
   readManifest,
 } from "./manifests.ts";
 
@@ -87,9 +87,9 @@ describe(".github/workflows/release.yml", () => {
     expect(job("github-release")).toContain(`name: ${uploaded}`);
   });
 
-  it("publishes under the preview tag and never under latest", () => {
-    expect(job("publish")).toContain(`--tag ${PREVIEW_DIST_TAG}`);
-    expect(workflow).not.toMatch(/--tag latest|npm publish|pnpm publish/);
+  it("publishes under the release tag, only through the publish script", () => {
+    expect(job("publish")).toContain(`--tag ${RELEASE_DIST_TAG}`);
+    expect(workflow).not.toMatch(/npm publish|pnpm publish/);
     expect(workflow).not.toContain("changeset publish");
   });
 
@@ -144,7 +144,7 @@ describe("docs/releasing.md", () => {
       expect(guide).toContain(name);
     }
 
-    expect(guide).toContain(`under the npm tag \`${PREVIEW_DIST_TAG}\``);
+    expect(guide).toContain(`under the npm tag \`${RELEASE_DIST_TAG}\``);
   });
 
   it("only mentions pnpm scripts that exist", () => {
@@ -185,30 +185,31 @@ describe("ignore files", () => {
   });
 });
 
-describe("the 0.1.0 release", () => {
+describe("the current release", () => {
   const version = readManifest(ROOT, "packages/driver").version as string;
 
-  it("has notes whose install commands use the preview tag", () => {
+  it("has notes whose install commands name no tag", () => {
     const notes = read(`docs/releases/${version}.md`);
 
-    expect(notes).toContain("npm install --global @sinterdb/cli@next");
-    expect(notes).toContain("npm install sinterdb@next");
+    expect(notes).toContain("npm install --global @sinterdb/cli\n");
+    expect(notes).toContain("npm install sinterdb\n");
   });
 
-  it("has READMEs whose install commands use the preview tag", () => {
+  it("has READMEs whose install commands name no tag", () => {
     for (const path of [
       "packages/driver/README.md",
       "apps/server-cli/README.md",
       "docs/quick-start.md",
+      "apps/website/src/app/docs/(guides)/installation/page.mdx",
     ]) {
       const installs = read(path).match(
-        /npm install[^\n]*(sinterdb|@sinterdb\/cli)[^\n]*/g,
+        /(npm install|pnpm add)[^\n]*(sinterdb|@sinterdb\/cli)[^\n]*/g,
       );
 
       expect(installs, path).not.toBeNull();
 
       for (const line of installs ?? []) {
-        expect(line, path).toMatch(/@next\b/);
+        expect(line, path).not.toMatch(/@(next|latest)\b/);
       }
     }
   });

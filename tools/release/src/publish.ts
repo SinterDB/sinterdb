@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { PREVIEW_DIST_TAG, PUBLIC_PACKAGES, tarballSpec } from "./manifests.ts";
+import { PUBLIC_PACKAGES, RELEASE_DIST_TAG, tarballSpec } from "./manifests.ts";
 
 export interface CommandResult {
   readonly status: number | null;
@@ -55,8 +55,9 @@ function sleep(milliseconds: number): void {
 /**
  * Publishes the packed packages to npm, protocol first because the driver
  * depends on it. It publishes the exact tarballs that were tested, with
- * provenance, under `distTag` and never `latest`. A version that is already on
- * npm is skipped, so a run that stopped halfway can be run again.
+ * provenance, under `distTag` (never `latest` for a prerelease version). A
+ * version that is already on npm is skipped, so a run that stopped halfway can
+ * be run again.
  *
  * All packages are published before any is checked. npm's registry is cached
  * for a few minutes, and a trusted publisher that only allows staged
@@ -71,9 +72,9 @@ export function publishTarballs(options: PublishOptions): PublishResult {
   const published: string[] = [];
   const skipped: string[] = [];
 
-  if (distTag === "latest") {
+  if (distTag === "latest" && version.includes("-")) {
     throw new Error(
-      'A developer preview must not be published under "latest". Promote it with `npm dist-tag add` after it has been tried.',
+      `${version} is a prerelease and must not be published under "latest". Use another tag, such as "next".`,
     );
   }
 
@@ -263,7 +264,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     const result = publishTarballs({
       directory,
       version,
-      distTag: value("--tag") ?? PREVIEW_DIST_TAG,
+      distTag: value("--tag") ?? RELEASE_DIST_TAG,
       dryRun: arguments_.includes("--dry-run"),
       log: (line) => process.stdout.write(`${line}\n`),
     });

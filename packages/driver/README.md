@@ -8,10 +8,10 @@ The official Node.js driver for the SinterDB document database.
 
 ## Installation
 
-The `0.2.0` developer preview is published under the `next` tag:
+The `0.2.0` developer preview is on npm:
 
 ```bash
-npm install sinterdb@next
+npm install sinterdb
 ```
 
 See the [quick start](../../docs/quick-start.md) for a walkthrough,

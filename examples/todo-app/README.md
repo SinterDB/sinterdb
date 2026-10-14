@@ -45,7 +45,7 @@ By default the app connects to `sinterdb://127.0.0.1:4721/todo`. Set
 
 ## Use it in your own project
 
-Copy `src/todos.ts` and `src/main.ts`, then run `npm install sinterdb@next`.
+Copy `src/todos.ts` and `src/main.ts`, then run `npm install sinterdb`.
 Because Node strips types without compiling them, the code avoids TypeScript
 syntax that needs a compiler (such as constructor parameter properties). The
 [`tsconfig.json`](./tsconfig.json) turns on `erasableSyntaxOnly` so that the

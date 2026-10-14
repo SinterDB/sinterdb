@@ -7,10 +7,10 @@ Command-line server for SinterDB. The package installs the `sinterd` executable.
 
 ## Installation
 
-The `0.2.0` developer preview is published under the `next` tag:
+The `0.2.0` developer preview is on npm:
 
 ```bash
-npm install --global @sinterdb/cli@next
+npm install --global @sinterdb/cli
 ```
 
 See the [quick start](../../docs/quick-start.md) for a walkthrough and the

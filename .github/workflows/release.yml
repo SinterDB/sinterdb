@@ -1,6 +1,6 @@
 name: Release
 
-# Publishes a developer preview to npm when a version tag is pushed, for
+# Publishes a release version to npm when a version tag is pushed, for
 # example `git tag v0.1.0 && git push origin v0.1.0`. See docs/releasing.md.
 #
 # npm trusts this workflow by its file name, so do not rename it without
@@ -113,10 +113,10 @@ jobs:
           name: release-tarballs
           path: release
 
-      - name: Publish under the next tag
+      - name: Publish under the latest tag
         run: |
           version="${GITHUB_REF_NAME#v}"
-          node tools/release/src/publish.ts --dir release --version "$version" --tag next
+          node tools/release/src/publish.ts --dir release --version "$version" --tag latest
 
   github-release:
     name: Create GitHub release

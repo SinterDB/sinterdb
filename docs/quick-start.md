@@ -6,19 +6,18 @@ data still there. It takes about five minutes.
 
 You need **Node.js 24 or later**.
 
-> SinterDB `0.2.0` is a developer preview. It is published under the `next`
-> tag on npm, so the install commands below end in `@next`. Once a version is
-> promoted to `latest` you can drop the tag.
+> SinterDB `0.2.0` is a developer preview. The APIs and the protocol may still
+> change before `1.0.0`.
 
 ## 1. Install the server
 
 The server is the `@sinterdb/cli` package. It installs one command, `sinterd`.
 
 ```bash
-npm install --global @sinterdb/cli@next
+npm install --global @sinterdb/cli
 ```
 
-With pnpm, use `pnpm add --global @sinterdb/cli@next`.
+With pnpm, use `pnpm add --global @sinterdb/cli`.
 
 Prefer a container? See [Running in Docker](./docker.md), then continue at step 3.
 
@@ -47,7 +46,7 @@ mkdir todo
 cd todo
 npm init -y
 npm pkg set type=module
-npm install sinterdb@next
+npm install sinterdb
 ```
 
 ## 4. Store and query documents

@@ -1,7 +1,7 @@
 # Releasing
 
-This page is for maintainers. It explains how a version reaches npm, what to set
-up once, and how to promote a preview.
+This page is for maintainers. It explains how a version reaches npm and what to set
+up once.
 
 SinterDB publishes three packages: `sinterdb-protocol`, `sinterdb` (the driver),
 and `@sinterdb/cli` (the server). They share one version. Pushing a tag such as
@@ -11,8 +11,9 @@ trusts the workflow through
 [trusted publishing](https://docs.npmjs.com/trusted-publishers), and every
 version is published with provenance.
 
-A developer preview goes out under the npm tag `next`, never `latest`. The
-workflow and `release:publish` both refuse `latest`.
+A release goes out under the npm tag `latest`, so a plain `npm install sinterdb`
+gets it. `release:publish` refuses to publish a prerelease version such as
+`0.3.0-rc.1` under `latest`; use `--tag next` for those.
 
 ## Releasing a version
 
@@ -46,7 +47,7 @@ workflow and `release:publish` both refuse `latest`.
    ```
 
 7. Watch the **Release** workflow. It runs the checks again, uploads the
-   tarballs it tested, publishes those exact files, confirms that the `next` tag
+   tarballs it tested, publishes those exact files, confirms that the `latest` tag
    points at the new version, and creates a GitHub release marked as a
    prerelease.
 
@@ -126,28 +127,25 @@ putting an npm token into GitHub.
 After the first tag, open each package on npmjs.com. The version page shows a
 **Provenance** badge that links to the workflow run and commit. npm may also
 point `latest` at the first version of a brand-new package, whatever tag it was
-published under; the publish step prints a note when that happens, and the next
-version you promote replaces it. Then:
+published under. Then:
 
 ```bash
 npm view sinterdb dist-tags
-npm install --global @sinterdb/cli@next
+npm install --global @sinterdb/cli
 sinterd --version
 ```
 
-## Promoting a preview to `latest`
+## Moving a tag by hand
 
-Once a version has been tried and you are happy with it, point `latest` at it.
-Do this by hand, for each package, with two-factor authentication:
+A version is normally tagged by the workflow. To move a tag yourself, for
+example to roll `latest` back to an earlier version, run this for each package,
+with two-factor authentication:
 
 ```bash
-npm dist-tag add sinterdb-protocol@0.1.0 latest
-npm dist-tag add sinterdb@0.1.0 latest
-npm dist-tag add @sinterdb/cli@0.1.0 latest
+npm dist-tag add sinterdb-protocol@0.2.0 latest
+npm dist-tag add sinterdb@0.2.0 latest
+npm dist-tag add @sinterdb/cli@0.2.0 latest
 ```
-
-Then drop the `@next` from the install commands in the documentation, and
-replace the commented-out npm badges in the root `README.md`.
 
 ## When something goes wrong
 
@@ -160,9 +158,9 @@ replace the commented-out npm badges in the root `README.md`.
   allows staged publishing only, so the package is waiting for your approval:
   open the package on npmjs.com, go to the **Staged Packages** tab, and approve
   it (or run `npm stage list` and `npm stage approve <id>`; both ask for
-  two-factor authentication). A staged publish may not keep the `next` tag, so
+  two-factor authentication). A staged publish may not keep the `latest` tag, so
   afterwards check `npm view sinterdb dist-tags` and, if needed, run
-  `npm dist-tag add sinterdb@0.1.0 next`. To avoid the approval next time,
+  `npm dist-tag add sinterdb@0.1.0 latest`. To avoid the approval next time,
   recreate the trusted publisher with **Allow npm publish** ticked.
 - **The publish step says a version is public but the tag is wrong.** Run the
   `npm dist-tag add` command it prints.
