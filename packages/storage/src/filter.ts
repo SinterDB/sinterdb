@@ -453,6 +453,12 @@ export function compareValues(
   return undefined;
 }
 
+/**
+ * Orders strings by Unicode code point, which is also the order of their UTF-8
+ * bytes. JavaScript's own `<` orders by UTF-16 code unit, which puts a
+ * character outside the Basic Multilingual Plane (an emoji, say) before
+ * U+E000 to U+FFFF, so it cannot be used directly.
+ */
 export function compareStrings(left: string, right: string): number {
   const length = Math.min(left.length, right.length);
 
