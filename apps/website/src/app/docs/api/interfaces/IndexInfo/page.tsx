@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 731,
+  id: 740,
   name: "IndexInfo",
   kind: "interface",
   label: "Interface",
@@ -36,7 +36,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 734,
+          id: 743,
           name: "direction",
           anchor: "direction",
           kind: "property",
@@ -54,9 +54,9 @@ const page: ApiPage = {
           ],
           comment: {
             summary:
-              "<p><code>1</code> for ascending or <code>-1</code> for descending.</p>",
+              "<p><code>1</code> for ascending or <code>-1</code> for descending, for the first field.</p>",
             short:
-              "<code>1</code> for ascending or <code>-1</code> for descending.",
+              "<code>1</code> for ascending or <code>-1</code> for descending, for the first field.",
             deprecated: null,
             modifiers: [],
             blocks: [],
@@ -67,13 +67,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 48,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L48",
+              line: 95,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L95",
             },
           ],
         },
         {
-          id: 733,
+          id: 742,
           name: "field",
           anchor: "field",
           kind: "property",
@@ -88,8 +88,10 @@ const page: ApiPage = {
             ["string", "prim"],
           ],
           comment: {
-            summary: "<p>The indexed field path.</p>",
-            short: "The indexed field path.",
+            summary:
+              "<p>The first indexed field path. Use <code>keys</code> for a compound index.</p>",
+            short:
+              "The first indexed field path. Use <code>keys</code> for a compound index.",
             deprecated: null,
             modifiers: [],
             blocks: [],
@@ -100,13 +102,50 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 46,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L46",
+              line: 93,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L93",
             },
           ],
         },
         {
-          id: 732,
+          id: 744,
+          name: "keys",
+          anchor: "keys",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["keys", "name"],
+            [": ", "pn"],
+            ["readonly ", "kw"],
+            ["IndexKeyInfo", "ref", "/docs/api/interfaces/IndexKeyInfo"],
+            ["[]", "pn"],
+          ],
+          comment: {
+            summary:
+              "<p>Every indexed field in order. One entry unless the index is compound.</p>",
+            short:
+              "Every indexed field in order. One entry unless the index is compound.",
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [],
+          sources: [
+            {
+              path: "packages/driver/src/indexes.ts",
+              line: 97,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L97",
+            },
+          ],
+        },
+        {
+          id: 741,
           name: "name",
           anchor: "name",
           kind: "property",
@@ -133,13 +172,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 44,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L44",
+              line: 91,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L91",
             },
           ],
         },
         {
-          id: 736,
+          id: 746,
           name: "sparse",
           anchor: "sparse",
           kind: "property",
@@ -168,13 +207,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 52,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L52",
+              line: 101,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L101",
             },
           ],
         },
         {
-          id: 735,
+          id: 745,
           name: "unique",
           anchor: "unique",
           kind: "property",
@@ -201,8 +240,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 50,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L50",
+              line: 99,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L99",
             },
           ],
         },
@@ -223,6 +262,12 @@ const page: ApiPage = {
         {
           anchor: "field",
           name: "field",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "keys",
+          name: "keys",
           kind: "property",
           deprecated: false,
         },
@@ -255,8 +300,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/indexes.ts",
-      line: 42,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L42",
+      line: 89,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L89",
     },
   ],
   usedBy: [

@@ -316,6 +316,7 @@ Initial known capabilities are:
 - `projection`: the server understands the optional `projection` parameter of
   `find` and `findOne`. A server without it ignores the parameter and returns
   whole documents, so clients MUST NOT send a projection to such a server.
+- `compound-indexes`: the server understands the `keys` option of `createIndex`. A server without it rejects the option as unknown, and clients SHOULD NOT send it.
 
 Unknown capability strings MUST be preserved during decoding and MAY be
 ignored when determining the negotiated feature set.
@@ -448,8 +449,10 @@ Notes:
   data directory, `details.storageErrorCode` is `DISK_FULL` or
   `PERMISSION_DENIED` and the write was not applied. For any other failure the
   outcome of that write is unknown until the server restarts and recovers.
-- `createIndex` takes an `index` document with `field` and the optional
-  `direction` (`1` or `-1`), `unique`, `sparse`, and `name`. Unknown options
+- `createIndex` takes an `index` document with either `field` and the optional
+  `direction` (`1` or `-1`), or `keys` (an array of `[field, direction]` pairs
+  for a compound index, from one to eight), and the optional `unique`,
+  `sparse`, and `name`. Giving both `field` and `keys` is `InvalidIndex`. Unknown options
   return `InvalidRequest`. An invalid definition returns `InvalidIndex`, a
   definition that conflicts with an existing index returns `IndexConflict`, and
   a unique index that existing documents violate returns `DuplicateKey`. It
@@ -457,13 +460,17 @@ Notes:
   identical index already exists.
 - `dropIndex` returns `IndexNotFound` for an unknown index or collection and
   `InvalidIndex` for the `_id_` index.
-- Each entry of `listIndexes` has `name`, `field`, `direction`, `unique`, and
-  `sparse`. The `_id_` index is first, followed by the others in creation order.
+- Each entry of `listIndexes` has `name`, `field`, `direction`, `keys`,
+  `unique`, and `sparse`. `field` and `direction` are the first key. `keys` is
+  an array of documents with `field` and `direction`, one for each indexed
+  field. A server older than 0.3.0 sends no `keys`. The `_id_` index is first, followed by the others in creation order.
   A collection that does not exist has no indexes.
 - `explain` returns `stage` (`COLLSCAN`, `IDLOOKUP`, or `IXSCAN`),
   `estimatedCandidates`, and `documents`. For an index it also returns `index`,
   `field`, and `access` (`equality`, `in`, or `range`), and for a range `lower`
-  and `upper` documents with `value` and `inclusive`. The plan format is
+  and `upper` documents with `value` and `inclusive`. For a compound index it
+  adds `fields` (every field in order) and `prefixLength` (how many leading
+  fields the query fixes), and `field` is the first one. The plan format is
   experimental.
 - `validateIndexes` returns `issues`, an array of documents with `index`,
   `problem`, and `detail`. A collection that does not exist is valid.

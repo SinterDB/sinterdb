@@ -278,6 +278,60 @@ describe("collection method types", () => {
       expect(definitions).toHaveLength(4);
     });
 
+    it("accepts compound definitions", () => {
+      const definitions: IndexDefinition<User>[] = [
+        {
+          keys: [
+            ["name", 1],
+            ["profile.stats.level", -1],
+          ],
+        },
+        { keys: [["name", 1]], unique: true, sparse: true, name: "only_name" },
+      ];
+
+      expect(definitions).toHaveLength(2);
+    });
+
+    it("rejects bad compound definitions", () => {
+      const unknownField: IndexDefinition<User> = {
+        keys: [
+          ["name", 1],
+          // @ts-expect-error unknown field
+          ["nope", 1],
+        ],
+      };
+      const onId: IndexDefinition<User> = {
+        keys: [
+          // @ts-expect-error _id always has its own index
+          ["_id", 1],
+        ],
+      };
+      const badDirection: IndexDefinition<User> = {
+        keys: [
+          // @ts-expect-error direction must be 1 or -1
+          ["name", 2],
+        ],
+      };
+      const both: IndexDefinition<User> = {
+        field: "name",
+        // @ts-expect-error field and keys cannot be combined
+        keys: [["name", 1]],
+      };
+      const outerDirection: IndexDefinition<User> = {
+        // @ts-expect-error direction goes inside each pair
+        keys: [["name", 1]],
+        direction: 1,
+      };
+
+      expect([
+        unknownField,
+        onId,
+        badDirection,
+        both,
+        outerDirection,
+      ]).toHaveLength(5);
+    });
+
     it("rejects _id, unknown fields, and bad options", () => {
       // @ts-expect-error _id always has its own index
       const onId: IndexDefinition<User> = { field: "_id" };

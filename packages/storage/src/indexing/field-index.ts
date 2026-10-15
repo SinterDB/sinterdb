@@ -1,7 +1,8 @@
 import type { Document, DocumentValue } from "sinterdb-protocol";
 
 import { pathTouchesArray, resolveField } from "../filter.js";
-import type { IndexSpec } from "./spec.js";
+import type { IndexContents, SecondaryIndex } from "./secondary-index.js";
+import type { IndexKey, IndexSpec } from "./spec.js";
 import {
   canonicalKey,
   compareSameClass,
@@ -26,7 +27,7 @@ export interface IndexConflict {
   readonly description: string;
 }
 
-export class FieldIndex {
+export class FieldIndex implements SecondaryIndex {
   private readonly segments: readonly string[];
   private readonly byValue = new Map<string, Set<string>>();
   private readonly missing = new Set<string>();
@@ -36,7 +37,7 @@ export class FieldIndex {
   private indexedDocuments = 0;
 
   public constructor(public readonly spec: IndexSpec) {
-    this.segments = spec.field.split(".");
+    this.segments = (spec.keys[0] as IndexKey).field.split(".");
   }
 
   /**
@@ -229,11 +230,7 @@ export class FieldIndex {
   }
 
   /** A canonical description of the index contents, for consistency checks. */
-  public contents(): {
-    values: [string, string[]][];
-    missing: string[];
-    orderedProblems: string[];
-  } {
+  public contents(): IndexContents {
     const values = [...this.byValue]
       .map(([key, docKeys]) => [key, [...docKeys].sort()] as [string, string[]])
       .sort((left, right) =>
@@ -291,7 +288,7 @@ export class FieldIndex {
   private conflict(description: string): IndexConflict {
     return {
       index: this.spec.name,
-      field: this.spec.field,
+      field: (this.spec.keys[0] as IndexKey).field,
       description,
     };
   }

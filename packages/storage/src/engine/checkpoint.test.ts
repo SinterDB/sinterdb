@@ -265,15 +265,13 @@ describe("checkpoint index definitions", () => {
         indexes: [
           {
             name: "email_1",
-            field: "email",
-            direction: 1,
+            keys: [{ field: "email", direction: 1 }],
             unique: true,
             sparse: false,
           },
           {
             name: "by_level",
-            field: "profile.level",
-            direction: -1,
+            keys: [{ field: "profile.level", direction: -1 }],
             unique: false,
             sparse: true,
           },
@@ -287,15 +285,13 @@ describe("checkpoint index definitions", () => {
     expect(read.collections[0]?.indexes).toEqual([
       {
         name: "email_1",
-        field: "email",
-        direction: 1,
+        keys: [{ field: "email", direction: 1 }],
         unique: true,
         sparse: false,
       },
       {
         name: "by_level",
-        field: "profile.level",
-        direction: -1,
+        keys: [{ field: "profile.level", direction: -1 }],
         unique: false,
         sparse: true,
       },
@@ -344,8 +340,7 @@ describe("checkpoint index definitions", () => {
     expect(readCheckpoint(path).collections[0]?.indexes).toEqual([
       {
         name: "age_1",
-        field: "age",
-        direction: 1,
+        keys: [{ field: "age", direction: 1 }],
         unique: false,
         sparse: false,
       },
@@ -373,7 +368,7 @@ describe("checkpoint index definitions", () => {
   it("rejects a snapshot from a newer format", () => {
     const path = join(directory, checkpointFileName(7n));
 
-    writeFileSync(path, buildSnapshot(3, 7n, []));
+    writeFileSync(path, buildSnapshot(4, 7n, []));
 
     expect(() => readCheckpoint(path)).toThrow(CheckpointDamagedError);
   });
@@ -385,8 +380,7 @@ describe("checkpoint index definitions", () => {
         indexes: [
           {
             name: "email_1",
-            field: "email",
-            direction: 1,
+            keys: [{ field: "email", direction: 1 }],
             unique: true,
             sparse: false,
           },

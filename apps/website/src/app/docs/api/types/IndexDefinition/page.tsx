@@ -1,0 +1,146 @@
+import type { Metadata } from "next";
+
+import { ApiReflectionPage } from "../../_components/pages";
+import type { ApiPage } from "../../_generated/model";
+
+const page: ApiPage = {
+  id: 726,
+  name: "IndexDefinition",
+  kind: "type-alias",
+  label: "Type Alias",
+  href: "/docs/api/types/IndexDefinition",
+  since: null,
+  description: "How to build an index, passed to SinterCollection.createIndex.",
+  badges: [],
+  declaration: [
+    ["type ", "kw"],
+    ["IndexDefinition", "name"],
+    ["<", "pn"],
+    ["TDocument", "tp"],
+    [" extends ", "kw"],
+    ["object", "prim"],
+    [" = ", "pn"],
+    ["Document", "ref", "/docs/api/interfaces/Document"],
+    ["> = ", "pn"],
+    [
+      "IndexDefinitionOptions",
+      "ref",
+      "/docs/api/interfaces/IndexDefinitionOptions",
+    ],
+    [" & (", "pn"],
+    ["\n  "],
+    ["| {", "pn"],
+    ["\n    "],
+    ["readonly ", "kw"],
+    ["direction", "prop"],
+    ["?: ", "pn"],
+    ["1", "lit"],
+    [" | ", "pn"],
+    ["-1", "lit"],
+    [";", "pn"],
+    ["\n    "],
+    ["readonly ", "kw"],
+    ["field", "prop"],
+    [": ", "pn"],
+    ["IndexablePath", "ref", "/docs/api/types/IndexablePath"],
+    ["<", "pn"],
+    ["TDocument", "tp"],
+    [">;", "pn"],
+    ["\n    "],
+    ["readonly ", "kw"],
+    ["keys", "prop"],
+    ["?: ", "pn"],
+    ["never", "prim"],
+    [";", "pn"],
+    ["\n  "],
+    ["}", "pn"],
+    ["\n  "],
+    ["| {", "pn"],
+    ["\n    "],
+    ["readonly ", "kw"],
+    ["direction", "prop"],
+    ["?: ", "pn"],
+    ["never", "prim"],
+    [";", "pn"],
+    ["\n    "],
+    ["readonly ", "kw"],
+    ["field", "prop"],
+    ["?: ", "pn"],
+    ["never", "prim"],
+    [";", "pn"],
+    ["\n    "],
+    ["readonly ", "kw"],
+    ["keys", "prop"],
+    [": ", "pn"],
+    ["readonly ", "kw"],
+    ["(", "pn"],
+    ["readonly ", "kw"],
+    ["[", "pn"],
+    ["IndexablePath", "ref", "/docs/api/types/IndexablePath"],
+    ["<", "pn"],
+    ["TDocument", "tp"],
+    [">, ", "pn"],
+    ["1", "lit"],
+    [" | ", "pn"],
+    ["-1", "lit"],
+    ["])[];", "pn"],
+    ["\n  "],
+    ["})", "pn"],
+  ],
+  comment: {
+    summary:
+      '<p>How to build an index, passed to <a href="/docs/api/classes/SinterCollection#create-index">SinterCollection.createIndex</a>.</p>\n<p>Give <code>field</code> (and optionally <code>direction</code>) for an index on one field, or\n<code>keys</code> for a compound index on several fields in order.</p>',
+    short:
+      'How to build an index, passed to <a href="/docs/api/classes/SinterCollection#create-index">SinterCollection.createIndex</a>.',
+    deprecated: null,
+    modifiers: [],
+    blocks: [],
+  },
+  typeParameters: [
+    {
+      name: "TDocument",
+      code: [
+        ["TDocument", "tp"],
+        [" extends ", "kw"],
+        ["object", "prim"],
+        [" = ", "pn"],
+        ["Document", "ref", "/docs/api/interfaces/Document"],
+      ],
+      comment: null,
+    },
+  ],
+  hierarchy: null,
+  signatureSection: null,
+  signatures: [],
+  sections: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
+  sources: [
+    {
+      path: "packages/driver/src/indexes.ts",
+      line: 40,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L40",
+    },
+  ],
+  usedBy: [
+    {
+      name: "SinterCollection.createIndex",
+      href: "/docs/api/classes/SinterCollection#create-index",
+      kind: "method",
+    },
+  ],
+};
+
+export const metadata: Metadata = {
+  title: page.name,
+  description: page.description || undefined,
+};
+
+export default function Page() {
+  return <ApiReflectionPage page={page} />;
+}

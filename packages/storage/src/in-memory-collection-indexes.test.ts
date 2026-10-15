@@ -60,18 +60,21 @@ describe("index management", () => {
     collection.createIndex({ field: "name", unique: true, name: "by_name" });
 
     expect(collection.listIndexes()).toEqual([
-      { name: "_id_", field: "_id", direction: 1, unique: true, sparse: false },
+      {
+        name: "_id_",
+        keys: [{ field: "_id", direction: 1 }],
+        unique: true,
+        sparse: false,
+      },
       {
         name: "age_1",
-        field: "age",
-        direction: 1,
+        keys: [{ field: "age", direction: 1 }],
         unique: false,
         sparse: false,
       },
       {
         name: "by_name",
-        field: "name",
-        direction: 1,
+        keys: [{ field: "name", direction: 1 }],
         unique: true,
         sparse: false,
       },
@@ -866,8 +869,7 @@ describe("recovered documents", () => {
       indexes: [
         {
           name: "age_1",
-          field: "age",
-          direction: 1,
+          keys: [{ field: "age", direction: 1 }],
           unique: false,
           sparse: false,
         },

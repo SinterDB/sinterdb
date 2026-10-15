@@ -393,11 +393,7 @@ const page: ApiPage = {
                 ["(", "pn"],
                 ["definition", "param"],
                 [": ", "pn"],
-                [
-                  "IndexDefinition",
-                  "ref",
-                  "/docs/api/interfaces/IndexDefinition",
-                ],
+                ["IndexDefinition", "ref", "/docs/api/types/IndexDefinition"],
                 ["<", "pn"],
                 ["TDocument", "tp"],
                 [">): ", "pn"],
@@ -429,7 +425,7 @@ const page: ApiPage = {
                     [
                       "IndexDefinition",
                       "ref",
-                      "/docs/api/interfaces/IndexDefinition",
+                      "/docs/api/types/IndexDefinition",
                     ],
                     ["<", "pn"],
                     ["TDocument", "tp"],
@@ -812,8 +808,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 375,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L375",
+                  line: 386,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L386",
                 },
               ],
             },
@@ -823,8 +819,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 375,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L375",
+              line: 386,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L386",
             },
           ],
         },
@@ -1029,8 +1025,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 412,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L412",
+                  line: 423,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L423",
                 },
               ],
             },
@@ -1040,8 +1036,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 412,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L412",
+              line: 423,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L423",
             },
           ],
         },
@@ -1254,8 +1250,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 383,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L383",
+                  line: 394,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L394",
                 },
               ],
             },
@@ -1265,8 +1261,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 383,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L383",
+              line: 394,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L394",
             },
           ],
         },
@@ -1877,8 +1873,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/collection.ts",
-                  line: 394,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L394",
+                  line: 405,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L405",
                 },
               ],
             },
@@ -1888,8 +1884,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 394,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L394",
+              line: 405,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L405",
             },
           ],
         },

@@ -34,6 +34,7 @@ describe("CommandDispatcher", () => {
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
         ProtocolCapability.Projection,
+        ProtocolCapability.CompoundIndexes,
       ],
     });
   });

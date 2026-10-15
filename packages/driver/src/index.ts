@@ -88,7 +88,9 @@ export type {
   IndexablePath,
   IndexBoundInfo,
   IndexDefinition,
+  IndexDefinitionOptions,
   IndexInfo,
+  IndexKeyInfo,
   IndexIssue,
   IndexValidationResult,
 } from "./indexes.js";

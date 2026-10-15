@@ -1,4 +1,8 @@
-import { normalizeIndexSpec, type IndexSpec } from "../indexing/spec.js";
+import {
+  normalizeIndexSpec,
+  type IndexKey,
+  type IndexSpec,
+} from "../indexing/spec.js";
 import { StorageError, StorageErrorCode } from "../errors.js";
 
 export const RecordType = {
@@ -177,18 +181,40 @@ export function decodeOperations(payload: Uint8Array): Operation[] {
 const UNIQUE_FLAG = 1;
 const SPARSE_FLAG = 2;
 const DESCENDING_FLAG = 4;
+const COMPOUND_FLAG = 8;
+const KNOWN_FLAGS = UNIQUE_FLAG | SPARSE_FLAG | DESCENDING_FLAG | COMPOUND_FLAG;
 
+/**
+ * An index definition is its name, its first field and a flags byte. A
+ * single-field index ends there, exactly as in storage format 2. A compound
+ * index sets the compound flag and adds the other fields: a count, then each
+ * field's name and a direction byte (0 ascending, 1 descending).
+ */
 export function encodeIndexSpec(spec: IndexSpec): Uint8Array {
+  const [first, ...others] = spec.keys as [IndexKey, ...IndexKey[]];
   const flags =
     (spec.unique ? UNIQUE_FLAG : 0) |
     (spec.sparse ? SPARSE_FLAG : 0) |
-    (spec.direction === -1 ? DESCENDING_FLAG : 0);
-
-  return Buffer.concat([
+    (first.direction === -1 ? DESCENDING_FLAG : 0) |
+    (others.length > 0 ? COMPOUND_FLAG : 0);
+  const parts: Uint8Array[] = [
     encodeName(spec.name),
-    encodeName(spec.field),
+    encodeName(first.field),
     Uint8Array.of(flags),
-  ]);
+  ];
+
+  if (others.length > 0) {
+    parts.push(Uint8Array.of(others.length));
+
+    for (const key of others) {
+      parts.push(
+        encodeName(key.field),
+        Uint8Array.of(key.direction === -1 ? 1 : 0),
+      );
+    }
+  }
+
+  return Buffer.concat(parts);
 }
 
 export function readIndexSpec(reader: {
@@ -199,11 +225,33 @@ export function readIndexSpec(reader: {
   const field = reader.name();
   const flags = reader.u8();
 
+  if ((flags & ~KNOWN_FLAGS) !== 0) {
+    throw malformed(`An index definition has unknown flags ${flags}.`);
+  }
+
+  const keys: [string, 1 | -1][] = [
+    [field, (flags & DESCENDING_FLAG) === 0 ? 1 : -1],
+  ];
+
+  if ((flags & COMPOUND_FLAG) !== 0) {
+    const extra = reader.u8();
+
+    for (let position = 0; position < extra; position += 1) {
+      const otherField = reader.name();
+      const direction = reader.u8();
+
+      if (direction > 1) {
+        throw malformed("An index definition has an unknown key direction.");
+      }
+
+      keys.push([otherField, direction === 1 ? -1 : 1]);
+    }
+  }
+
   try {
     return normalizeIndexSpec({
       name,
-      field,
-      direction: (flags & DESCENDING_FLAG) === 0 ? 1 : -1,
+      keys,
       unique: (flags & UNIQUE_FLAG) !== 0,
       sparse: (flags & SPARSE_FLAG) !== 0,
     });

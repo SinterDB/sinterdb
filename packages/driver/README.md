@@ -461,6 +461,25 @@ error. The options are:
 
 Creating an identical index again succeeds and reports `created: false`.
 
+A compound index covers several fields in order. Queries that fix the leading
+fields by equality use it:
+
+```ts
+await orders.createIndex({
+  keys: [
+    ["customerId", 1],
+    ["status", 1],
+  ],
+  unique: false,
+});
+
+const open = await orders.find({ customerId, status: "open" }).toArray();
+```
+
+`indexes()` returns `keys` for every index, and `field` and `direction` for its
+first field. A server older than 0.3.0 refuses compound indexes, and the driver
+throws `SinterCompatibilityError` instead of sending one.
+
 The server chooses an index when a query allows it, and the result is always
 the same as scanning the collection. See what it would do with `explain()`:
 

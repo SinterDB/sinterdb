@@ -14,6 +14,7 @@ describe("protocol message envelopes", () => {
       TypedDocuments: "typed-documents",
       Streaming: "streaming",
       Projection: "projection",
+      CompoundIndexes: "compound-indexes",
     });
   });
 

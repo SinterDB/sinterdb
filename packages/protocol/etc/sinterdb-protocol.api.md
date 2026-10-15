@@ -270,6 +270,7 @@ const ProtocolCapability: {
     readonly TypedDocuments: "typed-documents";
     readonly Streaming: "streaming";
     readonly Projection: "projection";
+    readonly CompoundIndexes: "compound-indexes";
 };
 
 // @public (undocumented)

@@ -201,6 +201,20 @@ describe("indexed queries equal collection scans", () => {
       indexed.createIndex({ field: "f" });
       indexed.createIndex({ field: "g", sparse: true });
       indexed.createIndex({ field: "n.x", direction: -1 });
+      indexed.createIndex({
+        keys: [
+          ["g", 1],
+          ["pad", -1],
+        ],
+      });
+      indexed.createIndex({
+        keys: [
+          ["f", -1],
+          ["g", 1],
+          ["n.x", 1],
+        ],
+        sparse: true,
+      });
 
       let indexUsed = 0;
       let compared = 0;
@@ -308,6 +322,12 @@ describe("indexed queries equal collection scans", () => {
       indexed.createIndex({ field: "f" });
       indexed.createIndex({ field: "g" });
       indexed.createIndex({ field: "n.x" });
+      indexed.createIndex({
+        keys: [
+          ["g", 1],
+          ["pad", 1],
+        ],
+      });
 
       let used = 0;
 
@@ -432,6 +452,101 @@ describe("unique constraints under random writes", () => {
       expect(failures).toBeGreaterThan(100);
       expect(successes).toBeGreaterThan(300);
       expect(collection.validateIndexes().valid).toBe(true);
+    },
+  );
+});
+
+describe("compound indexes equal collection scans", () => {
+  it(
+    "returns identical results for queries that fix leading fields",
+    { timeout: 120_000 },
+    () => {
+      const generator = new Generator(createRandom(909));
+      const indexed = new InMemoryCollection();
+      const plain = new InMemoryCollection();
+
+      indexed.createIndex({
+        keys: [
+          ["g", 1],
+          ["pad", -1],
+          ["f", 1],
+        ],
+      });
+
+      let prefixUsed = 0;
+      let nonEmpty = 0;
+
+      for (let step = 0; step < 400; step += 1) {
+        const roll = generator.int(8);
+        let operation: (collection: InMemoryCollection) => unknown;
+
+        if (roll < 3) {
+          const documents = Array.from({ length: 1 + generator.int(4) }, () =>
+            generator.document(),
+          );
+
+          operation = (collection) =>
+            collection.insertMany(documents).insertedIds.length;
+        } else if (roll < 5) {
+          const target = generator.scalar();
+          const next = generator.scalar();
+
+          operation = (collection) =>
+            collection.updateMany({ g: target }, { $set: { g: next } });
+        } else if (roll < 6) {
+          const target = generator.int(3);
+
+          operation = (collection) => collection.deleteMany({ pad: target });
+        } else {
+          operation = () => undefined;
+        }
+
+        expect(
+          comparable(attempt(() => operation(indexed))),
+          `step ${step}`,
+        ).toEqual(comparable(attempt(() => operation(plain))));
+
+        for (let query = 0; query < 4; query += 1) {
+          const filter: Document = {};
+
+          if (generator.int(5) !== 0) {
+            filter["g"] = generator.scalar();
+          }
+
+          if (generator.int(2) === 0) {
+            filter["pad"] = generator.int(3);
+          }
+
+          if (generator.int(3) === 0) {
+            filter["f"] = generator.scalar();
+          }
+
+          const expected = [...plain.find(filter)];
+
+          expect(
+            [...indexed.find(filter)],
+            `step ${step}: ${JSON.stringify(filter, (_k, v: unknown) => (typeof v === "bigint" ? `${v}n` : v))}`,
+          ).toEqual(expected);
+
+          if (expected.length > 0) {
+            nonEmpty += 1;
+          }
+
+          if (indexed.explain(filter).prefixLength !== undefined) {
+            prefixUsed += 1;
+          }
+        }
+
+        if (step % 40 === 0) {
+          expect(indexed.validateIndexes(), `step ${step}`).toMatchObject({
+            valid: true,
+          });
+        }
+      }
+
+      expect(indexed.validateIndexes().valid).toBe(true);
+      expect(nonEmpty).toBeGreaterThan(100);
+      expect(prefixUsed).toBeGreaterThan(150);
     },
   );
 });

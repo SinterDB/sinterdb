@@ -134,7 +134,7 @@ describe("inspectDataDirectory", () => {
     const report = inspectDataDirectory(directory);
 
     expect(report.manifest.status).toBe("ok");
-    expect(report.manifest.formatVersion).toBe(2);
+    expect(report.manifest.formatVersion).toBe(3);
     expect(report.manifest.needsUpgrade).toBe(false);
     expect(report.lock).toBeUndefined();
     expect(report.leftovers).toEqual([]);

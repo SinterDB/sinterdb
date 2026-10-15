@@ -359,6 +359,17 @@ export class SinterCollection<TDocument extends object = Document> {
   public async createIndex(
     definition: IndexDefinition<TDocument>,
   ): Promise<CreateIndexResult> {
+    if (
+      definition.keys !== undefined &&
+      this.database.client.serverInfo?.capabilities.includes(
+        ProtocolCapability.CompoundIndexes,
+      ) === false
+    ) {
+      throw new SinterCompatibilityError(
+        "The server does not support compound indexes. Upgrade the server to 0.3.0 or later, or index a single field.",
+      );
+    }
+
     const value = await this.database.client.executeCommand(
       this.database.name,
       "createIndex",

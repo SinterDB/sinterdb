@@ -195,6 +195,7 @@ export class CommandDispatcher {
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
         ProtocolCapability.Projection,
+        ProtocolCapability.CompoundIndexes,
       ],
     };
   }
@@ -422,13 +423,23 @@ export class CommandDispatcher {
       );
 
       return {
-        indexes: (collection?.listIndexes() ?? []).map((index) => ({
-          name: index.name,
-          field: index.field,
-          direction: index.direction,
-          unique: index.unique,
-          sparse: index.sparse,
-        })),
+        indexes: (collection?.listIndexes() ?? []).map((index) => {
+          const [first] = index.keys as [{ field: string; direction: 1 | -1 }];
+
+          // `field` and `direction` describe the first key, which is all a
+          // 0.2.0 driver knows how to read. `keys` has every field.
+          return {
+            name: index.name,
+            field: first.field,
+            direction: first.direction,
+            keys: index.keys.map((key) => ({
+              field: key.field,
+              direction: key.direction,
+            })),
+            unique: index.unique,
+            sparse: index.sparse,
+          };
+        }),
       };
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
@@ -1016,6 +1027,7 @@ function translateStorageError(error: unknown): CommandExecutionError {
 const INDEX_OPTIONS = new Set([
   "field",
   "direction",
+  "keys",
   "unique",
   "sparse",
   "name",

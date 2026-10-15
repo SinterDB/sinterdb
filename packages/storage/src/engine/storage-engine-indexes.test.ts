@@ -168,6 +168,58 @@ describe("indexes survive a restart", () => {
     everyIndexValid(engine);
   });
 
+  it("rebuilds a compound index from the log", () => {
+    let engine = open({ checkpointOnClose: false });
+
+    seed(engine);
+    users(engine).createIndex({
+      keys: [
+        ["team", 1],
+        ["age", -1],
+      ],
+      unique: false,
+    });
+    engine = reopenAfterCrash(engine);
+
+    expect(names(engine)).toEqual(["_id_", "team_1_age_-1"]);
+    expect(users(engine).listIndexes()[1]?.keys).toEqual([
+      { field: "team", direction: 1 },
+      { field: "age", direction: -1 },
+    ]);
+    expect(users(engine).explain({ team: "red", age: 20 })).toMatchObject({
+      stage: "IXSCAN",
+      prefixLength: 2,
+    });
+    everyIndexValid(engine);
+  });
+
+  it("rebuilds a compound index from a snapshot", () => {
+    let engine = open({ checkpointOnClose: false });
+
+    seed(engine);
+    users(engine).createIndex({
+      keys: [
+        ["team", 1],
+        ["email", 1],
+      ],
+      unique: true,
+      sparse: true,
+    });
+    engine.checkpoint();
+    engine = reopenAfterCrash(engine);
+
+    expect(engine.recovery.replayedRecords).toBe(0);
+    expect(users(engine).listIndexes()[1]).toMatchObject({
+      name: "team_1_email_1",
+      unique: true,
+      sparse: true,
+    });
+    expect([
+      ...users(engine).find({ team: "blue", email: "user-3@example.com" }),
+    ]).toHaveLength(1);
+    everyIndexValid(engine);
+  });
+
   it("keeps indexes through a clean shutdown", () => {
     let engine = open();
 
@@ -406,13 +458,13 @@ describe("index operations in the log", () => {
       engine
         .getCollection("one", "items")
         ?.listIndexes()
-        .map((i) => i.field),
+        .map((i) => i.keys[0]?.field),
     ).toEqual(["_id", "x"]);
     expect(
       engine
         .getCollection("two", "items")
         ?.listIndexes()
-        .map((i) => i.field),
+        .map((i) => i.keys[0]?.field),
     ).toEqual(["_id", "y"]);
   });
 });
@@ -433,15 +485,13 @@ describe("snapshots store index definitions", () => {
     expect(read.collections[0]?.indexes).toEqual([
       {
         name: "email_1",
-        field: "email",
-        direction: 1,
+        keys: [{ field: "email", direction: 1 }],
         unique: true,
         sparse: false,
       },
       {
         name: "age_-1",
-        field: "age",
-        direction: -1,
+        keys: [{ field: "age", direction: -1 }],
         unique: false,
         sparse: true,
       },
@@ -515,6 +565,37 @@ describe("storage format upgrade", () => {
     expect(typeof manifest()["upgradedAt"]).toBe("string");
   });
 
+  it("upgrades a version 2 directory and keeps its single-field indexes", () => {
+    let engine = open({ checkpointOnClose: false });
+
+    seed(engine);
+    users(engine).createIndex({ field: "email", unique: true });
+    users(engine).createIndex({ field: "age", direction: -1, sparse: true });
+    engine.checkpoint();
+    users(engine).createIndex({ field: "team" });
+    crash(engine);
+
+    writeFileSync(
+      join(directory, "manifest.json"),
+      JSON.stringify({
+        format: STORAGE_FORMAT,
+        formatVersion: 2,
+        createdAt: "2026-08-01T00:00:00.000Z",
+      }),
+    );
+
+    engine = open();
+
+    expect(names(engine)).toEqual(["_id_", "email_1", "age_-1", "team_1"]);
+    expect(users(engine).documentCount).toBe(30);
+    expect(manifest()).toMatchObject({
+      formatVersion: STORAGE_FORMAT_VERSION,
+      createdAt: "2026-08-01T00:00:00.000Z",
+      upgradedFrom: 2,
+    });
+    everyIndexValid(engine);
+  });
+
   it("makes older servers refuse the upgraded directory", () => {
     open().close();
     opened.pop();
@@ -569,8 +650,7 @@ describe("recovery refuses inconsistent index records", () => {
       collection: "users",
       index: {
         name: options.name ?? `${field}_1`,
-        field,
-        direction: 1 as const,
+        keys: [{ field, direction: 1 as const }],
         unique: options.unique ?? false,
         sparse: false,
       },

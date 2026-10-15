@@ -67,11 +67,6 @@ const page: ApiPage = {
       href: "/docs/api/types/FilterPaths",
       kind: "type-alias",
     },
-    {
-      name: "IndexDefinition.field",
-      href: "/docs/api/interfaces/IndexDefinition#field",
-      kind: "property",
-    },
   ],
 };
 

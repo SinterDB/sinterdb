@@ -222,6 +222,7 @@ describe("listIndexes command", () => {
           name: "_id_",
           field: "_id",
           direction: 1,
+          keys: [{ field: "_id", direction: 1 }],
           unique: true,
           sparse: false,
         },
@@ -229,6 +230,7 @@ describe("listIndexes command", () => {
           name: "email_1",
           field: "email",
           direction: 1,
+          keys: [{ field: "email", direction: 1 }],
           unique: true,
           sparse: false,
         },
@@ -236,6 +238,7 @@ describe("listIndexes command", () => {
           name: "age_-1",
           field: "age",
           direction: -1,
+          keys: [{ field: "age", direction: -1 }],
           unique: false,
           sparse: true,
         },
@@ -247,6 +250,144 @@ describe("listIndexes command", () => {
     expect(run(setup(), "listIndexes", { collection: "missing" })).toEqual({
       indexes: [],
     });
+  });
+});
+
+describe("compound indexes through commands", () => {
+  const compound = {
+    keys: [
+      ["age", 1],
+      ["email", -1],
+    ],
+  };
+
+  it("creates a compound index and lists every field", () => {
+    const dispatcher = setup();
+
+    expect(
+      run(dispatcher, "createIndex", { collection: "users", index: compound }),
+    ).toEqual({ acknowledged: true, name: "age_1_email_-1", created: true });
+    expect(
+      run(dispatcher, "createIndex", { collection: "users", index: compound }),
+    ).toEqual({ acknowledged: true, name: "age_1_email_-1", created: false });
+
+    const indexes = run(dispatcher, "listIndexes", { collection: "users" })[
+      "indexes"
+    ] as Result[];
+
+    expect(indexes[1]).toEqual({
+      name: "age_1_email_-1",
+      field: "age",
+      direction: 1,
+      keys: [
+        { field: "age", direction: 1 },
+        { field: "email", direction: -1 },
+      ],
+      unique: false,
+      sparse: false,
+    });
+  });
+
+  it("explains a query that fixes the leading fields", () => {
+    const dispatcher = setup();
+
+    run(dispatcher, "createIndex", { collection: "users", index: compound });
+
+    expect(
+      run(dispatcher, "explain", {
+        collection: "users",
+        filter: { age: 21, email: "user-1@example.com" },
+      }),
+    ).toMatchObject({
+      stage: "IXSCAN",
+      index: "age_1_email_-1",
+      field: "age",
+      fields: ["age", "email"],
+      prefixLength: 2,
+      access: "equality",
+    });
+  });
+
+  it("finds documents through the index", () => {
+    const dispatcher = setup();
+
+    run(dispatcher, "createIndex", { collection: "users", index: compound });
+
+    const found = run(dispatcher, "find", {
+      collection: "users",
+      filter: { age: 21 },
+    })["documents"] as unknown[];
+
+    expect(found).toHaveLength(4);
+  });
+
+  it("rejects an invalid definition with InvalidIndex", () => {
+    const dispatcher = setup();
+
+    for (const index of [
+      { keys: [] },
+      {
+        keys: [
+          ["age", 1],
+          ["age", -1],
+        ],
+      },
+      { keys: [["age", 2]] },
+      { keys: "age" },
+      { field: "age", keys: [["age", 1]] },
+    ]) {
+      expectWireError(
+        () => run(dispatcher, "createIndex", { collection: "users", index }),
+        WireErrorCode.InvalidIndex,
+        "InvalidIndex",
+      );
+    }
+  });
+
+  it("refuses the same fields under another name", () => {
+    const dispatcher = setup();
+
+    run(dispatcher, "createIndex", { collection: "users", index: compound });
+
+    expectWireError(
+      () =>
+        run(dispatcher, "createIndex", {
+          collection: "users",
+          index: {
+            keys: [
+              ["age", -1],
+              ["email", -1],
+            ],
+          },
+        }),
+      WireErrorCode.IndexConflict,
+      "IndexConflict",
+    );
+  });
+
+  it("enforces a unique compound index", () => {
+    const dispatcher = setup();
+
+    run(dispatcher, "createIndex", {
+      collection: "users",
+      index: {
+        keys: [
+          ["age", 1],
+          ["email", 1],
+        ],
+        unique: true,
+      },
+    });
+
+    expectWireError(
+      () =>
+        run(dispatcher, "insertOne", {
+          collection: "users",
+          document: { age: 20, email: "user-0@example.com" },
+        }),
+      WireErrorCode.DuplicateKey,
+      "DuplicateKey",
+    );
   });
 });
 

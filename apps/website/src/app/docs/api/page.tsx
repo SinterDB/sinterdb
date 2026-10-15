@@ -155,7 +155,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 746,
+        id: 759,
         name: "SinterNamespaceError",
         href: "/docs/api/classes/SinterNamespaceError",
         kind: "class",
@@ -226,7 +226,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 769,
+        id: 782,
         name: "DeleteResult",
         href: "/docs/api/interfaces/DeleteResult",
         kind: "interface",
@@ -290,7 +290,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 721,
+        id: 723,
         name: "IndexBoundInfo",
         href: "/docs/api/interfaces/IndexBoundInfo",
         kind: "interface",
@@ -301,18 +301,17 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 724,
-        name: "IndexDefinition",
-        href: "/docs/api/interfaces/IndexDefinition",
+        id: 736,
+        name: "IndexDefinitionOptions",
+        href: "/docs/api/interfaces/IndexDefinitionOptions",
         kind: "interface",
         label: "Interface",
-        short:
-          'How to build an index, passed to <a href="/docs/api/classes/SinterCollection#create-index">SinterCollection.createIndex</a>.',
+        short: "The options every index definition accepts.",
         deprecated: false,
         since: null,
       },
       {
-        id: 731,
+        id: 740,
         name: "IndexInfo",
         href: "/docs/api/interfaces/IndexInfo",
         kind: "interface",
@@ -323,7 +322,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 737,
+        id: 750,
         name: "IndexIssue",
         href: "/docs/api/interfaces/IndexIssue",
         kind: "interface",
@@ -334,7 +333,17 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 741,
+        id: 747,
+        name: "IndexKeyInfo",
+        href: "/docs/api/interfaces/IndexKeyInfo",
+        kind: "interface",
+        label: "Interface",
+        short: "One field of an index and the order it is kept in.",
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 754,
         name: "IndexValidationResult",
         href: "/docs/api/interfaces/IndexValidationResult",
         kind: "interface",
@@ -432,7 +441,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 788,
+        id: 801,
         name: "UpdateOptions",
         href: "/docs/api/interfaces/UpdateOptions",
         kind: "interface",
@@ -442,7 +451,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 792,
+        id: 805,
         name: "UpdateResult",
         href: "/docs/api/interfaces/UpdateResult",
         kind: "interface",
@@ -469,7 +478,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 765,
+        id: 778,
         name: "ArrayPaths",
         href: "/docs/api/types/ArrayPaths",
         kind: "type-alias",
@@ -491,7 +500,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 767,
+        id: 780,
         name: "ComparablePaths",
         href: "/docs/api/types/ComparablePaths",
         kind: "type-alias",
@@ -633,13 +642,24 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 719,
+        id: 721,
         name: "IndexablePath",
         href: "/docs/api/types/IndexablePath",
         kind: "type-alias",
         label: "Type Alias",
         short:
           "Field paths that can be indexed: every known path except <code>_id</code>, which always has its own unique index.",
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 726,
+        name: "IndexDefinition",
+        href: "/docs/api/types/IndexDefinition",
+        kind: "type-alias",
+        label: "Type Alias",
+        short:
+          'How to build an index, passed to <a href="/docs/api/classes/SinterCollection#create-index">SinterCollection.createIndex</a>.',
         deprecated: false,
         since: null,
       },
@@ -655,7 +675,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 772,
+        id: 785,
         name: "NumericPaths",
         href: "/docs/api/types/NumericPaths",
         kind: "type-alias",
@@ -688,7 +708,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 774,
+        id: 787,
         name: "PathsMatching",
         href: "/docs/api/types/PathsMatching",
         kind: "type-alias",
@@ -774,7 +794,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 777,
+        id: 790,
         name: "UpdateFilter",
         href: "/docs/api/types/UpdateFilter",
         kind: "type-alias",
@@ -785,7 +805,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 790,
+        id: 803,
         name: "UpdatePaths",
         href: "/docs/api/types/UpdatePaths",
         kind: "type-alias",

@@ -128,8 +128,9 @@ Also missing:
 - **A cursor is not a snapshot.** It reads the collection as it goes, so
   documents written while you iterate may or may not show up, and the document
   after the current one may already have been read.
-- Compound and multi-field indexes do not exist. Each index covers one field,
-  and a query uses at most one index. See [indexes.md](./indexes.md).
+- A query uses at most one index. Compound indexes serve equality on their
+  leading fields, not ranges or sorting, and are skipped once a document holds
+  an array in one of their fields. See [indexes.md](./indexes.md).
 - `explain()` is marked `@beta`; its shape may change in any release.
 
 ## Updates and transactions

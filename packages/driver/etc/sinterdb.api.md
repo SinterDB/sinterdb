@@ -93,8 +93,10 @@ export interface ExplainResult {
     readonly documents: number;
     readonly estimatedCandidates: number;
     readonly field?: string;
+    readonly fields?: readonly string[];
     readonly index?: string;
     readonly lower?: IndexBoundInfo;
+    readonly prefixLength?: number;
     readonly stage: "COLLSCAN" | "IDLOOKUP" | "IXSCAN";
     readonly upper?: IndexBoundInfo;
 }
@@ -176,9 +178,21 @@ export interface IndexBoundInfo {
 }
 
 // @public
-export interface IndexDefinition<TDocument extends object = Document> {
-    readonly direction?: 1 | -1;
+export type IndexDefinition<TDocument extends object = Document> = IndexDefinitionOptions & ({
     readonly field: IndexablePath<TDocument>;
+    readonly direction?: 1 | -1;
+    readonly keys?: never;
+} | {
+    readonly keys: readonly (readonly [
+    IndexablePath<TDocument>,
+    1 | -1
+    ])[];
+    readonly field?: never;
+    readonly direction?: never;
+});
+
+// @public
+export interface IndexDefinitionOptions {
     readonly name?: string;
     readonly sparse?: boolean;
     readonly unique?: boolean;
@@ -188,6 +202,7 @@ export interface IndexDefinition<TDocument extends object = Document> {
 export interface IndexInfo {
     readonly direction: 1 | -1;
     readonly field: string;
+    readonly keys: readonly IndexKeyInfo[];
     readonly name: string;
     readonly sparse: boolean;
     readonly unique: boolean;
@@ -198,6 +213,12 @@ export interface IndexIssue {
     readonly detail: string;
     readonly index: string;
     readonly problem: string;
+}
+
+// @public
+export interface IndexKeyInfo {
+    readonly direction: 1 | -1;
+    readonly field: string;
 }
 
 // @public

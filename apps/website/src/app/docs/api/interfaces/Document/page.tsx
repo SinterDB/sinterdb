@@ -117,8 +117,8 @@ const page: ApiPage = {
     },
     {
       name: "IndexDefinition",
-      href: "/docs/api/interfaces/IndexDefinition",
-      kind: "interface",
+      href: "/docs/api/types/IndexDefinition",
+      kind: "type-alias",
     },
     {
       name: "SinterClient.executeCommand",

@@ -50,6 +50,12 @@ export const MIGRATIONS: readonly Migration[] = [
     description:
       "Version 2 adds index definitions to the log and to snapshots. Version 1 files are read as they are.",
   },
+  {
+    from: 2,
+    to: 3,
+    description:
+      "Version 3 lets an index definition cover several fields. Version 2 files are read as they are.",
+  },
 ];
 
 /**

@@ -5,6 +5,7 @@ export const ProtocolCapability = {
   TypedDocuments: "typed-documents",
   Streaming: "streaming",
   Projection: "projection",
+  CompoundIndexes: "compound-indexes",
 } as const;
 
 export type ProtocolCapability =

@@ -66,6 +66,26 @@ export function compareDocumentValues(
   );
 }
 
+/**
+ * Like {@link compareDocumentValues}, but `undefined` stands for a field the
+ * document does not have, which sorts before everything else.
+ */
+export function compareOptionalValues(
+  left: DocumentValue | undefined,
+  right: DocumentValue | undefined,
+): number {
+  return compareSortValues(
+    {
+      rank: left === undefined ? Rank.Missing : rankOf(left),
+      value: left,
+    },
+    {
+      rank: right === undefined ? Rank.Missing : rankOf(right),
+      value: right,
+    },
+  );
+}
+
 function parseSortSpecification(
   specification: SortSpecification,
 ): readonly SortKey[] {

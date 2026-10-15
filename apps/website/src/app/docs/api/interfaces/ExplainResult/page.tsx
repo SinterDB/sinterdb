@@ -36,7 +36,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 714,
+          id: 716,
           name: "access",
           anchor: "access",
           kind: "property",
@@ -69,13 +69,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 86,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L86",
+              line: 141,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L141",
             },
           ],
         },
         {
-          id: 718,
+          id: 720,
           name: "documents",
           anchor: "documents",
           kind: "property",
@@ -102,13 +102,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 94,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L94",
+              line: 149,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L149",
             },
           ],
         },
         {
-          id: 717,
+          id: 719,
           name: "estimatedCandidates",
           anchor: "estimated-candidates",
           kind: "property",
@@ -135,8 +135,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 92,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L92",
+              line: 147,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L147",
             },
           ],
         },
@@ -157,8 +157,8 @@ const page: ApiPage = {
           ],
           comment: {
             summary:
-              "<p>The field the index covers, for <code>IXSCAN</code>.</p>",
-            short: "The field the index covers, for <code>IXSCAN</code>.",
+              "<p>The first field the index covers, for <code>IXSCAN</code>.</p>",
+            short: "The first field the index covers, for <code>IXSCAN</code>.",
             deprecated: null,
             modifiers: ["beta"],
             blocks: [],
@@ -169,8 +169,45 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 82,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L82",
+              line: 131,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L131",
+            },
+          ],
+        },
+        {
+          id: 714,
+          name: "fields",
+          anchor: "fields",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: ["beta"],
+          code: [
+            ["readonly ", "kw"],
+            ["fields", "name"],
+            ["?: ", "pn"],
+            ["readonly ", "kw"],
+            ["string", "prim"],
+            ["[]", "pn"],
+          ],
+          comment: {
+            summary:
+              "<p>Every field of a compound index, in order, for <code>IXSCAN</code>.</p>",
+            short:
+              "Every field of a compound index, in order, for <code>IXSCAN</code>.",
+            deprecated: null,
+            modifiers: ["beta"],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [],
+          sources: [
+            {
+              path: "packages/driver/src/indexes.ts",
+              line: 133,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L133",
             },
           ],
         },
@@ -202,13 +239,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 80,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L80",
+              line: 129,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L129",
             },
           ],
         },
         {
-          id: 715,
+          id: 717,
           name: "lower",
           anchor: "lower",
           kind: "property",
@@ -235,8 +272,43 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 88,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L88",
+              line: 143,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L143",
+            },
+          ],
+        },
+        {
+          id: 715,
+          name: "prefixLength",
+          anchor: "prefix-length",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: ["beta"],
+          code: [
+            ["readonly ", "kw"],
+            ["prefixLength", "name"],
+            ["?: ", "pn"],
+            ["number", "prim"],
+          ],
+          comment: {
+            summary:
+              "<p>How many leading fields of a compound index the query fixes by equality.</p>",
+            short:
+              "How many leading fields of a compound index the query fixes by equality.",
+            deprecated: null,
+            modifiers: ["beta"],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [],
+          sources: [
+            {
+              path: "packages/driver/src/indexes.ts",
+              line: 137,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L137",
             },
           ],
         },
@@ -274,13 +346,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 78,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L78",
+              line: 127,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L127",
             },
           ],
         },
         {
-          id: 716,
+          id: 718,
           name: "upper",
           anchor: "upper",
           kind: "property",
@@ -307,8 +379,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 90,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L90",
+              line: 145,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L145",
             },
           ],
         },
@@ -345,6 +417,12 @@ const page: ApiPage = {
           deprecated: false,
         },
         {
+          anchor: "fields",
+          name: "fields",
+          kind: "property",
+          deprecated: false,
+        },
+        {
           anchor: "index-2",
           name: "index",
           kind: "property",
@@ -353,6 +431,12 @@ const page: ApiPage = {
         {
           anchor: "lower",
           name: "lower",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "prefix-length",
+          name: "prefixLength",
           kind: "property",
           deprecated: false,
         },
@@ -379,8 +463,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/indexes.ts",
-      line: 73,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L73",
+      line: 122,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L122",
     },
   ],
   usedBy: [

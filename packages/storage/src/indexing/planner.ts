@@ -1,7 +1,9 @@
 import { CustomId, type Document, type DocumentValue } from "sinterdb-protocol";
 
 import { isOperatorDocument } from "../filter.js";
+import { CompoundIndex } from "./compound-index.js";
 import { FieldIndex, type IndexBound } from "./field-index.js";
+import type { SecondaryIndex } from "./secondary-index.js";
 import {
   canonicalKey,
   compareSameClass,
@@ -11,6 +13,7 @@ import {
 
 export type IndexAccess =
   | { readonly kind: "equal"; readonly values: readonly DocumentValue[] }
+  | { readonly kind: "prefix"; readonly values: readonly DocumentValue[] }
   | {
       readonly kind: "range";
       readonly valueClass: ValueClass;
@@ -27,7 +30,7 @@ export type QueryPlan =
     }
   | {
       readonly stage: "IXSCAN";
-      readonly index: FieldIndex;
+      readonly index: FieldIndex | CompoundIndex;
       readonly access: IndexAccess;
       readonly viaMembership: boolean;
       readonly estimated: number;
@@ -49,7 +52,7 @@ type Constraint =
  */
 export function planQuery(
   filter: Document,
-  indexes: readonly FieldIndex[],
+  indexes: readonly SecondaryIndex[],
   totalDocuments: number,
 ): QueryPlan {
   const scan: QueryPlan = { stage: "COLLSCAN", estimated: totalDocuments };
@@ -71,13 +74,24 @@ export function planQuery(
   let best: QueryPlan = scan;
 
   for (const index of indexes) {
-    const fieldConstraints = constraints.get(index.spec.field);
+    let candidates: QueryPlan[];
 
-    if (fieldConstraints === undefined) {
-      continue;
+    if (index instanceof CompoundIndex) {
+      candidates = planCompound(index, constraints);
+    } else if (index instanceof FieldIndex) {
+      const fieldConstraints = constraints.get(
+        (index.spec.keys[0] as { field: string }).field,
+      );
+
+      candidates =
+        fieldConstraints === undefined
+          ? []
+          : planIndex(index, fieldConstraints);
+    } else {
+      candidates = [];
     }
 
-    for (const candidate of planIndex(index, fieldConstraints)) {
+    for (const candidate of candidates) {
       if (
         candidate.estimated < best.estimated ||
         (candidate.estimated === best.estimated &&
@@ -103,8 +117,12 @@ export function candidateKeys(plan: QueryPlan): Set<string> {
     throw new Error("A collection scan has no candidate keys.");
   }
 
+  if (plan.access.kind === "prefix") {
+    return (plan.index as CompoundIndex).lookupPrefix(plan.access.values);
+  }
+
   if (plan.access.kind === "range") {
-    return plan.index.lookupRange(
+    return (plan.index as FieldIndex).lookupRange(
       plan.access.valueClass,
       plan.access.lower,
       plan.access.upper,
@@ -114,7 +132,7 @@ export function candidateKeys(plan: QueryPlan): Set<string> {
   const result = new Set<string>();
 
   for (const value of plan.access.values) {
-    for (const key of plan.index.lookupEqual(value) ?? []) {
+    for (const key of (plan.index as FieldIndex).lookupEqual(value) ?? []) {
       result.add(key);
     }
   }
@@ -228,6 +246,48 @@ function planId(constraints: Constraint[] | undefined): QueryPlan | undefined {
   return best === undefined
     ? undefined
     : { stage: "IDLOOKUP", keys: best, estimated: best.length };
+}
+
+/**
+ * A compound index answers a query that fixes its first fields by equality:
+ * the first field, the first two, and so on. Any field after a gap is left to
+ * the filter, which still runs on every candidate.
+ */
+function planCompound(
+  index: CompoundIndex,
+  constraints: Map<string, Constraint[]>,
+): QueryPlan[] {
+  if (index.hasArrayValues) {
+    return [];
+  }
+
+  const values: DocumentValue[] = [];
+
+  for (const key of index.spec.keys) {
+    const equal = constraints
+      .get(key.field)
+      ?.find((constraint) => constraint.kind === "equal");
+
+    if (equal === undefined || equal.kind !== "equal") {
+      break;
+    }
+
+    values.push(equal.value);
+  }
+
+  if (values.length === 0) {
+    return [];
+  }
+
+  return [
+    {
+      stage: "IXSCAN",
+      index,
+      access: { kind: "prefix", values },
+      viaMembership: false,
+      estimated: index.estimatePrefix(values),
+    },
+  ];
 }
 
 function planIndex(index: FieldIndex, constraints: Constraint[]): QueryPlan[] {

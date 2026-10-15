@@ -23,8 +23,8 @@ this page changing too.
 | Format                   | Constant                    | Version |
 | ------------------------ | --------------------------- | ------- |
 | Wire protocol            | `PROTOCOL_VERSION`          | 1       |
-| Storage directory        | `STORAGE_FORMAT_VERSION`    | 2       |
-| Snapshot (checkpoint)    | `CHECKPOINT_FORMAT_VERSION` | 2       |
+| Storage directory        | `STORAGE_FORMAT_VERSION`    | 3       |
+| Snapshot (checkpoint)    | `CHECKPOINT_FORMAT_VERSION` | 3       |
 | Write-ahead log segments | `WAL_FORMAT_VERSION`        | 1       |
 
 ## Data files
@@ -101,6 +101,20 @@ Each breaking change lands here in the release that makes it.
 
 ### 0.3.0
 
+- **Storage format 2 became 3** so an index can cover several fields.
+  Directories are upgraded in place on first open, and the upgrade is one way:
+  `0.2.0` refuses a format 3 directory. Nothing is rewritten, because format 2
+  files are read as they are. Copy your data directory before moving from
+  `0.2.0`.
+- **Compound indexes need a 0.3.0 server.** The server advertises a new
+  `compound-indexes` capability. A 0.3.0 driver refuses to send a `keys` index
+  definition to a server without it (`SinterCompatibilityError`). A `0.2.0`
+  driver can still list the indexes of a collection that has a compound one,
+  but sees only the first field of it, because `field` and `direction` describe
+  the first key. Do not drop and recreate such an index from a `0.2.0` driver.
+- **`IndexInfo` has a new `keys` property** with every field of the index, and
+  `ExplainResult` gains optional `fields` and `prefixLength`. Existing code that
+  reads `field` and `direction` keeps working.
 - **Projection needs a 0.3.0 server.** The server advertises a new `projection`
   capability. A 0.3.0 driver refuses to send a projection to a server without
   it (`SinterCompatibilityError`) instead of getting whole documents back.

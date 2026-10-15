@@ -109,7 +109,12 @@ export interface IndexInfo extends IndexSpec {}
 export interface ExplainResult {
   readonly stage: "COLLSCAN" | "IDLOOKUP" | "IXSCAN";
   readonly index?: string;
+  /** The first field the index covers. */
   readonly field?: string;
+  /** Every field of a compound index, in order. */
+  readonly fields?: readonly string[];
+  /** How many leading fields of a compound index the query fixes. */
+  readonly prefixLength?: number;
   readonly access?: "equality" | "in" | "range";
   readonly lower?: {
     readonly value: DocumentValue;
@@ -1107,10 +1112,19 @@ function describePlan(plan: QueryPlan, documents: number): ExplainResult {
   const base = {
     stage: "IXSCAN" as const,
     index: plan.index.spec.name,
-    field: plan.index.spec.field,
+    field: (plan.index.spec.keys[0] as { field: string }).field,
     estimatedCandidates: plan.estimated,
     documents,
   };
+
+  if (plan.access.kind === "prefix") {
+    return {
+      ...base,
+      fields: plan.index.spec.keys.map((key) => key.field),
+      prefixLength: plan.access.values.length,
+      access: "equality",
+    };
+  }
 
   if (plan.access.kind === "range") {
     return {
