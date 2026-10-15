@@ -446,6 +446,63 @@ data/
 - Query semantics are documented with specification tests.
 - ODM development can use only public `sinterdb` exports.
 
+## v0.3.5: Interactive CLI
+
+**Goal:** Give `@sinterdb/cli` a full-screen interactive console for running and controlling a server, without breaking anything that already works. This is a CLI-focused release. The driver, storage format and query engine stay unchanged apart from one additive logging change.
+
+### Compatibility rules
+
+- No breaking changes to the driver API, the on-disk format, or existing CLI commands and flags.
+- Server changes are additive only (structured log events); default output is unchanged.
+- The full-screen UI opens only on an interactive TTY. Non-TTY runs, `--no-ui`, and `ui: false` in config keep the current plain behavior.
+- `sinterdb start` still runs the server headless for Docker, systemd and CI.
+- New dependencies (UI library) are added to `@sinterdb/cli` only, never to the driver.
+
+### Slices
+
+1. **Structured log events**
+   - Server emits structured events (level, timestamp, op, collection, duration, message) alongside the existing plain logs.
+   - Plain output stays the default; structured output is opt-in.
+
+2. **Server supervisor**
+   - Run the server as a child process, with logs streamed over a pipe.
+   - States: stopped, starting, running, stopping, crashed.
+   - `start`, `stop` (graceful: flush WAL, checkpoint, with timeout), and `kill` (immediate).
+   - Lock file in the data directory to prevent two servers opening the same data.
+
+3. **Config system**
+   - `config get`, `config set`, `config list`, `config unset`, stored in a config file.
+   - Precedence: flags, then env vars, then config file, then defaults.
+   - Validation on set; clear notice when a change needs a restart (e.g. `dataDir`).
+
+4. **Interactive UI shell**
+   - Alternate screen buffer with clean terminal restore on exit or crash.
+   - Layout: status header, stats line, scrolling log pane, button row, command prompt.
+   - Log pane: capped ring buffer, follow mode, pause, level filter, search.
+   - Keyboard shortcut for every button (`?` help, `p` pause, `/` filter, `q` quit).
+
+5. **UI actions**
+   - Wire Help, Inspect, Backup and Repair to the existing CLI functions (no duplicated logic).
+   - Overlay panels that close with `esc`.
+   - Confirmation prompts for `kill` and for quitting while the server is running.
+
+6. **Compatibility, docs and release**
+   - TTY detection, `--no-ui`, headless `start` verified in tests.
+   - Tests for the supervisor state machine, config precedence and lock file.
+   - README and docs updated, changeset added, GitHub release, npm publish with provenance.
+
+### Out of scope
+
+- Mouse-only interactions (everything must work from the keyboard).
+- Any driver API, query engine or storage format changes.
+- Remote or multi-server management.
+
+### Done when
+
+- Running the CLI in a terminal opens the UI in a stopped state, and the user can start, stop and kill the server and change config from inside it.
+- All existing commands and scripts behave exactly as they did in 0.3.0.
+- The driver package needs no changes or version bump beyond the additive logging.
+
 ## `sinterdb-odm@0.0.1` — ODM Foundation
 
 **Begins after driver `0.3.0`.**
