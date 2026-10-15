@@ -124,6 +124,38 @@ describe("compound indexes through the driver", () => {
     });
   });
 
+  it("answers ranges and $in on a compound index", async () => {
+    await withItems(async (items) => {
+      await items.createIndex({
+        keys: [
+          ["shop", 1],
+          ["qty", -1],
+        ],
+      });
+
+      const range = { shop: "north", qty: { $gte: 5 } };
+
+      expect(await items.find(range).explain()).toMatchObject({
+        stage: "IXSCAN",
+        fields: ["shop", "qty"],
+        prefixLength: 1,
+        access: "range",
+        lower: { value: 5, inclusive: true },
+      });
+      expect(
+        (await items.find(range).toArray()).map((item) => item.qty),
+      ).toEqual([5, 7]);
+
+      const members = { shop: { $in: ["north", "south"] }, qty: 2 };
+
+      expect(await items.find(members).explain()).toMatchObject({
+        prefixLength: 2,
+        access: "in",
+      });
+      expect(await items.countDocuments(members)).toBe(1);
+    });
+  });
+
   it("enforces a unique compound index", async () => {
     await withItems(async (items) => {
       await items.createIndex({

@@ -549,4 +549,152 @@ describe("compound indexes equal collection scans", () => {
       expect(prefixUsed).toBeGreaterThan(150);
     },
   );
+
+  it(
+    "returns identical results for ranges and $in on compound indexes",
+    { timeout: 120_000 },
+    () => {
+      const generator = new Generator(createRandom(4242));
+      const indexed = new InMemoryCollection();
+      const plain = new InMemoryCollection();
+
+      indexed.createIndex({
+        keys: [
+          ["g", 1],
+          ["pad", -1],
+          ["f", 1],
+        ],
+      });
+      indexed.createIndex({
+        keys: [
+          ["pad", -1],
+          ["f", -1],
+        ],
+      });
+
+      const operators = ["$gt", "$gte", "$lt", "$lte"];
+      let ranges = 0;
+      let memberships = 0;
+      let nonEmpty = 0;
+
+      const condition = (kind: number, small: boolean): unknown => {
+        const pick = (): unknown =>
+          small ? generator.int(3) : generator.scalar();
+
+        if (kind === 0) {
+          return pick();
+        }
+
+        if (kind === 1) {
+          return {
+            $in: Array.from({ length: generator.int(4) }, pick),
+          };
+        }
+
+        const range: Document = {};
+
+        const bound = (): unknown => {
+          for (;;) {
+            const value = pick();
+
+            if (
+              typeof value === "string" ||
+              (typeof value === "number" && Number.isFinite(value)) ||
+              typeof value === "bigint"
+            ) {
+              return value;
+            }
+          }
+        };
+
+        range[operators[generator.int(4)] as string] = bound() as never;
+
+        if (generator.int(2) === 0) {
+          range[operators[generator.int(4)] as string] = bound() as never;
+        }
+
+        return range;
+      };
+
+      for (let step = 0; step < 400; step += 1) {
+        const roll = generator.int(8);
+        let operation: (collection: InMemoryCollection) => unknown;
+
+        if (roll < 3) {
+          const documents = Array.from({ length: 1 + generator.int(4) }, () =>
+            generator.document(),
+          );
+
+          operation = (collection) =>
+            collection.insertMany(documents).insertedIds.length;
+        } else if (roll < 5) {
+          const target = generator.scalar();
+          const next = generator.scalar();
+
+          operation = (collection) =>
+            collection.updateMany({ g: target }, { $set: { g: next } });
+        } else if (roll < 6) {
+          const target = generator.int(3);
+
+          operation = (collection) => collection.deleteMany({ pad: target });
+        } else {
+          operation = () => undefined;
+        }
+
+        expect(
+          comparable(attempt(() => operation(indexed))),
+          `step ${step}`,
+        ).toEqual(comparable(attempt(() => operation(plain))));
+
+        for (let query = 0; query < 5; query += 1) {
+          const filter: Document = {};
+
+          if (generator.int(6) !== 0) {
+            filter["g"] = condition(generator.int(3), false) as never;
+          }
+
+          if (generator.int(2) === 0) {
+            filter["pad"] = condition(generator.int(3), true) as never;
+          }
+
+          if (generator.int(2) === 0) {
+            filter["f"] = condition(generator.int(3), false) as never;
+          }
+
+          const expected = [...plain.find(filter)];
+          const text = JSON.stringify(filter, (_k, v: unknown) =>
+            typeof v === "bigint" ? `${v}n` : v,
+          );
+
+          expect([...indexed.find(filter)], `step ${step}: ${text}`).toEqual(
+            expected,
+          );
+
+          if (expected.length > 0) {
+            nonEmpty += 1;
+          }
+
+          const plan = indexed.explain(filter);
+
+          if (plan.fields !== undefined && plan.access === "range") {
+            ranges += 1;
+          }
+
+          if (plan.fields !== undefined && plan.access === "in") {
+            memberships += 1;
+          }
+        }
+
+        if (step % 40 === 0) {
+          expect(indexed.validateIndexes(), `step ${step}`).toMatchObject({
+            valid: true,
+          });
+        }
+      }
+
+      expect(nonEmpty).toBeGreaterThan(100);
+      expect(ranges).toBeGreaterThan(50);
+      expect(memberships).toBeGreaterThan(50);
+    },
+  );
 });

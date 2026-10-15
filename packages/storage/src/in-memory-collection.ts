@@ -1121,8 +1121,19 @@ function describePlan(plan: QueryPlan, documents: number): ExplainResult {
     return {
       ...base,
       fields: plan.index.spec.keys.map((key) => key.field),
-      prefixLength: plan.access.values.length,
-      access: "equality",
+      prefixLength: plan.access.fixed,
+      access:
+        plan.access.range !== undefined
+          ? "range"
+          : plan.viaMembership
+            ? "in"
+            : "equality",
+      ...(plan.access.range?.lower === undefined
+        ? {}
+        : { lower: plan.access.range.lower }),
+      ...(plan.access.range?.upper === undefined
+        ? {}
+        : { upper: plan.access.range.upper }),
     };
   }
 

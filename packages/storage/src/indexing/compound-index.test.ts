@@ -114,8 +114,7 @@ describe("compound indexes", () => {
     collection.createIndex(byShopKind);
 
     expect(collection.explain({ kind: "tea" }).stage).toBe("COLLSCAN");
-    expect(collection.explain({ shop: { $gt: "a" } }).stage).toBe("COLLSCAN");
-    expect(collection.explain({ shop: { $in: ["north"] } }).stage).toBe(
+    expect(collection.explain({ shop: { $ne: "north" } }).stage).toBe(
       "COLLSCAN",
     );
     expect(quantities(collection, { kind: "tea" })).toEqual([2, 3, 5, 7]);
@@ -465,5 +464,245 @@ describe("sparse compound indexes", () => {
     expect(codeOf(() => collection.insertOne({ other: 1 }))).toBe(
       StorageErrorCode.DuplicateKey,
     );
+  });
+});
+
+function ranged(): InMemoryCollection {
+  const collection = new InMemoryCollection();
+
+  collection.insertMany([
+    { shop: "north", qty: 1 },
+    { shop: "north", qty: 5 },
+    { shop: "north", qty: 7 },
+    { shop: "north", qty: 9 },
+    { shop: "north", qty: "ten" },
+    { shop: "north", qty: null },
+    { shop: "north" },
+    { shop: "south", qty: 2 },
+    { shop: "south", qty: 6 },
+    { shop: "west", qty: 3 },
+    { shop: "west", qty: 8 },
+    { qty: 4 },
+  ]);
+
+  return collection;
+}
+
+function column(collection: InMemoryCollection, filter: Document) {
+  return [...collection.find(filter)].map((document) => document["qty"]);
+}
+
+describe.each([1, -1] as const)(
+  "compound index ranges, last field direction %i",
+  (direction) => {
+    function indexed(): InMemoryCollection {
+      const collection = ranged();
+
+      collection.createIndex({
+        keys: [
+          ["shop", 1],
+          ["qty", direction],
+        ],
+      });
+
+      return collection;
+    }
+
+    it("bounds the field after the fixed ones", () => {
+      const collection = indexed();
+      const filter = { shop: "north", qty: { $gte: 5, $lt: 9 } };
+
+      expect(collection.explain(filter)).toMatchObject({
+        stage: "IXSCAN",
+        fields: ["shop", "qty"],
+        prefixLength: 1,
+        access: "range",
+        lower: { value: 5, inclusive: true },
+        upper: { value: 9, inclusive: false },
+      });
+      expect(column(collection, filter)).toEqual([5, 7]);
+    });
+
+    it("counts only values of the bound's kind when estimating", () => {
+      const collection = indexed();
+
+      expect(
+        collection.explain({ shop: "north", qty: { $gt: 5 } })
+          .estimatedCandidates,
+      ).toBe(2);
+    });
+
+    it("takes a single bound", () => {
+      const collection = indexed();
+
+      expect(column(collection, { shop: "north", qty: { $gt: 5 } })).toEqual([
+        7, 9,
+      ]);
+      expect(column(collection, { shop: "north", qty: { $lte: 5 } })).toEqual([
+        1, 5,
+      ]);
+    });
+
+    it("compares only values of the bound's kind", () => {
+      const collection = indexed();
+
+      expect(column(collection, { shop: "north", qty: { $gt: "a" } })).toEqual([
+        "ten",
+      ]);
+      expect(
+        column(collection, { shop: "north", qty: { $gte: 0, $lte: 100 } }),
+      ).toEqual([1, 5, 7, 9]);
+    });
+
+    it("skips documents without the field or with null", () => {
+      const collection = indexed();
+
+      expect(column(collection, { shop: "north", qty: { $lt: 100 } })).toEqual([
+        1, 5, 7, 9,
+      ]);
+    });
+
+    it("is a range on the first field when nothing is fixed", () => {
+      const collection = indexed();
+      const filter = { shop: { $gte: "north", $lt: "west" } };
+
+      expect(collection.explain(filter)).toMatchObject({
+        stage: "IXSCAN",
+        prefixLength: 0,
+        access: "range",
+      });
+      expect(
+        [...collection.find(filter)].map((document) => document["shop"]).sort(),
+      ).toEqual(Array(7).fill("north").concat(["south", "south"]));
+    });
+
+    it("combines $in on the first field with a range", () => {
+      const collection = indexed();
+      const filter = {
+        shop: { $in: ["south", "west", "nowhere"] },
+        qty: { $gt: 2, $lt: 8 },
+      };
+
+      expect(collection.explain(filter)).toMatchObject({
+        prefixLength: 1,
+        access: "range",
+      });
+      expect(column(collection, filter).sort()).toEqual([3, 6]);
+    });
+
+    it("matches an empty range", () => {
+      const collection = indexed();
+
+      expect(
+        column(collection, { shop: "north", qty: { $gt: 5, $lt: 5 } }),
+      ).toEqual([]);
+      expect(column(collection, { shop: "north", qty: { $gt: 9 } })).toEqual(
+        [],
+      );
+    });
+  },
+);
+
+describe("compound indexes with $in", () => {
+  it("looks up each listed value", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    const filter = { shop: { $in: ["north", "south"] }, kind: "tea" };
+
+    expect(collection.explain(filter)).toMatchObject({
+      stage: "IXSCAN",
+      prefixLength: 2,
+      access: "in",
+    });
+    expect(quantities(collection, filter)).toEqual([2, 5, 7]);
+  });
+
+  it("combines $in on both fields", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    const filter = {
+      shop: { $in: ["north", "south", "north"] },
+      kind: { $in: ["coffee", "tea"] },
+    };
+
+    expect(collection.explain(filter)).toMatchObject({ prefixLength: 2 });
+    expect(quantities(collection, filter)).toEqual([1, 2, 5, 7, 9]);
+  });
+
+  it("uses the shorter of two $in lists on one field", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    const filter = {
+      $and: [
+        { shop: { $in: ["north", "south", "east"] } },
+        { shop: { $in: ["north"] } },
+      ],
+    };
+
+    expect(collection.explain(filter).estimatedCandidates).toBe(3);
+    expect(quantities(collection, filter)).toEqual([1, 5, 7]);
+  });
+
+  it("matches nothing for an empty list", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    const filter = { shop: { $in: [] as string[] } };
+
+    expect(collection.explain(filter)).toMatchObject({
+      stage: "IXSCAN",
+      estimatedCandidates: 0,
+    });
+    expect(quantities(collection, filter)).toEqual([]);
+  });
+
+  it("prefers equality over $in on the same field", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    const filter = {
+      shop: "north",
+      $and: [{ shop: { $in: ["north", "south"] } }],
+    };
+
+    expect(collection.explain(filter)).toMatchObject({
+      prefixLength: 1,
+      access: "equality",
+    });
+    expect(quantities(collection, filter)).toEqual([1, 5, 7]);
+  });
+
+  it("stops expanding when there are too many combinations", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    const shops = Array.from({ length: 100 }, (_, index) => `shop${index}`);
+    const filter = { shop: { $in: [...shops, "north"] }, kind: "tea" };
+
+    expect(collection.explain(filter).stage).toBe("COLLSCAN");
+    expect(quantities(collection, filter)).toEqual([5, 7]);
+  });
+
+  it("finds null and missing values apart", () => {
+    const collection = stock();
+
+    collection.createIndex(byShopKind);
+
+    expect(quantities(collection, { shop: { $in: [null] } })).toEqual([]);
+    expect(
+      quantities(collection, {
+        shop: "south",
+        kind: { $in: [null, "coffee"] },
+      }),
+    ).toEqual([9]);
   });
 });

@@ -2,16 +2,29 @@ import type { Document, DocumentValue } from "sinterdb-protocol";
 
 import { pathTouchesArray, resolveField } from "../filter.js";
 import { compareOptionalValues } from "../sort.js";
-import type { IndexConflict } from "./field-index.js";
+import type { IndexBound, IndexConflict } from "./field-index.js";
 import type { IndexContents, SecondaryIndex } from "./secondary-index.js";
 import type { IndexSpec } from "./spec.js";
-import { canonicalKey, describeValue } from "./values.js";
+import {
+  canonicalKey,
+  compareSameClass,
+  describeValue,
+  valueClassOf,
+  type ValueClass,
+} from "./values.js";
 
 /** One value per indexed field; `undefined` is a field the document lacks. */
 type Tuple = readonly (DocumentValue | undefined)[];
 
 /** Up to this many value combinations are counted exactly when planning. */
 const EXACT_ESTIMATE_LIMIT = 64;
+
+/** A range on the field right after the fixed leading fields. */
+export interface CompoundRange {
+  readonly valueClass: ValueClass;
+  readonly lower?: IndexBound;
+  readonly upper?: IndexBound;
+}
 
 interface OrderedEntry {
   readonly tuple: Tuple;
@@ -200,6 +213,58 @@ export class CompoundIndex implements SecondaryIndex {
     return Math.ceil((end - start) * average);
   }
 
+  /**
+   * The documents whose first fields equal `prefix` and whose next field falls
+   * in `range`. The prefix may be empty, which is a range on the first field.
+   */
+  public lookupRange(
+    prefix: readonly DocumentValue[],
+    range: CompoundRange,
+  ): Set<string> {
+    const result = new Set<string>();
+    const { start, end } = this.rangeWindow(prefix, range);
+
+    for (let position = start; position < end; position += 1) {
+      const entry = this.ordered[position] as OrderedEntry;
+
+      if (!inRange(entry.tuple, prefix, range)) {
+        continue;
+      }
+
+      for (const docKey of this.byTuple.get(entry.key) ?? []) {
+        result.add(docKey);
+      }
+    }
+
+    return result;
+  }
+
+  public estimateRange(
+    prefix: readonly DocumentValue[],
+    range: CompoundRange,
+  ): number {
+    const { start, end } = this.rangeWindow(prefix, range);
+
+    if (end - start <= EXACT_ESTIMATE_LIMIT) {
+      let total = 0;
+
+      for (let position = start; position < end; position += 1) {
+        const entry = this.ordered[position] as OrderedEntry;
+
+        if (inRange(entry.tuple, prefix, range)) {
+          total += this.byTuple.get(entry.key)?.size ?? 0;
+        }
+      }
+
+      return total;
+    }
+
+    const average =
+      this.byTuple.size === 0 ? 0 : this.indexedDocuments / this.byTuple.size;
+
+    return Math.ceil((end - start) * average);
+  }
+
   public contents(): IndexContents {
     const values = [...this.byTuple]
       .map(([key, docKeys]) => [key, [...docKeys].sort()] as [string, string[]])
@@ -337,6 +402,77 @@ export class CompoundIndex implements SecondaryIndex {
     return { start, end: low };
   }
 
+  /**
+   * A span of ordered entries that holds every entry in the range. Inside the
+   * prefix the entries are ordered by the next field, in its direction, so the
+   * bounds can be found by binary search. Entries of other kinds of value can
+   * sit inside the span, so the caller still checks each one.
+   */
+  private rangeWindow(
+    prefix: readonly DocumentValue[],
+    range: CompoundRange,
+  ): { start: number; end: number } {
+    const span = this.prefixRange(prefix);
+    const direction = this.spec.keys[prefix.length]?.direction ?? 1;
+    const position = prefix.length;
+    const compareTo = (index: number, bound: IndexBound): number =>
+      compareOptionalValues(
+        (this.ordered[index] as OrderedEntry).tuple[position],
+        bound.value,
+      );
+    const first = (
+      from: number,
+      to: number,
+      reached: (index: number) => boolean,
+    ): number => {
+      let low = from;
+      let high = to;
+
+      while (low < high) {
+        const middle = (low + high) >>> 1;
+
+        if (reached(middle)) {
+          high = middle;
+        } else {
+          low = middle + 1;
+        }
+      }
+
+      return low;
+    };
+
+    let start = span.start;
+    let end = span.end;
+
+    if (direction === 1) {
+      if (range.lower !== undefined) {
+        const lower = range.lower;
+
+        start = first(span.start, span.end, (i) => compareTo(i, lower) >= 0);
+      }
+
+      if (range.upper !== undefined) {
+        const upper = range.upper;
+
+        end = first(start, span.end, (i) => compareTo(i, upper) > 0);
+      }
+    } else {
+      if (range.upper !== undefined) {
+        const upper = range.upper;
+
+        start = first(span.start, span.end, (i) => compareTo(i, upper) <= 0);
+      }
+
+      if (range.lower !== undefined) {
+        const lower = range.lower;
+
+        end = first(start, span.end, (i) => compareTo(i, lower) < 0);
+      }
+    }
+
+    return { start, end };
+  }
+
   private lowerBound(tuple: Tuple): number {
     let low = 0;
     let high = this.ordered.length;
@@ -398,4 +534,38 @@ function matchesPrefix(
 
     return found !== undefined && canonicalKey(found) === canonicalKey(value);
   });
+}
+
+function inRange(
+  tuple: Tuple,
+  prefix: readonly DocumentValue[],
+  range: CompoundRange,
+): boolean {
+  if (!matchesPrefix(tuple, prefix)) {
+    return false;
+  }
+
+  const value = tuple[prefix.length];
+
+  if (value === undefined || valueClassOf(value) !== range.valueClass) {
+    return false;
+  }
+
+  if (range.lower !== undefined) {
+    const comparison = compareSameClass(value, range.lower.value);
+
+    if (comparison < 0 || (comparison === 0 && !range.lower.inclusive)) {
+      return false;
+    }
+  }
+
+  if (range.upper !== undefined) {
+    const comparison = compareSameClass(value, range.upper.value);
+
+    if (comparison > 0 || (comparison === 0 && !range.upper.inclusive)) {
+      return false;
+    }
+  }
+
+  return true;
 }

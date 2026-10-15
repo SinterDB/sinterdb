@@ -73,7 +73,7 @@ returns, including the order, which is always insertion order.
 | `{ field: { $in: [...] } }`                     | Yes, unless an indexed document holds an array in that field |
 | `{ _id: id }` and `{ _id: { $in: [...] } }`     | Yes: direct lookup                                           |
 | Several conditions joined by `$and`             | Yes: the most selective single index                         |
-| Equality on the leading fields of a compound    | Yes: see [Compound indexes](#compound-indexes)               |
+| Equality, `$in`, and a range on a compound      | Yes: see [Compound indexes](#compound-indexes)               |
 | `$or`, `$nor`, `$ne`, `$nin`, `$exists`, `$not` | No: a scan, with the filter still applied                    |
 | `sort`, `skip`, `limit`                         | Applied after the index narrows the candidates               |
 
@@ -119,12 +119,17 @@ await orders.find({ customerId: id, status: "open" }).toArray();
 await orders.find({ status: "open" }).toArray();
 ```
 
-- **A query uses the index by its leading fields.** The query must fix the first
-  field by equality, and can continue with the second, the third, and so on.
-  Fields after the first one the query leaves out are checked on each candidate.
-  A range, `$in`, or other operator on a field stops the prefix there, so a
-  query with `customerId` equal and `total` greater than something uses only
-  `customerId`.
+- **A query uses the index by its leading fields.** The query fixes the first
+  field by equality or `$in`, and can continue with the second, the third, and
+  so on. The first field it leaves out can carry a range (`$gt`, `$gte`, `$lt`,
+  `$lte`) that the index uses too. Anything after that is checked on each
+  candidate. With an index on `customerId` and `total`, a query for one
+  customer and a `total` above some value uses both fields.
+- **A range alone works on the first field.** `{ customerId: { $gt: a } }`
+  reads the index in a range, just as a single-field index does.
+- **`$in` expands into one lookup per combination**, up to 64 combinations. A
+  query that would need more falls back to the fields before it, or to a scan.
+  When a field has both an equality and a `$in`, the equality is used.
 - **The order of the fields matters.** `["a", "b"]` and `["b", "a"]` are two
   different indexes, and both can exist. Two indexes over the same fields in
   the same order cannot, whatever their directions.
@@ -141,9 +146,8 @@ await orders.find({ status: "open" }).toArray();
   one of the fields, queries scan the collection instead.
 - **`explain()` shows the prefix.** `fields` lists every field and
   `prefixLength` says how many the query fixed.
-- **Not used for sorting or ranges yet.** A compound index serves equality on
-  its leading fields. The planner does not read it in order, so it does not
-  replace a sort, and a range on the last field is checked per document.
+- **Not used for sorting yet.** The planner does not read a compound index in
+  order, so it does not replace a sort. Results are sorted after they are found.
 - `field` and `direction` in `indexes()` and `explain()` describe the first
   field, so older drivers keep working. Read `keys` for the whole index.
 
@@ -155,16 +159,16 @@ const plan = await users.find({ email: "ada@example.com" }).explain();
 
 `explain()` reports how the server would run the query without running it.
 
-| Field                 | Meaning                                              |
-| --------------------- | ---------------------------------------------------- |
-| `stage`               | `COLLSCAN`, `IDLOOKUP`, or `IXSCAN`                  |
-| `index`, `field`      | The index used, and its first field                  |
-| `fields`              | Every field of a compound index, in order            |
-| `prefixLength`        | How many leading fields of a compound index are used |
-| `access`              | `equality`, `in`, or `range`                         |
-| `lower`, `upper`      | The range bounds, each with `value` and `inclusive`  |
-| `estimatedCandidates` | How many documents the server expects to examine     |
-| `documents`           | How many documents the collection holds              |
+| Field                 | Meaning                                               |
+| --------------------- | ----------------------------------------------------- |
+| `stage`               | `COLLSCAN`, `IDLOOKUP`, or `IXSCAN`                   |
+| `index`, `field`      | The index used, and its first field                   |
+| `fields`              | Every field of a compound index, in order             |
+| `prefixLength`        | How many leading fields of a compound index are fixed |
+| `access`              | `equality`, `in`, or `range`                          |
+| `lower`, `upper`      | The range bounds, each with `value` and `inclusive`   |
+| `estimatedCandidates` | How many documents the server expects to examine      |
+| `documents`           | How many documents the collection holds               |
 
 ```json
 {
@@ -239,8 +243,8 @@ See [Durable Storage](./storage.md).
 
 ## Limits
 
-- There are no text, partial, or expiring indexes yet. A compound index serves
-  equality on its leading fields only.
+- There are no text, partial, or expiring indexes yet. A compound index is not
+  yet read in order to serve a sort.
 - Arrays are indexed as whole values. An index does not match on an individual
   array element.
 - Indexes live in memory next to the documents, and the whole dataset must fit.

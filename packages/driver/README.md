@@ -476,6 +476,9 @@ await orders.createIndex({
 const open = await orders.find({ customerId, status: "open" }).toArray();
 ```
 
+A compound index serves equality and `$in` on its leading fields, then a range
+on the next one. It does not serve a sort yet.
+
 `indexes()` returns `keys` for every index, and `field` and `direction` for its
 first field. A server older than 0.3.0 refuses compound indexes, and the driver
 throws `SinterCompatibilityError` instead of sending one.

@@ -1,7 +1,7 @@
 import { CustomId, type Document, type DocumentValue } from "sinterdb-protocol";
 
 import { isOperatorDocument } from "../filter.js";
-import { CompoundIndex } from "./compound-index.js";
+import { CompoundIndex, type CompoundRange } from "./compound-index.js";
 import { FieldIndex, type IndexBound } from "./field-index.js";
 import type { SecondaryIndex } from "./secondary-index.js";
 import {
@@ -13,7 +13,16 @@ import {
 
 export type IndexAccess =
   | { readonly kind: "equal"; readonly values: readonly DocumentValue[] }
-  | { readonly kind: "prefix"; readonly values: readonly DocumentValue[] }
+  | {
+      /**
+       * A compound index read at one or more combinations of its leading
+       * fields, optionally narrowed by a range on the field after them.
+       */
+      readonly kind: "prefix";
+      readonly prefixes: readonly (readonly DocumentValue[])[];
+      readonly fixed: number;
+      readonly range?: CompoundRange;
+    }
   | {
       readonly kind: "range";
       readonly valueClass: ValueClass;
@@ -118,7 +127,22 @@ export function candidateKeys(plan: QueryPlan): Set<string> {
   }
 
   if (plan.access.kind === "prefix") {
-    return (plan.index as CompoundIndex).lookupPrefix(plan.access.values);
+    const compound = plan.index as CompoundIndex;
+    const { range } = plan.access;
+    const found = new Set<string>();
+
+    for (const prefix of plan.access.prefixes) {
+      const keys =
+        range === undefined
+          ? compound.lookupPrefix(prefix)
+          : compound.lookupRange(prefix, range);
+
+      for (const key of keys) {
+        found.add(key);
+      }
+    }
+
+    return found;
   }
 
   if (plan.access.kind === "range") {
@@ -248,10 +272,13 @@ function planId(constraints: Constraint[] | undefined): QueryPlan | undefined {
     : { stage: "IDLOOKUP", keys: best, estimated: best.length };
 }
 
+/** Most value combinations one compound lookup will expand `$in` into. */
+const MAX_PREFIXES = 64;
+
 /**
- * A compound index answers a query that fixes its first fields by equality:
- * the first field, the first two, and so on. Any field after a gap is left to
- * the filter, which still runs on every candidate.
+ * A compound index answers a query that fixes its first fields, by equality or
+ * `$in`, and may then bound the next field with a range. A field after a gap
+ * is left to the filter, which still runs on every candidate.
  */
 function planCompound(
   index: CompoundIndex,
@@ -261,33 +288,97 @@ function planCompound(
     return [];
   }
 
-  const values: DocumentValue[] = [];
+  const keys = index.spec.keys;
+  let prefixes: DocumentValue[][] = [[]];
+  let fixed = 0;
+  let viaMembership = false;
 
-  for (const key of index.spec.keys) {
-    const equal = constraints
-      .get(key.field)
-      ?.find((constraint) => constraint.kind === "equal");
+  while (fixed < keys.length) {
+    const options = fixedValues(constraints.get(keys[fixed]?.field ?? ""));
 
-    if (equal === undefined || equal.kind !== "equal") {
+    if (
+      options === undefined ||
+      prefixes.length * options.values.length > MAX_PREFIXES
+    ) {
       break;
     }
 
-    values.push(equal.value);
+    prefixes = prefixes.flatMap((prefix) =>
+      options.values.map((value) => [...prefix, value]),
+    );
+    viaMembership = viaMembership || options.membership;
+    fixed += 1;
   }
 
-  if (values.length === 0) {
+  const next = keys[fixed];
+  const range =
+    next === undefined ? undefined : rangeBounds(constraints.get(next.field));
+
+  if (fixed === 0 && range === undefined) {
     return [];
   }
+
+  const compoundRange: CompoundRange | undefined =
+    range === undefined
+      ? undefined
+      : {
+          valueClass: range.valueClass,
+          ...(range.lower === undefined ? {} : { lower: range.lower }),
+          ...(range.upper === undefined ? {} : { upper: range.upper }),
+        };
 
   return [
     {
       stage: "IXSCAN",
       index,
-      access: { kind: "prefix", values },
-      viaMembership: false,
-      estimated: index.estimatePrefix(values),
+      access: {
+        kind: "prefix",
+        prefixes,
+        fixed,
+        ...(compoundRange === undefined ? {} : { range: compoundRange }),
+      },
+      viaMembership,
+      estimated: prefixes.reduce<number>(
+        (total, prefix) =>
+          total +
+          (compoundRange === undefined
+            ? index.estimatePrefix(prefix)
+            : index.estimateRange(prefix, compoundRange)),
+        0,
+      ),
     },
   ];
+}
+
+/** The values a field is pinned to, when equality or `$in` pins it. */
+function fixedValues(
+  constraints: Constraint[] | undefined,
+): { values: DocumentValue[]; membership: boolean } | undefined {
+  const equal = constraints?.find((constraint) => constraint.kind === "equal");
+
+  if (equal !== undefined && equal.kind === "equal") {
+    return { values: [equal.value], membership: false };
+  }
+
+  let best: DocumentValue[] | undefined;
+
+  for (const constraint of constraints ?? []) {
+    if (constraint.kind !== "in") {
+      continue;
+    }
+
+    const distinct = new Map<string, DocumentValue>();
+
+    for (const value of constraint.values) {
+      distinct.set(canonicalKey(value), value);
+    }
+
+    if (best === undefined || distinct.size < best.length) {
+      best = [...distinct.values()];
+    }
+  }
+
+  return best === undefined ? undefined : { values: best, membership: true };
 }
 
 function planIndex(index: FieldIndex, constraints: Constraint[]): QueryPlan[] {
@@ -339,15 +430,18 @@ function planIndex(index: FieldIndex, constraints: Constraint[]): QueryPlan[] {
   return plans;
 }
 
-function planRange(
-  index: FieldIndex,
-  constraints: Constraint[],
-): QueryPlan | undefined {
+function rangeBounds(constraints: Constraint[] | undefined):
+  | {
+      valueClass: ValueClass;
+      lower?: IndexBound;
+      upper?: IndexBound;
+    }
+  | undefined {
   let valueClass: ValueClass | undefined;
   let lower: IndexBound | undefined;
   let upper: IndexBound | undefined;
 
-  for (const constraint of constraints) {
+  for (const constraint of constraints ?? []) {
     if (constraint.kind !== "lower" && constraint.kind !== "upper") {
       continue;
     }
@@ -381,16 +475,32 @@ function planRange(
   }
 
   return {
+    valueClass,
+    ...(lower === undefined ? {} : { lower }),
+    ...(upper === undefined ? {} : { upper }),
+  };
+}
+
+function planRange(
+  index: FieldIndex,
+  constraints: Constraint[],
+): QueryPlan | undefined {
+  const bounds = rangeBounds(constraints);
+
+  if (bounds === undefined) {
+    return undefined;
+  }
+
+  return {
     stage: "IXSCAN",
     index,
-    access: {
-      kind: "range",
-      valueClass,
-      ...(lower === undefined ? {} : { lower }),
-      ...(upper === undefined ? {} : { upper }),
-    },
+    access: { kind: "range", ...bounds },
     viaMembership: false,
-    estimated: index.estimateRange(valueClass, lower, upper),
+    estimated: index.estimateRange(
+      bounds.valueClass,
+      bounds.lower,
+      bounds.upper,
+    ),
   };
 }
 
