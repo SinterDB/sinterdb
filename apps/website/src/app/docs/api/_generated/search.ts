@@ -2280,7 +2280,7 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     kind: "type-alias",
     href: "/docs/api/types/DistinctValue",
     summary:
-      "The type of one value returned by SinterCollection.distinct for a field: the element type when the field holds and array.",
+      "The type of one value returned by SinterCollection.distinct for a field: the element type when the field holds an array.",
     code: 'type DistinctValue<TDocument extends object, TField extends string> = TField extends "_id" ? CustomId : Exclude<ElementOf<FilterPathValue<TDocument, TField>>...',
     deprecated: false,
     since: null,

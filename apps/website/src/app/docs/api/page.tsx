@@ -541,7 +541,7 @@ const groups: readonly ApiIndexGroup[] = [
         kind: "type-alias",
         label: "Type Alias",
         short:
-          'The type of one value returned by <a href="/docs/api/classes/SinterCollection#distinct">SinterCollection.distinct</a> for a field: the element type when the field holds and array.',
+          'The type of one value returned by <a href="/docs/api/classes/SinterCollection#distinct">SinterCollection.distinct</a> for a field: the element type when the field holds an array.',
         deprecated: false,
         since: null,
       },

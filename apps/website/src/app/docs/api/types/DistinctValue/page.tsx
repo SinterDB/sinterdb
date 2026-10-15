@@ -11,7 +11,7 @@ const page: ApiPage = {
   href: "/docs/api/types/DistinctValue",
   since: null,
   description:
-    "The type of one value returned by SinterCollection.distinct for a field: the element type when the field holds and array.",
+    "The type of one value returned by SinterCollection.distinct for a field: the element type when the field holds an array.",
   badges: [],
   declaration: [
     ["type ", "kw"],
@@ -48,9 +48,9 @@ const page: ApiPage = {
   ],
   comment: {
     summary:
-      '<p>The type of one value returned by <a href="/docs/api/classes/SinterCollection#distinct">SinterCollection.distinct</a> for a\nfield: the element type when the field holds and array.</p>',
+      '<p>The type of one value returned by <a href="/docs/api/classes/SinterCollection#distinct">SinterCollection.distinct</a> for a\nfield: the element type when the field holds an array.</p>',
     short:
-      'The type of one value returned by <a href="/docs/api/classes/SinterCollection#distinct">SinterCollection.distinct</a> for a field: the element type when the field holds and array.',
+      'The type of one value returned by <a href="/docs/api/classes/SinterCollection#distinct">SinterCollection.distinct</a> for a field: the element type when the field holds an array.',
     deprecated: null,
     modifiers: [],
     blocks: [],

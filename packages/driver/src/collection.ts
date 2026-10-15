@@ -60,7 +60,7 @@ export type EqualityFilter<TDocument extends object> = {
 
 /**
  * The type of one value returned by {@link SinterCollection.distinct} for a
- * field: the element type when the field holds and array.
+ * field: the element type when the field holds an array.
  */
 export type DistinctValue<
   TDocument extends object,
