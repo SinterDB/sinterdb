@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 508,
+  id: 536,
   name: "SinterConnectionTimeoutError",
   kind: "class",
   label: "Class",
@@ -70,7 +70,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 518,
+          id: 546,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -82,7 +82,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 519,
+              id: 547,
               code: [
                 ["new ", "kw"],
                 ["SinterConnectionTimeoutError", "name"],
@@ -153,7 +153,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 522,
+          id: 550,
           name: "code",
           anchor: "code",
           kind: "property",

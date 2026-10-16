@@ -117,10 +117,12 @@ Each breaking change lands here in the release that makes it.
   reads `field` and `direction` keeps working.
 - **Aggregation needs a 0.3.0 server.** The server advertises a new
   `aggregation` capability and an `aggregate` command with the stages `$match`,
-  `$project`, `$sort`, `$skip`, `$limit` and `$count`. A 0.3.0 driver refuses to
-  send a pipeline to a server without it (`SinterCompatibilityError`). The
-  driver exports `AggregateCursor` and the `AggregationStage` and
-  `AggregateOptions` types. Nothing that worked before changes.
+  `$project`, `$sort`, `$skip`, `$limit`, `$count` and `$group`. A 0.3.0 driver
+  refuses to send a pipeline to a server without it
+  (`SinterCompatibilityError`). The driver exports `AggregateCursor` and the
+  `AggregationStage`, `AggregateOptions`, `GroupSpecification`,
+  `GroupAccumulator` and `GroupValue` types. Nothing that worked before
+  changes.
 - **Projection needs a 0.3.0 server.** The server advertises a new `projection`
   capability. A 0.3.0 driver refuses to send a projection to a server without
   it (`SinterCompatibilityError`) instead of getting whole documents back.

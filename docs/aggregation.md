@@ -41,6 +41,7 @@ Each stage is an object with exactly one key, which names the stage.
 | `$skip`    | a non-negative integer    | Drops that many documents.                     |
 | `$limit`   | a positive integer        | Keeps at most that many documents.             |
 | `$count`   | a field name              | Replaces the documents with one count document |
+| `$group`   | `_id` and accumulators    | Replaces the documents with one per group      |
 
 - **`$match`** takes the same filters as `find()`, and the rules in
   [query semantics](./query-semantics.md) apply. A `$match` at the start of the
@@ -59,6 +60,77 @@ Each stage is an object with exactly one key, which names the stage.
   empty, start with `$`, or contain `.`. The stage produces one document, such
   as `{ total: 3 }`, or no document at all when nothing reached it. Check the
   length of the result rather than assuming a document is there.
+
+- **`$group`** is described [below](#grouping).
+
+## Grouping
+
+`$group` puts documents into groups by a key and computes a value for each
+group. The key is `_id`, and every other field is an accumulator:
+
+```ts
+const teams = await users
+  .aggregate<{ _id: string; members: number; payroll: number }>([
+    {
+      $group: {
+        _id: "$team",
+        members: { $count: {} },
+        payroll: { $sum: "$salary" },
+      },
+    },
+    { $sort: [["payroll", -1]] },
+  ])
+  .toArray();
+```
+
+**Field references.** A string that starts with `$` names a field of the
+incoming document: `"$age"`, or `"$address.city"` for a nested one. A path steps
+into documents only, not into arrays. Any other value is a literal, so
+`{ $sum: 1 }` adds one for every document. A literal string that starts with `$`
+cannot be written.
+
+**The key.** `_id` is a field reference, a literal, or a document of up to eight
+field references or literals for a compound key, such as
+`{ team: "$team", level: "$level" }`. `_id: null` puts every document in one
+group. A document without the field is in the group with key `null`, which is
+also the group of documents that hold `null`. Two keys are the same group when
+filters would call them equal, so `1` and `1n` are different groups, and `NaN`
+is one group. The key is the `_id` of the output document.
+
+**Accumulators.** Each is an object with one key:
+
+| Accumulator         | Result                                                        |
+| ------------------- | ------------------------------------------------------------- |
+| `{ $count: {} }`    | The number of documents in the group.                         |
+| `{ $sum: value }`   | The total of the numbers, or `0` when there are none.         |
+| `{ $avg: value }`   | The mean of the numbers, or `null` when there are none.       |
+| `{ $min: value }`   | The smallest value in sort order, or `null` when none exists. |
+| `{ $max: value }`   | The largest value in sort order, or `null` when none exists.  |
+| `{ $first: value }` | The value in the first document of the group, or `null`.      |
+| `{ $last: value }`  | The value in the last document of the group, or `null`.       |
+
+- `$sum` and `$avg` ignore values that are not numbers. A `$sum` adds numbers or
+  `bigint` values, and fails with `DocumentValidationFailed` when a group holds
+  both, or when a bigint total leaves the signed 64-bit range. `$avg` fails on
+  a `bigint`, because averaging would lose precision. Sum them and divide in your
+  code.
+- `$min` and `$max` compare as `sort` does, so a string is larger than a number
+  and `null` is smaller than both. They skip documents that lack the field, but
+  not a stored `null`. On a tie the earlier document's value stays.
+- `$first` and `$last` depend on the order the documents arrive in, so put a
+  `$sort` before the `$group` when you need a particular one. A missing field
+  gives `null`.
+
+**Order and memory.** Groups come out in the order their first document arrived.
+Use a `$sort` after the `$group` to order them. A `$group` reads every document
+before it yields the first group, and keeps one entry per group, so memory grows
+with the number of groups and not the number of documents. At most 100,000
+groups may exist at once. Beyond that the pipeline fails with
+`DocumentValidationFailed`. Put a `$match` first, which can use an index, to
+reduce the work.
+
+Output documents hold `_id` and the accumulator fields. Output field names must
+not be empty, start with `$`, contain `.`, or be `__proto__`.
 
 ## Rules
 
@@ -88,9 +160,10 @@ and a `$limit` around it when the collection is large.
 
 ## What is not there yet
 
-Only these six stages exist. `$group`, `$lookup`, `$unwind`, `$addFields` and the
-other stages are rejected with `DocumentValidationFailed`, and there are no
-expressions such as `"$age"` or `$sum`. See [Known limitations](./limitations.md).
+Only these seven stages exist. `$lookup`, `$unwind`, `$addFields` and the other
+stages are rejected with `DocumentValidationFailed`. Field references work only
+inside `$group`, and `$push` and `$addToSet` do not exist. See
+[Known limitations](./limitations.md).
 
 A server older than 0.3.0 does not understand `aggregate`, and the driver throws
 `SinterCompatibilityError` instead of sending one.

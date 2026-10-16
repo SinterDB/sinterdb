@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 357,
+  id: 385,
   name: "FindCursor",
   kind: "class",
   label: "Class",
@@ -80,7 +80,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 360,
+          id: 388,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -92,7 +92,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 361,
+              id: 389,
               code: [
                 ["new ", "kw"],
                 ["FindCursor", "name"],
@@ -258,7 +258,7 @@ const page: ApiPage = {
       title: "Methods",
       members: [
         {
-          id: 383,
+          id: 411,
           name: "[asyncIterator]",
           anchor: "async-iterator",
           kind: "method",
@@ -270,7 +270,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 384,
+              id: 412,
               code: [
                 ["[asyncIterator]", "name"],
                 ["(): ", "pn"],
@@ -327,7 +327,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 381,
+          id: 409,
           name: "close",
           anchor: "close",
           kind: "method",
@@ -339,7 +339,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 382,
+              id: 410,
               code: [
                 ["close", "name"],
                 ["(): ", "pn"],
@@ -388,7 +388,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 373,
+          id: 401,
           name: "explain",
           anchor: "explain",
           kind: "method",
@@ -400,7 +400,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 374,
+              id: 402,
               code: [
                 ["explain", "name"],
                 ["(): ", "pn"],
@@ -453,7 +453,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 375,
+          id: 403,
           name: "hasNext",
           anchor: "has-next",
           kind: "method",
@@ -465,7 +465,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 376,
+              id: 404,
               code: [
                 ["hasNext", "name"],
                 ["(): ", "pn"],
@@ -514,7 +514,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 377,
+          id: 405,
           name: "next",
           anchor: "next",
           kind: "method",
@@ -526,7 +526,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 378,
+              id: 406,
               code: [
                 ["next", "name"],
                 ["(): ", "pn"],
@@ -579,7 +579,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 379,
+          id: 407,
           name: "toArray",
           anchor: "to-array",
           kind: "method",
@@ -591,7 +591,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 380,
+              id: 408,
               code: [
                 ["toArray", "name"],
                 ["(): ", "pn"],

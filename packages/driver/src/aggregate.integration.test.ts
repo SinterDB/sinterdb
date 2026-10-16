@@ -128,7 +128,7 @@ describe("aggregate through the driver", () => {
   it("reports an invalid pipeline as a server error", async () => {
     await withPeople(async (people) => {
       for (const pipeline of [
-        [{ $group: { _id: "$team" } }],
+        [{ $group: { n: { $count: {} } } }],
         [{ $limit: 0 }],
         [{ $match: { age: { $regex: "x" } } }],
         [{ $count: "$total" }],
@@ -144,6 +144,48 @@ describe("aggregate through the driver", () => {
           "DocumentValidationFailed",
         );
       }
+    });
+  });
+
+  it("groups documents", async () => {
+    await withPeople(async (people) => {
+      const groups = await people
+        .aggregate<{
+          _id: string;
+          n: number;
+          oldest: number | null;
+          mean: number | null;
+        }>([
+          {
+            $group: {
+              _id: "$team",
+              n: { $count: {} },
+              oldest: { $max: "$age" },
+              mean: { $avg: "$age" },
+            },
+          },
+          { $sort: [["_id", 1]] },
+        ])
+        .toArray();
+
+      expect(groups).toEqual([
+        { _id: "a", n: 3, oldest: 36, mean: (36 + 36 + 29) / 3 },
+        { _id: "b", n: 3, oldest: 41, mean: (29 + 41) / 2 },
+      ]);
+    });
+  });
+
+  it("reports a failure while grouping as a server error", async () => {
+    await withPeople(async (people) => {
+      const error: unknown = await people
+        .aggregate([{ $group: { _id: null, mean: { $avg: 5n } } }])
+        .toArray()
+        .catch((caught: unknown) => caught);
+
+      expect(error).toBeInstanceOf(SinterServerError);
+      expect((error as SinterServerError).serverErrorName).toBe(
+        "DocumentValidationFailed",
+      );
     });
   });
 

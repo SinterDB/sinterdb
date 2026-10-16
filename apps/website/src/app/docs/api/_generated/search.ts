@@ -1655,6 +1655,38 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     since: null,
   },
   {
+    name: "GroupSpecification",
+    parent: null,
+    kind: "interface",
+    href: "/docs/api/interfaces/GroupSpecification",
+    summary:
+      "The argument of $group: an _id that says how to group, plus any number of output fields, each computed by an accumulator.",
+    code: "interface GroupSpecification",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "[field]",
+    parent: "GroupSpecification",
+    kind: "index-signature",
+    href: "/docs/api/interfaces/GroupSpecification#index-signature",
+    summary:
+      "An output field computed by an accumulator. The name must not be empty, start with $, or contain ..",
+    code: "readonly [field: string]: GroupAccumulator | GroupValue | { readonly [name: string]: GroupValue }",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "_id",
+    parent: "GroupSpecification",
+    kind: "property",
+    href: "/docs/api/interfaces/GroupSpecification#_id",
+    summary: "How to group: a field reference, a literal, or a compound key.",
+    code: "readonly _id: GroupValue | { readonly [name: string]: GroupValue }",
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "IndexBoundInfo",
     parent: null,
     kind: "interface",
@@ -2636,6 +2668,28 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     summary:
       "The type of the value at a dotted field path. A path through an array reads the type of the elements.",
     code: "type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? TH...",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "GroupAccumulator",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/GroupAccumulator",
+    summary:
+      "What a $group stage computes for each group. Each is an object with one key.",
+    code: "type GroupAccumulator = | { readonly $count: Readonly<Record<string, never>> } | { readonly $sum: GroupValue } | { readonly $avg: GroupValue } | { readonly $...",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "GroupValue",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/GroupValue",
+    summary:
+      'A value in a $group stage: a field reference or a literal. A string that starts with $ names a field of the incoming document ("$age", or "$address.city" for a nested one). A document without the field gives null in a key. Any other value is a literal. There is no way to write a literal string that starts with $.',
+    code: "type GroupValue = string | number | bigint | boolean | null | Date | Uint8Array | CustomId",
     deprecated: false,
     since: null,
   },

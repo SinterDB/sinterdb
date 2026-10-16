@@ -64,8 +64,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/aggregation.ts",
-              line: 54,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L54",
+              line: 142,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L142",
             },
           ],
         },
@@ -94,8 +94,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/aggregation.ts",
-      line: 50,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L50",
+      line: 138,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L138",
     },
   ],
   usedBy: [

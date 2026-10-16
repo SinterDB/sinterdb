@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 645,
+  id: 673,
   name: "SinterServerError",
   kind: "class",
   label: "Class",
@@ -78,7 +78,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 655,
+          id: 683,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -90,7 +90,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 656,
+              id: 684,
               code: [
                 ["new ", "kw"],
                 ["SinterServerError", "name"],
@@ -169,7 +169,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 663,
+          id: 691,
           name: "code",
           anchor: "code",
           kind: "property",
@@ -210,7 +210,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 662,
+          id: 690,
           name: "details",
           anchor: "details",
           kind: "property",
@@ -246,7 +246,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 661,
+          id: 689,
           name: "retryable",
           anchor: "retryable",
           kind: "property",
@@ -281,7 +281,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 660,
+          id: 688,
           name: "serverErrorName",
           anchor: "server-error-name",
           kind: "property",
@@ -318,7 +318,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 659,
+          id: 687,
           name: "wireCode",
           anchor: "wire-code",
           kind: "property",

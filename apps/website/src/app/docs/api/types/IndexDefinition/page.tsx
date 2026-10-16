@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 762,
+  id: 790,
   name: "IndexDefinition",
   kind: "type-alias",
   label: "Type Alias",

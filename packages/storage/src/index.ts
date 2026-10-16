@@ -9,6 +9,7 @@ export {
   StorageCorruptionError,
 } from "./errors.js";
 export { compilePipeline, MAX_PIPELINE_STAGES } from "./aggregation.js";
+export { MAX_GROUPS, MAX_GROUP_KEY_FIELDS } from "./group.js";
 export { compileFilter } from "./filter.js";
 export { compileProjection } from "./projection.js";
 export { compileSort } from "./sort.js";

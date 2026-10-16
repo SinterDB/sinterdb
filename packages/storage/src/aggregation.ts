@@ -2,6 +2,7 @@ import type { Document, DocumentValue } from "sinterdb-protocol";
 
 import { StorageError, StorageErrorCode } from "./errors.js";
 import { compileFilter } from "./filter.js";
+import { compileGroup } from "./group.js";
 import { compileProjection } from "./projection.js";
 import { compileSort, compileTopN, type SortSpecification } from "./sort.js";
 
@@ -15,6 +16,7 @@ const STAGE_NAMES = new Set([
   "$skip",
   "$limit",
   "$count",
+  "$group",
 ]);
 
 type Stage = (input: Iterable<Document>) => Iterable<Document>;
@@ -47,6 +49,9 @@ export interface CompiledPipeline {
  * - `$skip: n` and `$limit: n` drop and cap documents.
  * - `$count: name` replaces the documents with one `{ [name]: n }`, or with
  *   nothing when there were no documents.
+ * - `$group: { _id: key, name: { $accumulator: expression }, ... }` replaces
+ *   the documents with one document per distinct key. It holds one entry per
+ *   group, at most `MAX_GROUPS`.
  *
  * A `$sort` followed by `$limit` (with at most a `$skip` between) keeps only
  * the documents it needs while sorting.
@@ -224,6 +229,9 @@ function compileStage(stage: ParsedStage): Stage {
         }
       };
     }
+
+    case "$group":
+      return compileGroup(stage.argument, stage.position);
 
     default: {
       const name = countName(stage);

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 447,
+  id: 475,
   name: "SinterCompatibilityError",
   kind: "class",
   label: "Class",
@@ -72,7 +72,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 457,
+          id: 485,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -84,7 +84,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 458,
+              id: 486,
               code: [
                 ["new ", "kw"],
                 ["SinterCompatibilityError", "name"],
@@ -167,7 +167,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 461,
+          id: 489,
           name: "code",
           anchor: "code",
           kind: "property",
@@ -206,7 +206,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 465,
+          id: 493,
           name: "details",
           anchor: "details",
           kind: "property",
@@ -248,7 +248,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 464,
+          id: 492,
           name: "retryable",
           anchor: "retryable",
           kind: "property",
@@ -289,7 +289,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 463,
+          id: 491,
           name: "serverErrorName",
           anchor: "server-error-name",
           kind: "property",
@@ -332,7 +332,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 462,
+          id: 490,
           name: "wireCode",
           anchor: "wire-code",
           kind: "property",

@@ -591,6 +591,11 @@ const page: ApiPage = {
       kind: "property",
     },
     {
+      name: "GroupValue",
+      href: "/docs/api/types/GroupValue",
+      kind: "type-alias",
+    },
+    {
       name: "InsertManyResult.insertedIds",
       href: "/docs/api/interfaces/InsertManyResult#inserted-ids",
       kind: "property",

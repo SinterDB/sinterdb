@@ -427,7 +427,9 @@ Notes:
   batch like `find`, which `getMore` and `closeCursor` continue. Each stage is a
   document with one key: `$match` (a filter), `$project` (a projection), `$sort`
   (an array of `[path, direction]` pairs, as for `find`), `$skip`, `$limit`, or
-  `$count` (a field name). A pipeline has at most 32 stages. An invalid pipeline
+  `$count` (a field name), or `$group` (a document with an `_id` and
+  accumulators; see [aggregation](../aggregation.md)). A pipeline has at most 32
+  stages. An invalid pipeline
   returns `DocumentValidationFailed` with `details.storageErrorCode` set to
   `INVALID_PIPELINE`, or to the code of the filter, projection or sort that was
   invalid, even when the collection does not exist. A `pipeline` that is not an

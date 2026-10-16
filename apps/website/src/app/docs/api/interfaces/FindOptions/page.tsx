@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 301,
+  id: 329,
   name: "FindOptions",
   kind: "interface",
   label: "Interface",
@@ -79,7 +79,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 304,
+          id: 332,
           name: "batchSize",
           anchor: "batch-size",
           kind: "property",
@@ -114,7 +114,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 307,
+          id: 335,
           name: "limit",
           anchor: "limit",
           kind: "property",
@@ -147,7 +147,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 308,
+          id: 336,
           name: "projection",
           anchor: "projection",
           kind: "property",
@@ -182,7 +182,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 306,
+          id: 334,
           name: "skip",
           anchor: "skip",
           kind: "property",
@@ -216,7 +216,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 305,
+          id: 333,
           name: "sort",
           anchor: "sort",
           kind: "property",

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 741,
+  id: 769,
   name: "SortDirection",
   kind: "type-alias",
   label: "Type Alias",

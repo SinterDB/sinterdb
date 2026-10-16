@@ -122,11 +122,18 @@ Not supported, and rejected with `DocumentValidationFailed`: `$regex`, `$all`,
 
 Also missing:
 
-- **Aggregation is limited to six stages.** `aggregate()` runs `$match`,
-  `$project`, `$sort`, `$skip`, `$limit` and `$count`. `$group`, `$lookup`,
+- **Aggregation is limited to seven stages.** `aggregate()` runs `$match`,
+  `$project`, `$sort`, `$skip`, `$limit`, `$count` and `$group`. `$lookup`,
   `$unwind` and `$addFields` are rejected with `DocumentValidationFailed`, and
   there are no joins. `countDocuments()`, `estimatedDocumentCount()` and
   `distinct()` cover counting and distinct values.
+- **`$group` has seven accumulators and no array-building ones.** `$count`,
+  `$sum`, `$avg`, `$min`, `$max`, `$first` and `$last` exist. `$push` and
+  `$addToSet` are rejected with `DocumentValidationFailed`, because they would
+  build arrays with no size limit. A `$group` holds one entry per group in
+  memory, at most 100,000 of them, and fails with `DocumentValidationFailed`
+  beyond that. A field reference cannot step into arrays, and a literal string
+  that starts with `$` cannot be written.
 - **No full-text, geospatial, or regular-expression search.**
 - **A cursor is not a snapshot.** It reads the collection as it goes, so
   documents written while you iterate may or may not show up, and the document

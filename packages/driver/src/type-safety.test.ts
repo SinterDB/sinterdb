@@ -579,9 +579,21 @@ describe("AggregationStage<TDocument> types", () => {
       { $skip: 5 },
       { $limit: 10 },
       { $count: "total" },
+      {
+        $group: {
+          _id: { team: "$team", level: 3 },
+          n: { $count: {} },
+          total: { $sum: "$age" },
+          mean: { $avg: "$age" },
+          youngest: { $min: "$age" },
+          oldest: { $max: "$age" },
+          first: { $first: "$name" },
+          last: { $last: "$name" },
+        },
+      },
     ];
 
-    expect(pipeline).toHaveLength(6);
+    expect(pipeline).toHaveLength(7);
   });
 
   it("checks the fields that stages name", () => {
@@ -596,8 +608,8 @@ describe("AggregationStage<TDocument> types", () => {
       { $skip: "5" },
       // @ts-expect-error $count takes a name
       { $count: 1 },
-      // @ts-expect-error $group is not supported
-      { $group: { _id: "$age" } },
+      // @ts-expect-error $group needs an _id
+      { $group: { n: { $count: {} } } },
     ];
 
     expect(pipeline).toHaveLength(6);

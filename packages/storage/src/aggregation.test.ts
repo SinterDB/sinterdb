@@ -200,8 +200,8 @@ describe("aggregation validation", () => {
   });
 
   it("rejects unknown stages and names the supported ones", () => {
-    expect(invalid([{ $group: { _id: "$a" } }])).toContain("$group");
-    expect(invalid([{ $group: { _id: "$a" } }])).toContain("$match");
+    expect(invalid([{ $lookup: {} }])).toContain("$lookup");
+    expect(invalid([{ $lookup: {} }])).toContain("$group");
     invalid([{ match: {} }]);
   });
 

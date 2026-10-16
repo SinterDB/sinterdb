@@ -111,7 +111,7 @@ describe("docs/limitations.md: queries", () => {
     });
   });
 
-  it.each(["$group", "$lookup", "$unwind", "$addFields"])(
+  it.each(["$lookup", "$unwind", "$addFields"])(
     "rejects the aggregation stage %s",
     async (stage) => {
       expect(markdown).toContain(`\`${stage}\``);
@@ -123,6 +123,29 @@ describe("docs/limitations.md: queries", () => {
 
         const error = await serverError(
           items.aggregate([{ [stage]: {} } as never]).toArray(),
+        );
+
+        expect(error.serverErrorName).toBe("DocumentValidationFailed");
+      });
+    },
+  );
+
+  it.each(["$push", "$addToSet"])(
+    "rejects the $group accumulator %s",
+    async (accumulator) => {
+      expect(markdown).toContain(`\`${accumulator}\``);
+
+      await inDatabase(async (client) => {
+        const items = client.db().collection("items");
+
+        await items.insertOne({ n: 1 });
+
+        const error = await serverError(
+          items
+            .aggregate([
+              { $group: { _id: null, all: { [accumulator]: "$n" } } } as never,
+            ])
+            .toArray(),
         );
 
         expect(error.serverErrorName).toBe("DocumentValidationFailed");

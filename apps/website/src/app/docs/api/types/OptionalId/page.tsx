@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 316,
+  id: 344,
   name: "OptionalId",
   kind: "type-alias",
   label: "Type Alias",
@@ -62,7 +62,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 318,
+          id: 346,
           name: "_id",
           anchor: "_id",
           kind: "property",

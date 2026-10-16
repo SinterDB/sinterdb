@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 215,
+  id: 243,
   name: "SinterCollection",
   kind: "class",
   label: "Class",
@@ -53,7 +53,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 217,
+          id: 245,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -65,7 +65,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 218,
+              id: 246,
               code: [
                 ["new ", "kw"],
                 ["SinterCollection", "name"],
@@ -162,7 +162,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 222,
+          id: 250,
           name: "database",
           anchor: "database",
           kind: "property",
@@ -195,7 +195,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 224,
+          id: 252,
           name: "name",
           anchor: "name",
           kind: "property",
@@ -234,7 +234,7 @@ const page: ApiPage = {
       title: "Accessors",
       members: [
         {
-          id: 225,
+          id: 253,
           name: "namespace",
           anchor: "namespace",
           kind: "accessor",
@@ -246,7 +246,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 226,
+              id: 254,
               code: [
                 ["get ", "kw"],
                 ["namespace", "name"],
@@ -294,7 +294,7 @@ const page: ApiPage = {
       title: "Methods",
       members: [
         {
-          id: 284,
+          id: 312,
           name: "aggregate",
           anchor: "aggregate",
           kind: "method",
@@ -306,7 +306,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 285,
+              id: 313,
               code: [
                 ["aggregate", "name"],
                 ["<", "pn"],
@@ -435,7 +435,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 238,
+          id: 266,
           name: "countDocuments",
           anchor: "count-documents",
           kind: "method",
@@ -447,7 +447,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 239,
+              id: 267,
               code: [
                 ["countDocuments", "name"],
                 ["(", "pn"],
@@ -516,7 +516,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 269,
+          id: 297,
           name: "createIndex",
           anchor: "create-index",
           kind: "method",
@@ -528,7 +528,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 270,
+              id: 298,
               code: [
                 ["createIndex", "name"],
                 ["(", "pn"],
@@ -609,7 +609,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 251,
+          id: 279,
           name: "deleteMany",
           anchor: "delete-many",
           kind: "method",
@@ -621,7 +621,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 252,
+              id: 280,
               code: [
                 ["deleteMany", "name"],
                 ["(", "pn"],
@@ -689,7 +689,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 248,
+          id: 276,
           name: "deleteOne",
           anchor: "delete-one",
           kind: "method",
@@ -701,7 +701,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 249,
+              id: 277,
               code: [
                 ["deleteOne", "name"],
                 ["(", "pn"],
@@ -769,7 +769,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 243,
+          id: 271,
           name: "distinct",
           anchor: "distinct",
           kind: "method",
@@ -781,7 +781,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 244,
+              id: 272,
               code: [
                 ["distinct", "name"],
                 ["<", "pn"],
@@ -890,7 +890,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 272,
+          id: 300,
           name: "dropIndex",
           anchor: "drop-index",
           kind: "method",
@@ -902,7 +902,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 273,
+              id: 301,
               code: [
                 ["dropIndex", "name"],
                 ["(", "pn"],
@@ -966,7 +966,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 241,
+          id: 269,
           name: "estimatedDocumentCount",
           anchor: "estimated-document-count",
           kind: "method",
@@ -978,7 +978,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 242,
+              id: 270,
               code: [
                 ["estimatedDocumentCount", "name"],
                 ["(): ", "pn"],
@@ -1027,7 +1027,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 279,
+          id: 307,
           name: "find",
           anchor: "find",
           kind: "method",
@@ -1039,7 +1039,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 280,
+              id: 308,
               code: [
                 ["find", "name"],
                 ["<", "pn"],
@@ -1183,7 +1183,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 233,
+          id: 261,
           name: "findOne",
           anchor: "find-one",
           kind: "method",
@@ -1195,7 +1195,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 234,
+              id: 262,
               code: [
                 ["findOne", "name"],
                 ["<", "pn"],
@@ -1347,7 +1347,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 275,
+          id: 303,
           name: "indexes",
           anchor: "indexes",
           kind: "method",
@@ -1359,7 +1359,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 276,
+              id: 304,
               code: [
                 ["indexes", "name"],
                 ["(): ", "pn"],
@@ -1408,7 +1408,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 230,
+          id: 258,
           name: "insertMany",
           anchor: "insert-many",
           kind: "method",
@@ -1420,7 +1420,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 231,
+              id: 259,
               code: [
                 ["insertMany", "name"],
                 ["(", "pn"],
@@ -1501,7 +1501,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 227,
+          id: 255,
           name: "insertOne",
           anchor: "insert-one",
           kind: "method",
@@ -1513,7 +1513,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 228,
+              id: 256,
               code: [
                 ["insertOne", "name"],
                 ["(", "pn"],
@@ -1595,7 +1595,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 254,
+          id: 282,
           name: "replaceOne",
           anchor: "replace-one",
           kind: "method",
@@ -1607,7 +1607,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 255,
+              id: 283,
               code: [
                 ["replaceOne", "name"],
                 ["(", "pn"],
@@ -1718,7 +1718,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 264,
+          id: 292,
           name: "updateMany",
           anchor: "update-many",
           kind: "method",
@@ -1730,7 +1730,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 265,
+              id: 293,
               code: [
                 ["updateMany", "name"],
                 ["(", "pn"],
@@ -1840,7 +1840,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 259,
+          id: 287,
           name: "updateOne",
           anchor: "update-one",
           kind: "method",
@@ -1852,7 +1852,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 260,
+              id: 288,
               code: [
                 ["updateOne", "name"],
                 ["(", "pn"],
@@ -1962,7 +1962,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 277,
+          id: 305,
           name: "validateIndexes",
           anchor: "validate-indexes",
           kind: "method",
@@ -1974,7 +1974,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 278,
+              id: 306,
               code: [
                 ["validateIndexes", "name"],
                 ["(): ", "pn"],

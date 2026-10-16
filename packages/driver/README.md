@@ -332,8 +332,8 @@ The exact rules are in [query semantics](../../docs/query-semantics.md).
 ## Aggregate
 
 `aggregate()` runs a pipeline of stages over a collection and returns a cursor,
-like `find()`. The stages are `$match`, `$project`, `$sort`, `$skip`, `$limit`
-and `$count`.
+like `find()`. The stages are `$match`, `$project`, `$sort`, `$skip`, `$limit`,
+`$count` and `$group`.
 
 ```ts
 const oldest = await users
@@ -347,6 +347,23 @@ const oldest = await users
 ```
 
 `$sort` takes `[path, direction]` pairs, as the `sort` option of `find()` does.
+
+`$group` collects documents by a key and computes values with accumulators:
+
+```ts
+const byTeam = await users
+  .aggregate<{ _id: string; members: number; oldest: number | null }>([
+    {
+      $group: {
+        _id: "$team",
+        members: { $count: {} },
+        oldest: { $max: "$age" },
+      },
+    },
+  ])
+  .toArray();
+```
+
 The result type is the type argument you pass, because it depends on the
 pipeline. See [Aggregation](../../docs/aggregation.md) for every stage and its
 rules. A server older than 0.3.0 does not support it, and the driver throws

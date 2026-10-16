@@ -69,10 +69,17 @@ const page: ApiPage = {
     [": ", "pn"],
     ["string", "prim"],
     [" }", "pn"],
+    ["\n  "],
+    ["| { ", "pn"],
+    ["readonly ", "kw"],
+    ["$group", "prop"],
+    [": ", "pn"],
+    ["GroupSpecification", "ref", "/docs/api/interfaces/GroupSpecification"],
+    [" }", "pn"],
   ],
   comment: {
     summary:
-      "<p>One stage of an aggregation pipeline. Each stage is an object with a single\n<code>$</code> key. Documents flow through the stages in order.</p>\n<ul>\n<li><code>$match</code> keeps the documents that match a filter, like <code>find</code>. A <code>$match</code>\nat the start of the pipeline can use an index.</li>\n<li><code>$project</code> reshapes documents, like the <code>projection</code> option of <code>find</code>.</li>\n<li><code>$sort</code> orders documents, as <code>[path, direction]</code> pairs like the <code>sort</code>\noption of <code>find</code>. It is an array of pairs because the order of an object's\nkeys is not preserved.</li>\n<li><code>$skip</code> drops that many documents.</li>\n<li><code>$limit</code> keeps at most that many documents.</li>\n<li><code>$count</code> replaces the documents with one document holding their number\nunder the given name, or with nothing when there were no documents.</li>\n</ul>\n<p>A <code>$sort</code> directly followed by <code>$limit</code> (and at most a <code>$skip</code>) keeps only\nthe documents it needs while sorting, so it can run over a large collection\nwithout holding all of it in memory.</p>",
+      '<p>One stage of an aggregation pipeline. Each stage is an object with a single\n<code>$</code> key. Documents flow through the stages in order.</p>\n<ul>\n<li><code>$match</code> keeps the documents that match a filter, like <code>find</code>. A <code>$match</code>\nat the start of the pipeline can use an index.</li>\n<li><code>$project</code> reshapes documents, like the <code>projection</code> option of <code>find</code>.</li>\n<li><code>$sort</code> orders documents, as <code>[path, direction]</code> pairs like the <code>sort</code>\noption of <code>find</code>. It is an array of pairs because the order of an object\'s\nkeys is not preserved.</li>\n<li><code>$skip</code> drops that many documents.</li>\n<li><code>$limit</code> keeps at most that many documents.</li>\n<li><code>$count</code> replaces the documents with one document holding their number\nunder the given name, or with nothing when there were no documents.</li>\n<li><code>$group</code> replaces the documents with one document per distinct key, with\nvalues computed by accumulators (see <a href="/docs/api/interfaces/GroupSpecification">GroupSpecification</a>).</li>\n</ul>\n<p>A <code>$sort</code> directly followed by <code>$limit</code> (and at most a <code>$skip</code>) keeps only\nthe documents it needs while sorting, so it can run over a large collection\nwithout holding all of it in memory.</p>',
     short:
       "One stage of an aggregation pipeline. Each stage is an object with a single <code>$</code> key. Documents flow through the stages in order.",
     deprecated: null,
@@ -104,8 +111,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/aggregation.ts",
-      line: 23,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L23",
+      line: 27,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L27",
     },
   ],
   usedBy: [

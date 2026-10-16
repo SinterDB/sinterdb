@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 337,
+  id: 365,
   name: "AggregateCursor",
   kind: "class",
   label: "Class",
@@ -60,7 +60,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 339,
+          id: 367,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -72,7 +72,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 340,
+              id: 368,
               code: [
                 ["new ", "kw"],
                 ["AggregateCursor", "name"],
@@ -196,7 +196,7 @@ const page: ApiPage = {
       title: "Methods",
       members: [
         {
-          id: 355,
+          id: 383,
           name: "[asyncIterator]",
           anchor: "async-iterator",
           kind: "method",
@@ -208,7 +208,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 356,
+              id: 384,
               code: [
                 ["[asyncIterator]", "name"],
                 ["(): ", "pn"],
@@ -265,7 +265,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 353,
+          id: 381,
           name: "close",
           anchor: "close",
           kind: "method",
@@ -277,7 +277,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 354,
+              id: 382,
               code: [
                 ["close", "name"],
                 ["(): ", "pn"],
@@ -326,7 +326,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 347,
+          id: 375,
           name: "hasNext",
           anchor: "has-next",
           kind: "method",
@@ -338,7 +338,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 348,
+              id: 376,
               code: [
                 ["hasNext", "name"],
                 ["(): ", "pn"],
@@ -387,7 +387,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 349,
+          id: 377,
           name: "next",
           anchor: "next",
           kind: "method",
@@ -399,7 +399,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 350,
+              id: 378,
               code: [
                 ["next", "name"],
                 ["(): ", "pn"],
@@ -452,7 +452,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 351,
+          id: 379,
           name: "toArray",
           anchor: "to-array",
           kind: "method",
@@ -464,7 +464,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 352,
+              id: 380,
               code: [
                 ["toArray", "name"],
                 ["(): ", "pn"],

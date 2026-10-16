@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 826,
+  id: 854,
   name: "UpdateFilter",
   kind: "type-alias",
   label: "Type Alias",
@@ -234,7 +234,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 834,
+          id: 862,
           name: "$addToSet",
           anchor: "add-to-set",
           kind: "property",
@@ -289,7 +289,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 830,
+          id: 858,
           name: "$inc",
           anchor: "inc",
           kind: "property",
@@ -342,7 +342,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 832,
+          id: 860,
           name: "$max",
           anchor: "max",
           kind: "property",
@@ -395,7 +395,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 831,
+          id: 859,
           name: "$min",
           anchor: "min",
           kind: "property",
@@ -448,7 +448,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 835,
+          id: 863,
           name: "$pull",
           anchor: "pull",
           kind: "property",
@@ -501,7 +501,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 833,
+          id: 861,
           name: "$push",
           anchor: "push",
           kind: "property",
@@ -556,7 +556,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 828,
+          id: 856,
           name: "$set",
           anchor: "set",
           kind: "property",
@@ -606,7 +606,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 829,
+          id: 857,
           name: "$unset",
           anchor: "unset",
           kind: "property",

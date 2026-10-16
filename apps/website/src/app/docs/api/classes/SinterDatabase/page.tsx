@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 395,
+  id: 423,
   name: "SinterDatabase",
   kind: "class",
   label: "Class",
@@ -34,7 +34,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 396,
+          id: 424,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -46,7 +46,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 397,
+              id: 425,
               code: [
                 ["new ", "kw"],
                 ["SinterDatabase", "name"],
@@ -117,7 +117,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 400,
+          id: 428,
           name: "client",
           anchor: "client",
           kind: "property",
@@ -150,7 +150,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 401,
+          id: 429,
           name: "name",
           anchor: "name",
           kind: "property",
@@ -189,7 +189,7 @@ const page: ApiPage = {
       title: "Methods",
       members: [
         {
-          id: 402,
+          id: 430,
           name: "collection",
           anchor: "collection",
           kind: "method",
@@ -201,7 +201,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 403,
+              id: 431,
               code: [
                 ["collection", "name"],
                 ["<", "pn"],
@@ -308,7 +308,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 406,
+          id: 434,
           name: "listCollections",
           anchor: "list-collections",
           kind: "method",
@@ -320,7 +320,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 407,
+              id: 435,
               code: [
                 ["listCollections", "name"],
                 ["(): ", "pn"],

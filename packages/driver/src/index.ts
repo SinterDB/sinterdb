@@ -21,7 +21,13 @@ export type {
   SinterServerInfo,
 } from "./client.js";
 
-export type { AggregateOptions, AggregationStage } from "./aggregation.js";
+export type {
+  AggregateOptions,
+  AggregationStage,
+  GroupAccumulator,
+  GroupSpecification,
+  GroupValue,
+} from "./aggregation.js";
 
 export { SinterCollection } from "./collection.js";
 export type {

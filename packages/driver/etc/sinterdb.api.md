@@ -37,6 +37,8 @@ export type AggregationStage<TDocument extends object> = {
     readonly $limit: number;
 } | {
     readonly $count: string;
+} | {
+    readonly $group: GroupSpecification;
 };
 
 // @public
@@ -197,6 +199,36 @@ export interface FindQueryOptions {
     readonly skip?: number;
     readonly sort?: readonly (readonly [string, SortDirection])[];
 }
+
+// @public
+export type GroupAccumulator = {
+    readonly $count: Readonly<Record<string, never>>;
+} | {
+    readonly $sum: GroupValue;
+} | {
+    readonly $avg: GroupValue;
+} | {
+    readonly $min: GroupValue;
+} | {
+    readonly $max: GroupValue;
+} | {
+    readonly $first: GroupValue;
+} | {
+    readonly $last: GroupValue;
+};
+
+// @public
+export interface GroupSpecification {
+    readonly [field: string]: GroupAccumulator | GroupValue | {
+        readonly [name: string]: GroupValue;
+    };
+    readonly _id: GroupValue | {
+        readonly [name: string]: GroupValue;
+    };
+}
+
+// @public
+export type GroupValue = string | number | bigint | boolean | null | Date | Uint8Array | CustomId;
 
 // @public
 export type IndexablePath<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>;

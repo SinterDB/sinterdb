@@ -117,6 +117,47 @@ describe("aggregate command", () => {
     expect(second.cursorId).toBeNull();
   });
 
+  it("groups documents", () => {
+    expect(
+      aggregate(setup(), {
+        pipeline: [
+          {
+            $group: {
+              _id: "$team",
+              n: { $count: {} },
+              total: { $sum: "$n" },
+              top: { $max: "$n" },
+            },
+          },
+          { $sort: [["_id", 1]] },
+        ],
+      }).documents,
+    ).toEqual([
+      { _id: "a", n: 5, total: 20, top: 8 },
+      { _id: "b", n: 5, total: 25, top: 9 },
+    ]);
+  });
+
+  it("reports a failure while grouping as a validation error", () => {
+    const dispatcher = setup();
+
+    dispatcher.dispatch({
+      command: "insertMany",
+      database: "app",
+      parameters: { collection: "mixed", documents: [{ v: 1 }, { v: 2n }] },
+    });
+
+    expectWireError(
+      () =>
+        aggregate(
+          dispatcher,
+          { pipeline: [{ $group: { _id: null, t: { $sum: "$v" } } }] },
+          "mixed",
+        ),
+      WireErrorCode.DocumentValidationFailed,
+    );
+  });
+
   it("returns nothing for a collection that does not exist", () => {
     expect(
       aggregate(setup(), { pipeline: [{ $count: "n" }] }, "nowhere"),
@@ -125,7 +166,7 @@ describe("aggregate command", () => {
 
   it("rejects an invalid pipeline, even for a missing collection", () => {
     for (const pipeline of [
-      [{ $group: { _id: "$a" } }],
+      [{ $group: { n: { $count: {} } } }],
       [{ $limit: 0 }],
       [{ $match: { a: { $bogus: 1 } } }],
       [{ $sort: { n: 1 } }],

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 687,
+  id: 715,
   name: "SinterServerErrorOptions",
   kind: "interface",
   label: "Interface",
@@ -51,7 +51,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 691,
+          id: 719,
           name: "details",
           anchor: "details",
           kind: "property",
@@ -84,7 +84,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 690,
+          id: 718,
           name: "retryable",
           anchor: "retryable",
           kind: "property",
@@ -119,7 +119,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 689,
+          id: 717,
           name: "serverErrorName",
           anchor: "server-error-name",
           kind: "property",
@@ -154,7 +154,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 688,
+          id: 716,
           name: "wireCode",
           anchor: "wire-code",
           kind: "property",
