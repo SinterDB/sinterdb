@@ -86,6 +86,16 @@ const page: ApiPage = {
   ],
   usedBy: [
     {
+      name: "AggregateCursor",
+      href: "/docs/api/classes/AggregateCursor",
+      kind: "class",
+    },
+    {
+      name: "AggregateCursor.constructor",
+      href: "/docs/api/classes/AggregateCursor#constructor",
+      kind: "constructor",
+    },
+    {
       name: "CursorExecutor",
       href: "/docs/api/types/CursorExecutor",
       kind: "type-alias",
@@ -129,6 +139,11 @@ const page: ApiPage = {
       name: "SinterCollection",
       href: "/docs/api/classes/SinterCollection",
       kind: "class",
+    },
+    {
+      name: "SinterCollection.aggregate",
+      href: "/docs/api/classes/SinterCollection#aggregate",
+      kind: "method",
     },
     {
       name: "SinterCollection.constructor",

@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 678,
+  id: 714,
   name: "Filter",
   kind: "type-alias",
   label: "Type Alias",
@@ -129,7 +129,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 680,
+          id: 716,
           name: "_id",
           anchor: "_id",
           kind: "property",
@@ -167,7 +167,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 681,
+          id: 717,
           name: "$and",
           anchor: "and",
           kind: "property",
@@ -204,7 +204,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 683,
+          id: 719,
           name: "$nor",
           anchor: "nor",
           kind: "property",
@@ -241,7 +241,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 682,
+          id: 718,
           name: "$or",
           anchor: "or",
           kind: "property",
@@ -325,6 +325,11 @@ const page: ApiPage = {
     },
   ],
   usedBy: [
+    {
+      name: "AggregationStage",
+      href: "/docs/api/types/AggregationStage",
+      kind: "type-alias",
+    },
     {
       name: "ElementMatch",
       href: "/docs/api/types/ElementMatch",

@@ -6,6 +6,7 @@ export const StorageErrorCode = {
   InvalidFilter: "INVALID_FILTER",
   InvalidFindOptions: "INVALID_FIND_OPTIONS",
   InvalidBatch: "INVALID_BATCH",
+  InvalidPipeline: "INVALID_PIPELINE",
   InvalidUpdate: "INVALID_UPDATE",
   ImmutableId: "IMMUTABLE_ID",
   DuplicateId: "DUPLICATE_ID",

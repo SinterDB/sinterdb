@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 299,
+  id: 320,
   name: "WithId",
   kind: "type-alias",
   label: "Type Alias",
@@ -61,7 +61,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 301,
+          id: 322,
           name: "_id",
           anchor: "_id",
           kind: "property",
@@ -88,8 +88,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 53,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L53",
+              line: 54,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L54",
             },
           ],
         },
@@ -118,8 +118,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 51,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L51",
+      line: 52,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L52",
     },
   ],
   usedBy: [

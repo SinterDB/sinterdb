@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 354,
+  id: 390,
   name: "FindQueryOptions",
   kind: "interface",
   label: "Interface",
@@ -35,7 +35,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 357,
+          id: 393,
           name: "limit",
           anchor: "limit",
           kind: "property",
@@ -68,7 +68,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 358,
+          id: 394,
           name: "projection",
           anchor: "projection",
           kind: "property",
@@ -101,7 +101,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 356,
+          id: 392,
           name: "skip",
           anchor: "skip",
           kind: "property",
@@ -134,7 +134,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 355,
+          id: 391,
           name: "sort",
           anchor: "sort",
           kind: "property",

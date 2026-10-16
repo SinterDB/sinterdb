@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 701,
+  id: 737,
   name: "PathChild",
   kind: "type-alias",
   label: "Type Alias",

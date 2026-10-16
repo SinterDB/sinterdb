@@ -1,3 +1,4 @@
+import { compilePipeline } from "./aggregation.js";
 import {
   CustomId,
   decodeDocument,
@@ -323,6 +324,17 @@ export class InMemoryCollection {
     const results = this.scan(filter, matches, sorter, skip, limit);
 
     return project === undefined ? results : projectAll(results, project);
+  }
+
+  /**
+   * Runs an aggregation pipeline (see {@link compilePipeline}) over the
+   * collection. The pipeline is checked before the first document is read. A
+   * leading `$match` can use an index.
+   */
+  public aggregate(pipeline: readonly Document[]): IterableIterator<Document> {
+    const compiled = compilePipeline(pipeline);
+
+    return compiled.run(this.find(compiled.filter ?? {}));
   }
 
   /**

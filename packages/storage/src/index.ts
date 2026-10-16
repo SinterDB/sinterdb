@@ -8,6 +8,7 @@ export {
   StorageInsertManyError,
   StorageCorruptionError,
 } from "./errors.js";
+export { compilePipeline, MAX_PIPELINE_STAGES } from "./aggregation.js";
 export { compileFilter } from "./filter.js";
 export { compileProjection } from "./projection.js";
 export { compileSort } from "./sort.js";
@@ -65,6 +66,7 @@ export type {
   StorageUpdateResult,
 } from "./in-memory-collection.js";
 export type { StorageErrorCode as StorageErrorCodeValue } from "./errors.js";
+export type { CompiledPipeline } from "./aggregation.js";
 export type { CompiledFilter } from "./filter.js";
 export type { CompiledSort, SortDirection, SortSpecification } from "./sort.js";
 export type { CompiledUpdate } from "./update.js";

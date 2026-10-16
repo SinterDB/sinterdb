@@ -111,14 +111,32 @@ describe("docs/limitations.md: queries", () => {
     });
   });
 
-  it("has no aggregation, findOneAnd*, bulkWrite or watch", async () => {
+  it.each(["$group", "$lookup", "$unwind", "$addFields"])(
+    "rejects the aggregation stage %s",
+    async (stage) => {
+      expect(markdown).toContain(`\`${stage}\``);
+
+      await inDatabase(async (client) => {
+        const items = client.db().collection("items");
+
+        await items.insertOne({ n: 1 });
+
+        const error = await serverError(
+          items.aggregate([{ [stage]: {} } as never]).toArray(),
+        );
+
+        expect(error.serverErrorName).toBe("DocumentValidationFailed");
+      });
+    },
+  );
+
+  it("has no findOneAnd*, bulkWrite or watch", async () => {
     await inDatabase(async (client) => {
       const items = client.db().collection("items");
       const names = Object.getOwnPropertyNames(Object.getPrototypeOf(items));
 
       for (const missing of [
         "count",
-        "aggregate",
         "findOneAndUpdate",
         "findOneAndReplace",
         "findOneAndDelete",

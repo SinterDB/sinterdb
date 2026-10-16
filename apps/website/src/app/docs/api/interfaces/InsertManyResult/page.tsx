@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 288,
+  id: 309,
   name: "InsertManyResult",
   kind: "interface",
   label: "Interface",
@@ -35,7 +35,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 289,
+          id: 310,
           name: "acknowledged",
           anchor: "acknowledged",
           kind: "property",
@@ -63,13 +63,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 121,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L121",
+              line: 122,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L122",
             },
           ],
         },
         {
-          id: 290,
+          id: 311,
           name: "insertedCount",
           anchor: "inserted-count",
           kind: "property",
@@ -96,13 +96,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 123,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L123",
+              line: 124,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L124",
             },
           ],
         },
         {
-          id: 291,
+          id: 312,
           name: "insertedIds",
           anchor: "inserted-ids",
           kind: "property",
@@ -133,8 +133,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 125,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L125",
+              line: 126,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L126",
             },
           ],
         },
@@ -175,8 +175,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 119,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L119",
+      line: 120,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L120",
     },
   ],
   usedBy: [

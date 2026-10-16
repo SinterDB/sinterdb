@@ -1,5 +1,6 @@
 import {
   compileFilter,
+  compilePipeline,
   compileProjection,
   validateDistinctField,
   compileUpdate,
@@ -49,6 +50,7 @@ export const ServerCommand = {
   Find: "find",
   Count: "count",
   Distinct: "distinct",
+  Aggregate: "aggregate",
   GetMore: "getMore",
   CloseCursor: "closeCursor",
   CreateIndex: "createIndex",
@@ -151,6 +153,9 @@ export class CommandDispatcher {
       case ServerCommand.Distinct:
         return this.distinct(command);
 
+      case ServerCommand.Aggregate:
+        return this.aggregate(command, cursors);
+
       case ServerCommand.GetMore:
         return this.getMore(command, cursors);
 
@@ -196,6 +201,7 @@ export class CommandDispatcher {
         ProtocolCapability.Streaming,
         ProtocolCapability.Projection,
         ProtocolCapability.CompoundIndexes,
+        ProtocolCapability.Aggregation,
       ],
     };
   }
@@ -720,6 +726,42 @@ export class CommandDispatcher {
     }
   }
 
+  private aggregate(
+    command: CommandEnvelope,
+    cursors: CursorManager,
+  ): Document {
+    const databaseName = requireDatabase(command);
+    const collectionName = requireStringParameter(
+      command.parameters,
+      "collection",
+    );
+    const pipeline = requirePipelineParameter(command.parameters);
+    const batchSize = optionalBatchSize(command.parameters);
+
+    try {
+      const collection = this.catalog.getCollection(
+        databaseName,
+        collectionName,
+      );
+
+      if (collection === undefined) {
+        compilePipeline(pipeline);
+
+        return { cursorId: null, documents: [] };
+      }
+
+      return toBatchDocument(
+        cursors.open(collection.aggregate(pipeline), batchSize),
+      );
+    } catch (error: unknown) {
+      if (error instanceof CatalogError) {
+        throw translateCatalogError(error);
+      }
+
+      throw translateStorageError(error);
+    }
+  }
+
   private getMore(command: CommandEnvelope, cursors: CursorManager): Document {
     const cursorId = requireCursorId(command.parameters);
     const batchSize = optionalBatchSize(command.parameters);
@@ -827,6 +869,21 @@ function requireDocumentParameter(
           field: name,
         },
       },
+    );
+  }
+
+  return value;
+}
+
+function requirePipelineParameter(parameters: Document): Document[] {
+  const value = parameters["pipeline"];
+
+  if (!Array.isArray(value) || !value.every(isPlainDocument)) {
+    throw new CommandExecutionError(
+      WireErrorCode.InvalidRequest,
+      "InvalidRequest",
+      'Command parameter "pipeline" must be an array of stage documents.',
+      { details: { field: "pipeline" } },
     );
   }
 

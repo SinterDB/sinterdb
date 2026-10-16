@@ -317,6 +317,7 @@ Initial known capabilities are:
   `find` and `findOne`. A server without it ignores the parameter and returns
   whole documents, so clients MUST NOT send a projection to such a server.
 - `compound-indexes`: the server understands the `keys` option of `createIndex`. A server without it rejects the option as unknown, and clients SHOULD NOT send it.
+- `aggregation`: the server understands the `aggregate` command. A server without it answers `UnknownCommand`.
 
 Unknown capability strings MUST be preserved during decoding and MAY be
 ignored when determining the negotiated feature set.
@@ -394,6 +395,7 @@ Database and collection names are created on first write.
 | `find`             | Yes      | `collection`, `filter`, optional `batchSize`, `sort`, `skip`, `limit`, `projection` | `cursorId` (number or `null`), `documents`                     |
 | `count`            | Yes      | `collection`, `filter`                                                              | `count`: non-negative integer                                  |
 | `distinct`         | Yes      | `collection`, `field`, `filter`                                                     | `values`: array                                                |
+| `aggregate`        | Yes      | `collection`, `pipeline`, optional `batchSize`                                      | `cursorId` (number or `null`), `documents`                     |
 | `getMore`          | Yes      | `cursorId`, optional `batchSize`                                                    | `cursorId` (number or `null`), `documents`                     |
 | `closeCursor`      | Yes      | `cursorId`                                                                          | `closed`: boolean                                              |
 | `replaceOne`       | Yes      | `collection`, `filter`, `replacement`, optional `upsert`                            | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
@@ -421,6 +423,16 @@ Notes:
   `INVALID_FIND_OPTIONS`, like an invalid `sort`. Result documents carry `_id`
   unless the projection excludes it, so clients must not assume it is
   present.
+- `aggregate` runs `pipeline`, an array of stage documents, and returns a cursor
+  batch like `find`, which `getMore` and `closeCursor` continue. Each stage is a
+  document with one key: `$match` (a filter), `$project` (a projection), `$sort`
+  (an array of `[path, direction]` pairs, as for `find`), `$skip`, `$limit`, or
+  `$count` (a field name). A pipeline has at most 32 stages. An invalid pipeline
+  returns `DocumentValidationFailed` with `details.storageErrorCode` set to
+  `INVALID_PIPELINE`, or to the code of the filter, projection or sort that was
+  invalid, even when the collection does not exist. A `pipeline` that is not an
+  array of documents returns `InvalidRequest`. Result documents may lack `_id`.
+  Only servers that advertise the `aggregation` capability understand it.
 - `count` counts the documents that match `filter`; an empty filter counts the
   whole collection without reading it. `distinct` returns the distinct values of
   `field` among the matching documents, in sort order, with the elements of any

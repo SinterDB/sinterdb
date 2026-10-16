@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 703,
+  id: 739,
   name: "Sort",
   kind: "type-alias",
   label: "Type Alias",
@@ -77,6 +77,11 @@ const page: ApiPage = {
     },
   ],
   usedBy: [
+    {
+      name: "AggregationStage",
+      href: "/docs/api/types/AggregationStage",
+      kind: "type-alias",
+    },
     {
       name: "FindOptions.sort",
       href: "/docs/api/interfaces/FindOptions#sort",

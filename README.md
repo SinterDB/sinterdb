@@ -149,6 +149,7 @@ on `SIGINT` or `SIGTERM`.
 - [Connection strings](./docs/connection-strings.md)
 - [Durable storage](./docs/storage.md)
 - [Indexes](./docs/indexes.md)
+- [Aggregation](./docs/aggregation.md)
 - [Query semantics](./docs/query-semantics.md)
 - [Compatibility and versioning](./docs/compatibility.md)
 - [Running in Docker](./docs/docker.md)

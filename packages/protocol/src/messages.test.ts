@@ -15,6 +15,7 @@ describe("protocol message envelopes", () => {
       Streaming: "streaming",
       Projection: "projection",
       CompoundIndexes: "compound-indexes",
+      Aggregation: "aggregation",
     });
   });
 

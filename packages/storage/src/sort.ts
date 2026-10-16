@@ -14,6 +14,12 @@ interface SortKey {
   readonly direction: SortDirection;
 }
 
+interface Decorated {
+  readonly document: Document;
+  readonly values: readonly SortValue[];
+  readonly arrival: number;
+}
+
 const Rank = {
   Missing: 0,
   Null: 1,
@@ -31,28 +37,69 @@ export function compileSort(specification: SortSpecification): CompiledSort {
   const keys = parseSortSpecification(specification);
 
   return (documents) => {
-    const decorated = documents.map((document) => ({
-      document,
-      values: keys.map((key) => resolveSortValue(document, key.segments)),
-    }));
+    const decorated = documents.map((document, arrival) =>
+      decorate(keys, document, arrival),
+    );
 
-    decorated.sort((left, right) => {
-      for (let index = 0; index < keys.length; index += 1) {
-        const key = keys[index] as SortKey;
-        const comparison = compareSortValues(
-          left.values[index] as SortValue,
-          right.values[index] as SortValue,
-        );
+    decorated.sort((left, right) => compareDecorated(keys, left, right));
 
-        if (comparison !== 0) {
-          return comparison * key.direction;
+    return decorated.map((entry) => entry.document);
+  };
+}
+
+/**
+ * Like {@link compileSort}, but for the first `count` documents only. It holds
+ * at most `count` documents at a time, so sorting a large stream for a few
+ * results does not hold the stream in memory. The result is the same as
+ * sorting everything and taking the first `count`.
+ */
+export function compileTopN(
+  specification: SortSpecification,
+  count: number,
+): (documents: Iterable<Document>) => Document[] {
+  const keys = parseSortSpecification(specification);
+
+  return (documents) => {
+    const kept: Decorated[] = [];
+    let arrival = 0;
+
+    if (count < 1) {
+      return [];
+    }
+
+    for (const document of documents) {
+      const entry = decorate(keys, document, arrival);
+
+      arrival += 1;
+
+      if (
+        kept.length === count &&
+        compareDecorated(keys, entry, kept[count - 1] as Decorated) > 0
+      ) {
+        continue;
+      }
+
+      let low = 0;
+      let high = kept.length;
+
+      while (low < high) {
+        const middle = (low + high) >>> 1;
+
+        if (compareDecorated(keys, kept[middle] as Decorated, entry) < 0) {
+          low = middle + 1;
+        } else {
+          high = middle;
         }
       }
 
-      return 0;
-    });
+      kept.splice(low, 0, entry);
 
-    return decorated.map((entry) => entry.document);
+      if (kept.length > count) {
+        kept.pop();
+      }
+    }
+
+    return kept.map((entry) => entry.document);
   };
 }
 
@@ -265,6 +312,39 @@ function compareBytes(left: Uint8Array, right: Uint8Array): number {
   }
 
   return compareOrdered(left.byteLength, right.byteLength);
+}
+
+/** Orders by the sort keys, then by arrival, so equal documents keep order. */
+function compareDecorated(
+  keys: readonly SortKey[],
+  left: Decorated,
+  right: Decorated,
+): number {
+  for (let index = 0; index < keys.length; index += 1) {
+    const key = keys[index] as SortKey;
+    const comparison = compareSortValues(
+      left.values[index] as SortValue,
+      right.values[index] as SortValue,
+    );
+
+    if (comparison !== 0) {
+      return comparison * key.direction;
+    }
+  }
+
+  return left.arrival - right.arrival;
+}
+
+function decorate(
+  keys: readonly SortKey[],
+  document: Document,
+  arrival: number,
+): Decorated {
+  return {
+    document,
+    values: keys.map((key) => resolveSortValue(document, key.segments)),
+    arrival,
+  };
 }
 
 function invalidSort(message: string): StorageError {

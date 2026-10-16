@@ -122,8 +122,11 @@ Not supported, and rejected with `DocumentValidationFailed`: `$regex`, `$all`,
 
 Also missing:
 
-- **No aggregation and no joins.** `countDocuments()`, `estimatedDocumentCount()`
-  and `distinct()` cover counting and distinct values.
+- **Aggregation is limited to six stages.** `aggregate()` runs `$match`,
+  `$project`, `$sort`, `$skip`, `$limit` and `$count`. `$group`, `$lookup`,
+  `$unwind` and `$addFields` are rejected with `DocumentValidationFailed`, and
+  there are no joins. `countDocuments()`, `estimatedDocumentCount()` and
+  `distinct()` cover counting and distinct values.
 - **No full-text, geospatial, or regular-expression search.**
 - **A cursor is not a snapshot.** It reads the collection as it goes, so
   documents written while you iterate may or may not show up, and the document

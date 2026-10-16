@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 801,
+  id: 837,
   name: "UpdateOptions",
   kind: "interface",
   label: "Interface",
@@ -33,7 +33,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 802,
+          id: 838,
           name: "upsert",
           anchor: "upsert",
           kind: "property",

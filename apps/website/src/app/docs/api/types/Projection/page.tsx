@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 308,
+  id: 329,
   name: "Projection",
   kind: "type-alias",
   label: "Type Alias",
@@ -71,6 +71,11 @@ const page: ApiPage = {
     },
   ],
   usedBy: [
+    {
+      name: "AggregationStage",
+      href: "/docs/api/types/AggregationStage",
+      kind: "type-alias",
+    },
     {
       name: "FindOneOptions",
       href: "/docs/api/interfaces/FindOneOptions",

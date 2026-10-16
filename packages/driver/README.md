@@ -329,6 +329,29 @@ await orders
 
 The exact rules are in [query semantics](../../docs/query-semantics.md).
 
+## Aggregate
+
+`aggregate()` runs a pipeline of stages over a collection and returns a cursor,
+like `find()`. The stages are `$match`, `$project`, `$sort`, `$skip`, `$limit`
+and `$count`.
+
+```ts
+const oldest = await users
+  .aggregate<{ name: string }>([
+    { $match: { active: true } },
+    { $sort: [["age", -1]] },
+    { $limit: 10 },
+    { $project: { _id: 0, name: 1 } },
+  ])
+  .toArray();
+```
+
+`$sort` takes `[path, direction]` pairs, as the `sort` option of `find()` does.
+The result type is the type argument you pass, because it depends on the
+pipeline. See [Aggregation](../../docs/aggregation.md) for every stage and its
+rules. A server older than 0.3.0 does not support it, and the driver throws
+`SinterCompatibilityError`.
+
 ## Update
 
 `updateOne()` changes the first matching document and `updateMany()` changes

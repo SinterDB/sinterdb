@@ -6,6 +6,7 @@ export const ProtocolCapability = {
   Streaming: "streaming",
   Projection: "projection",
   CompoundIndexes: "compound-indexes",
+  Aggregation: "aggregation",
 } as const;
 
 export type ProtocolCapability =

@@ -271,6 +271,7 @@ const ProtocolCapability: {
     readonly Streaming: "streaming";
     readonly Projection: "projection";
     readonly CompoundIndexes: "compound-indexes";
+    readonly Aggregation: "aggregation";
 };
 
 // @public (undocumented)

@@ -1,7 +1,9 @@
-import type { CustomId } from "sinterdb-protocol";
+import type { CustomId, Document } from "sinterdb-protocol";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
+import type { AggregationStage } from "./aggregation.js";
 import type { SinterCollection, WithId } from "./collection.js";
+import type { AggregateCursor } from "./cursor.js";
 import type { Filter, Sort } from "./filter.js";
 import type {
   CreateIndexResult,
@@ -560,5 +562,61 @@ describe("distinct types", () => {
     };
 
     expect(check).toBeTypeOf("function");
+  });
+});
+
+describe("AggregationStage<TDocument> types", () => {
+  it("accepts the supported stages", () => {
+    const pipeline: AggregationStage<User>[] = [
+      { $match: { age: { $gte: 18 }, "profile.stats.level": 3 } },
+      { $project: { name: 1, "profile.bio": 1 } },
+      {
+        $sort: [
+          ["age", -1],
+          ["name", 1],
+        ],
+      },
+      { $skip: 5 },
+      { $limit: 10 },
+      { $count: "total" },
+    ];
+
+    expect(pipeline).toHaveLength(6);
+  });
+
+  it("checks the fields that stages name", () => {
+    const pipeline: AggregationStage<User>[] = [
+      // @ts-expect-error unknown field in a $match filter
+      { $match: { nope: 1 } },
+      // @ts-expect-error unknown field in a $project
+      { $project: { nope: 1 } },
+      // @ts-expect-error unknown field in a $sort
+      { $sort: [["nope", 1]] },
+      // @ts-expect-error $skip takes a number
+      { $skip: "5" },
+      // @ts-expect-error $count takes a name
+      { $count: 1 },
+      // @ts-expect-error $group is not supported
+      { $group: { _id: "$age" } },
+    ];
+
+    expect(pipeline).toHaveLength(6);
+  });
+
+  it("returns a cursor of the type the caller asks for", () => {
+    function count(collection: SinterCollection<User>) {
+      return collection.aggregate<{ total: number }>([{ $count: "total" }]);
+    }
+
+    function untyped(collection: SinterCollection<User>) {
+      return collection.aggregate([{ $limit: 1 }]);
+    }
+
+    expectTypeOf<ReturnType<typeof count>>().toEqualTypeOf<
+      AggregateCursor<{ total: number }>
+    >();
+    expectTypeOf<ReturnType<typeof untyped>>().toEqualTypeOf<
+      AggregateCursor<Document>
+    >();
   });
 });

@@ -10,6 +10,36 @@ import { DocumentValue } from 'sinterdb-protocol';
 import { EventEmitter } from 'node:events';
 
 // @public
+export class AggregateCursor<TResult extends object = Document> implements AsyncIterable<TResult> {
+    [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined>;
+    constructor(execute: CursorExecutor, collection: string, pipeline: readonly Document[], batchSize: number | undefined);
+    close(): Promise<void>;
+    hasNext(): Promise<boolean>;
+    next(): Promise<TResult | null>;
+    toArray(): Promise<TResult[]>;
+}
+
+// @public
+export interface AggregateOptions {
+    readonly batchSize?: number;
+}
+
+// @public
+export type AggregationStage<TDocument extends object> = {
+    readonly $match: Filter<TDocument>;
+} | {
+    readonly $project: Projection<TDocument>;
+} | {
+    readonly $sort: Sort<TDocument>;
+} | {
+    readonly $skip: number;
+} | {
+    readonly $limit: number;
+} | {
+    readonly $count: string;
+};
+
+// @public
 export type ArrayOperators<TValue> = [
 Extract<TValue, readonly unknown[]>
 ] extends [never] ? unknown : {
@@ -355,6 +385,7 @@ export class SinterClientStateError extends SinterError {
 export class SinterCollection<TDocument extends object = Document> {
     constructor(
     database: SinterDatabase, name: string);
+    aggregate<TResult extends object = Document>(pipeline: readonly AggregationStage<TDocument>[], options?: AggregateOptions): AggregateCursor<TResult>;
     countDocuments(filter?: Filter<TDocument>): Promise<number>;
     createIndex(definition: IndexDefinition<TDocument>): Promise<CreateIndexResult>;
     readonly database: SinterDatabase;

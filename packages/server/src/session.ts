@@ -377,6 +377,7 @@ export class ServerSession {
         ProtocolCapability.Streaming,
         ProtocolCapability.Projection,
         ProtocolCapability.CompoundIndexes,
+        ProtocolCapability.Aggregation,
       ],
     });
 

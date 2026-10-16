@@ -21,6 +21,8 @@ export type {
   SinterServerInfo,
 } from "./client.js";
 
+export type { AggregateOptions, AggregationStage } from "./aggregation.js";
+
 export { SinterCollection } from "./collection.js";
 export type {
   DistinctValue,
@@ -41,7 +43,7 @@ export type {
 export { DEFAULT_SINTERDB_PORT } from "./connection-string.js";
 export type { ParsedSinterConnectionString } from "./connection-string.js";
 
-export { FindCursor } from "./cursor.js";
+export { AggregateCursor, FindCursor } from "./cursor.js";
 export type { CursorExecutor, FindQueryOptions } from "./cursor.js";
 
 export { SinterDatabase } from "./database.js";

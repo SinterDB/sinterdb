@@ -2,6 +2,82 @@ import type { ApiSearchEntry } from "./model";
 
 export const searchIndex: readonly ApiSearchEntry[] = [
   {
+    name: "AggregateCursor",
+    parent: null,
+    kind: "class",
+    href: "/docs/api/classes/AggregateCursor",
+    summary:
+      "A lazy, batched cursor over the results of an aggregation. It reads like a FindCursor: nothing is sent until the first read, documents arrive in batches, and toArray() and for await close the cursor for you.",
+    code: "class AggregateCursor<TResult extends object = Document> implements AsyncIterable<TResult>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "constructor",
+    parent: "AggregateCursor",
+    kind: "constructor",
+    href: "/docs/api/classes/AggregateCursor#constructor",
+    summary: "",
+    code: "new AggregateCursor<TResult extends object = Document>( execute: CursorExecutor, collection: string, pipeline: readonly Document[], batchSize: number | undef...",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "[asyncIterator]",
+    parent: "AggregateCursor",
+    kind: "method",
+    href: "/docs/api/classes/AggregateCursor#async-iterator",
+    summary:
+      "Iterates the remaining documents, closing the cursor when the loop ends.",
+    code: "[asyncIterator](): AsyncGenerator<TResult, void, undefined>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "close",
+    parent: "AggregateCursor",
+    kind: "method",
+    href: "/docs/api/classes/AggregateCursor#close",
+    summary:
+      "Closes the cursor and releases it on the server. Closing twice does nothing.",
+    code: "close(): Promise<void>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "hasNext",
+    parent: "AggregateCursor",
+    kind: "method",
+    href: "/docs/api/classes/AggregateCursor#has-next",
+    summary:
+      "Whether another document is available. This may fetch the next batch.",
+    code: "hasNext(): Promise<boolean>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "next",
+    parent: "AggregateCursor",
+    kind: "method",
+    href: "/docs/api/classes/AggregateCursor#next",
+    summary:
+      "Returns the next document, or null when the results are exhausted or the cursor is closed.",
+    code: "next(): Promise<TResult | null>",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "toArray",
+    parent: "AggregateCursor",
+    kind: "method",
+    href: "/docs/api/classes/AggregateCursor#to-array",
+    summary:
+      "Reads all remaining documents into an array and closes the cursor. Large result sets are held in memory; iterate instead when they may be large.",
+    code: "toArray(): Promise<TResult[]>",
+    deprecated: false,
+    since: null,
+  },
+  {
     name: "CustomId",
     parent: null,
     kind: "class",
@@ -453,6 +529,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     summary:
       "The database and collection names joined with a dot, such as app.users.",
     code: "get namespace(): string",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "aggregate",
+    parent: "SinterCollection",
+    kind: "method",
+    href: "/docs/api/classes/SinterCollection#aggregate",
+    summary:
+      "Starts an aggregation and returns a cursor. No request is sent until the cursor is read. See AggregationStage for the stages.",
+    code: "aggregate<TResult extends object = Document>( pipeline: readonly AggregationStage<TDocument>[], options?: AggregateOptions, ): AggregateCursor<TResult>",
     deprecated: false,
     since: null,
   },
@@ -1205,6 +1292,27 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     href: "/docs/api/classes/SinterSocketTimeoutError#code",
     summary: "Always SOCKET_TIMEOUT.",
     code: 'readonly code: "SOCKET_TIMEOUT"',
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "AggregateOptions",
+    parent: null,
+    kind: "interface",
+    href: "/docs/api/interfaces/AggregateOptions",
+    summary: "Options for SinterCollection.aggregate.",
+    code: "interface AggregateOptions",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "batchSize",
+    parent: "AggregateOptions",
+    kind: "property",
+    href: "/docs/api/interfaces/AggregateOptions#batch-size",
+    summary:
+      "How many documents the cursor fetches from the server per round trip.",
+    code: "readonly batchSize?: number",
     deprecated: false,
     since: null,
   },
@@ -2239,6 +2347,17 @@ export const searchIndex: readonly ApiSearchEntry[] = [
     summary:
       "The _id of the inserted document when an upsert inserted one, otherwise null. In that case matchedCount is 0.",
     code: "readonly upsertedId: CustomId | null",
+    deprecated: false,
+    since: null,
+  },
+  {
+    name: "AggregationStage",
+    parent: null,
+    kind: "type-alias",
+    href: "/docs/api/types/AggregationStage",
+    summary:
+      "One stage of an aggregation pipeline. Each stage is an object with a single $ key. Documents flow through the stages in order.",
+    code: "type AggregationStage<TDocument extends object> = | { readonly $match: Filter<TDocument> } | { readonly $project: Projection<TDocument> } | { readonly $sort:...",
     deprecated: false,
     since: null,
   },

@@ -5,7 +5,8 @@ import {
   type DocumentValue,
 } from "sinterdb-protocol";
 
-import { FindCursor } from "./cursor.js";
+import type { AggregateOptions, AggregationStage } from "./aggregation.js";
+import { AggregateCursor, FindCursor } from "./cursor.js";
 import type { SinterDatabase } from "./database.js";
 import {
   SinterCompatibilityError,
@@ -443,6 +444,35 @@ export class SinterCollection<TDocument extends object = Document> {
   }
 
   /**
+   * Starts an aggregation and returns a cursor. No request is sent until the
+   * cursor is read. See {@link AggregationStage} for the stages.
+   *
+   * The result type is not worked out from the pipeline: pass it as the type
+   * argument when you need it, such as `aggregate<{ total: number }>(...)`.
+   *
+   * @example
+   * ```ts
+   * const [{ total }] = await users
+   *   .aggregate<{ total: number }>([
+   *     { $match: { active: true } },
+   *     { $count: "total" },
+   *   ])
+   *   .toArray();
+   * ```
+   */
+  public aggregate<TResult extends object = Document>(
+    pipeline: readonly AggregationStage<TDocument>[],
+    options: AggregateOptions = {},
+  ): AggregateCursor<TResult> {
+    return new AggregateCursor<TResult>(
+      (command, parameters) => this.execute(command, parameters),
+      this.name,
+      pipeline as unknown as readonly Document[],
+      options.batchSize,
+    );
+  }
+
+  /**
    * Sends a command, first checking that the server understands a projection
    * if the command carries one. An older server would ignore it and return
    * whole documents.
@@ -460,6 +490,19 @@ export class SinterCollection<TDocument extends object = Document> {
       return Promise.reject(
         new SinterCompatibilityError(
           "The server does not support projection. Upgrade the server to 0.3.0 or later, or remove the projection option.",
+        ),
+      );
+    }
+
+    if (
+      command === "aggregate" &&
+      this.database.client.serverInfo?.capabilities.includes(
+        ProtocolCapability.Aggregation,
+      ) === false
+    ) {
+      return Promise.reject(
+        new SinterCompatibilityError(
+          "The server does not support aggregation. Upgrade the server to 0.3.0 or later.",
         ),
       );
     }
