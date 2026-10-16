@@ -74,8 +74,20 @@ function search(entries: readonly ApiSearchEntry[], query: string) {
     .map((result) => result.entry);
 }
 
-/** Search box for the sidebar: opens a palette with ⌘K, Ctrl+K or `/`. */
-export function Search({ label }: { readonly label: string }) {
+/**
+ * Search box: opens a palette with ⌘K, Ctrl+K or `/`. It searches the API
+ * index plus any `extraEntries`, such as a site's guide pages. Entries of
+ * kind `guide` and `section` show as "Page › Section".
+ *
+ * Render one per page: each instance listens for the shortcut.
+ */
+export function Search({
+  label,
+  extraEntries = [],
+}: {
+  readonly label: string;
+  readonly extraEntries?: readonly ApiSearchEntry[];
+}) {
   const router = useRouter();
   const id = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -90,7 +102,7 @@ export function Search({ label }: { readonly label: string }) {
   const results = entries ? search(entries, query) : [];
 
   function open() {
-    void loadSearchIndex().then(setEntries);
+    void loadSearchIndex().then((api) => setEntries([...extraEntries, ...api]));
     dialogRef.current?.showModal();
     inputRef.current?.select();
   }
@@ -232,7 +244,8 @@ export function Search({ label }: { readonly label: string }) {
                       >
                         {entry.parent && (
                           <span className="tdk-search-parent">
-                            {entry.parent}.
+                            {entry.parent}
+                            {entry.kind === "section" ? " › " : "."}
                           </span>
                         )}
                         {entry.name}

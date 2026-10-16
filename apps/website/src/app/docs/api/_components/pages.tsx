@@ -434,7 +434,8 @@ function SectionHeading({
       <a
         href={`#${id}`}
         className="tdk-anchor"
-        aria-label="Link to this section"
+        aria-label="Copy link to this section"
+        title="Copy link"
       >
         #
       </a>

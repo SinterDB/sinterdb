@@ -5,6 +5,7 @@ dist/
 build/
 out/
 lib/
+!apps/website/src/lib/
 coverage/
 test-results/
 playwright-report/

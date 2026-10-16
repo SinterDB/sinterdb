@@ -29,26 +29,26 @@ export const docsNav: readonly DocsNavSection[] = [
   {
     title: "Core",
     items: [
-      { label: "Databases", href: "/docs/databases", soon: true },
-      { label: "Collections", href: "/docs/collections", soon: true },
-      { label: "Documents", href: "/docs/documents", soon: true },
+      { label: "Databases", href: "/docs/databases" },
+      { label: "Collections", href: "/docs/collections" },
+      { label: "Documents", href: "/docs/documents" },
     ],
   },
   {
     title: "Queries",
     items: [
-      { label: "Filters", href: "/docs/filters", soon: true },
-      { label: "Sorting", href: "/docs/sorting", soon: true },
-      { label: "Cursors", href: "/docs/cursors", soon: true },
+      { label: "Filters", href: "/docs/filters" },
+      { label: "Sorting", href: "/docs/sorting" },
+      { label: "Cursors", href: "/docs/cursors" },
     ],
   },
   {
     title: "Writing Data",
     items: [
-      { label: "Inserts", href: "/docs/inserts", soon: true },
-      { label: "Updates", href: "/docs/updates", soon: true },
-      { label: "Replacements", href: "/docs/replacements", soon: true },
-      { label: "Deletes", href: "/docs/deletes", soon: true },
+      { label: "Inserts", href: "/docs/inserts" },
+      { label: "Updates", href: "/docs/updates" },
+      { label: "Replacements", href: "/docs/replacements" },
+      { label: "Deletes", href: "/docs/deletes" },
     ],
   },
 ];

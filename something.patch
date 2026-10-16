@@ -1,0 +1,1709 @@
+diff --git a/apps/website/package.json b/apps/website/package.json
+index 831b3f7..9939ae7 100644
+--- a/apps/website/package.json
++++ b/apps/website/package.json
+@@ -17,6 +17,7 @@
+     "@mdx-js/loader": "^3.1.1",
+     "@mdx-js/react": "^3.1.1",
+     "@next/mdx": "16.4.0",
++    "github-slugger": "^2.0.0",
+     "next": "16.4.0",
+     "react": "19.3.0",
+     "react-dom": "19.3.0",
+diff --git a/apps/website/public/typedoc/react-output/schema.json b/apps/website/public/typedoc/react-output/schema.json
+index 39025bf..b34aba2 100644
+--- a/apps/website/public/typedoc/react-output/schema.json
++++ b/apps/website/public/typedoc/react-output/schema.json
+@@ -137,6 +137,16 @@
+           "type": "boolean",
+           "default": false,
+           "description": "Show members inherited from outside the project, such as Error.stack."
++        },
++        "errorGroup": {
++          "type": "boolean",
++          "default": true,
++          "description": "Show classes that extend Error in their own \"Errors\" group after \"Classes\", in the sidebar and on the index page."
++        },
++        "search": {
++          "type": "boolean",
++          "default": true,
++          "description": "Show the search box in the sidebar. Turn it off when the site renders its own Search component, such as in a shared header."
+         }
+       }
+     },
+diff --git a/apps/website/src/app/docs/(guides)/collections/page.mdx b/apps/website/src/app/docs/(guides)/collections/page.mdx
+new file mode 100644
+index 0000000..4730f31
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/collections/page.mdx
+@@ -0,0 +1,113 @@
++export const metadata = {
++  title: "Collections",
++  description:
++    "Get typed collection handles, count documents, read distinct values, and manage indexes.",
++};
++
++# Collections
++
++A collection is a group of documents inside a database. Most of the driver's API lives on <Api name="SinterCollection" />.
++
++## Get a collection
++
++<Api name="SinterDatabase.collection">db.collection()</Api> returns a handle.
++Give it your document type, and filters, updates and results are type-checked
++against it.
++
++```ts app.ts
++import { type CustomId, SinterClient } from "sinterdb";
++
++interface User {
++  _id: CustomId;
++  email: string;
++  name: string;
++  age: number;
++  tags: string[];
++}
++
++const client = new SinterClient("sinterdb://localhost/my-app");
++await client.connect();
++
++const users = client.db().collection<User>("users");
++```
++
++No request is sent. Like databases, a collection is created by the first write: an insert, or `createIndex`. Until then, reads return no documents rather than an error.
++
++The type parameter is checked by TypeScript only. The server does not validate documents against a schema, so a document written without types, or by another program, can have any shape.
++
++## Counting
++
++```ts
++const total = await users.estimatedDocumentCount();
++const adults = await users.countDocuments({ age: { $gte: 18 } });
++```
++
++| Method                                                                             | What it counts                                              |
++| ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
++| <Api name="SinterCollection.countDocuments">countDocuments(filter)</Api>           | Documents that match the filter, counted on the server.     |
++| <Api name="SinterCollection.estimatedDocumentCount">estimatedDocumentCount()</Api> | Every document, from the collection's size, without a scan. |
++
++Neither transfers documents. Without a filter, `countDocuments()` counts the whole collection.
++
++## Distinct values
++
++<Api name="SinterCollection.distinct">distinct(field, filter)</Api> returns each
++value of a field once, among the documents that match the filter.
++
++```ts
++const ages = await users.distinct("age");
++// [17, 25, 31]
++
++const adultTags = await users.distinct("tags", { age: { $gte: 18 } });
++// ["admin", "beta"]
++```
++
++- A field that holds an array contributes its elements, so `tags` returns tags, not arrays of tags.
++- Documents without the field contribute nothing. A field holding `null` contributes `null`.
++- Values come back in [sort order](/docs/sorting#how-values-sort), and are distinct by exact equality, so `1` and `1n` are two values.
++
++## Indexes
++
++An index lets the server find matching documents without reading the whole collection. Every collection has a unique index on `_id`. Index the fields you filter on often.
++
++```ts
++await users.createIndex({ field: "email", unique: true });
++await users.createIndex({
++  keys: [
++    ["name", 1],
++    ["age", -1],
++  ],
++});
++
++const indexes = await users.indexes();
++await users.dropIndex("name_1_age_-1");
++```
++
++| Option   | Meaning                                                                |
++| -------- | ---------------------------------------------------------------------- |
++| `field`  | One field to index. Dotted paths reach into nested documents.          |
++| `keys`   | One to eight `[field, direction]` pairs for a compound index.          |
++| `unique` | At most one document may hold a given value, or combination of values. |
++| `sparse` | Documents without the field are left out of the index.                 |
++| `name`   | Defaults to the fields and directions, such as `email_1`.              |
++
++Give either `field` or `keys`, not both. Creating an identical index again succeeds and reports `created: false`. A unique index fails with a `DuplicateKey` server error if existing documents already break it.
++
++<Callout title="Unique indexes and missing fields" tone="warning">
++  A unique index counts a missing field as a value, so only one document can
++  lack it. If the field is optional, add `sparse: true`: documents without it
++  are left out of the index and never conflict.
++</Callout>
++
++An index can serve equality, `$in`, and range filters. It never changes what a query returns, only how fast. Sorting is not served by indexes. The full rules, including how compound indexes are chosen, are in [indexes.md](https://github.com/SinterDB/sinterdb/blob/main/docs/indexes.md).
++
++<Callout title="Building an index pauses the server" tone="neutral">
++  The server does all its work on one thread. Creating an index on a large
++  collection delays other clients until the index is built.
++</Callout>
++
++## Names
++
++Collection names must not be empty, must not contain null characters, and can be at most 255 bytes. Unlike database names, they may contain `/` and `\`.
++
++You cannot drop or rename a collection yet. `deleteMany({})` removes every document and leaves the empty collection, with its indexes.
+diff --git a/apps/website/src/app/docs/(guides)/cursors/page.mdx b/apps/website/src/app/docs/(guides)/cursors/page.mdx
+new file mode 100644
+index 0000000..7ce25c6
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/cursors/page.mdx
+@@ -0,0 +1,95 @@
++export const metadata = {
++  title: "Cursors",
++  description:
++    "Read query results with find and findOne, iterate cursors, choose fields with projections, and close cursors.",
++};
++
++# Cursors
++
++`find` returns a <Api name="FindCursor" />, a lazy handle to the results. Nothing is sent to the server until you read from it, and documents arrive in batches.
++
++## Read the results
++
++There are three ways to read a cursor:
++
++```ts
++// All at once
++const all = await users.find({ active: true }).toArray();
++
++// One at a time, with for await
++for await (const user of users.find({ active: true })) {
++  console.log(user.name);
++}
++
++// Manually
++const cursor = users.find({ active: true });
++while (await cursor.hasNext()) {
++  const user = await cursor.next();
++}
++```
++
++`toArray()` loads every result into memory. For large results, prefer `for await`, which only holds one batch at a time.
++
++## Find one document
++
++<Api name="SinterCollection.findOne">findOne</Api> returns the first match, or
++`null`. It doesn't need closing.
++
++```ts
++const user = await users.findOne({ email: "kage@example.com" });
++
++if (user) {
++  console.log(user._id.toHexString());
++}
++```
++
++## Close what you don't finish
++
++The server keeps state for an open cursor. `toArray()` and `for await` release it for you, even when you `break` out of the loop or an error is thrown. If you read with `next()` and stop early, call `close()`:
++
++```ts
++const cursor = users.find({}, { sort: [["age", -1]] });
++
++try {
++  const oldest = await cursor.next();
++} finally {
++  await cursor.close();
++}
++```
++
++An idle cursor expires on the server after 10 minutes. A cursor also belongs to its connection, so it is released when the client closes.
++
++## Choose fields
++
++A projection picks which fields come back. Include fields with `1`, or exclude them with `0`:
++
++```ts
++const names = await users
++  .find({}, { projection: { name: 1, email: 1 } })
++  .toArray();
++// [{ _id, name, email }, ...]
++
++const safe = await users.findOne({}, { projection: { passwordHash: 0 } });
++```
++
++- `_id` is included unless you set it to `0`, which works in both kinds: `{ name: 1, _id: 0 }`.
++- You cannot mix including and excluding other fields in one projection.
++- Dotted paths keep the nesting: `{ "address.city": 1 }` returns `{ address: { city } }`.
++- The projection is applied after sorting, so you can sort by a field you don't return.
++
++When the projection is written inline, the result type follows it: `names` above is typed with just `_id`, `name` and `email`.
++
++## Batch size
++
++```ts
++users.find({}, { batchSize: 500 });
++```
++
++The cursor fetches `batchSize` documents per round trip, from 1 to 10,000. The default is 100. Larger batches mean fewer round trips but more memory per batch.
++
++## Things to know
++
++- **A cursor is not a snapshot.** It reads the collection as it goes, so documents written while you iterate may or may not appear.
++- **Ask how a query runs.** `cursor.explain()` returns the plan the server would use, such as which index, without running the query. Its shape may change between releases.
++
++The options are <Api name="FindOptions" />, and the projection type is <Api name="Projection" />.
+diff --git a/apps/website/src/app/docs/(guides)/databases/page.mdx b/apps/website/src/app/docs/(guides)/databases/page.mdx
+new file mode 100644
+index 0000000..4f6c4e7
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/databases/page.mdx
+@@ -0,0 +1,67 @@
++export const metadata = {
++  title: "Databases",
++  description:
++    "Select a database, list the databases on a server, and understand how databases are created.",
++};
++
++# Databases
++
++A server holds any number of databases, and each database holds collections. You select a database through the client.
++
++## Select a database
++
++<Api name="SinterClient.db">client.db()</Api> returns a handle to a database.
++With no argument, it uses the database named in the connection string.
++
++```ts app.ts
++import { SinterClient } from "sinterdb";
++
++const client = new SinterClient("sinterdb://localhost/my-app");
++await client.connect();
++
++const app = client.db(); // "my-app", from the connection string
++const reports = client.db("reports"); // any other database
++```
++
++Calling `db()` with no name when the connection string has no database throws a <Api name="SinterNamespaceError" />. Getting a handle sends nothing to the server, so it is cheap to call wherever you need one.
++
++## Databases are created by writing
++
++There is no `createDatabase`. A database appears the first time you write to one of its collections, by inserting a document or creating an index.
++
++```ts
++const db = client.db("new-app");
++
++await db.collection("events").insertOne({ type: "signup" });
++// "new-app" now exists
++```
++
++Reading from a database that does not exist is not an error. It simply has no collections and no documents.
++
++## List databases and collections
++
++```ts
++const databases = await client.listDatabases();
++// ["my-app", "new-app", "reports"]
++
++const collections = await client.db().listCollections();
++// ["events", "users"]
++```
++
++Both return names only, as plain strings. See <Api name="SinterClient.listDatabases" /> and <Api name="SinterDatabase.listCollections" />.
++
++## Names
++
++| Rule       | Detail                                    |
++| ---------- | ----------------------------------------- |
++| Not empty  | Whitespace-only names are rejected too.   |
++| Characters | No `/`, `\`, or null characters.          |
++| Length     | At most 255 bytes, checked by the server. |
++
++The driver checks the first two rules when you call `db()`, before anything is sent. The length limit is checked by the server, so a name that is too long fails on the first write with a <Api name="SinterServerError" />.
++
++<Callout title="Dropping and renaming" tone="neutral">
++  You cannot drop or rename a database yet. To empty a collection, use
++  `deleteMany({})`. To remove all data, stop the server and delete its data
++  directory.
++</Callout>
+diff --git a/apps/website/src/app/docs/(guides)/deletes/page.mdx b/apps/website/src/app/docs/(guides)/deletes/page.mdx
+new file mode 100644
+index 0000000..386f095
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/deletes/page.mdx
+@@ -0,0 +1,49 @@
++export const metadata = {
++  title: "Deletes",
++  description: "Delete one or many documents that match a filter.",
++};
++
++# Deletes
++
++## Delete one or many
++
++```ts
++await users.deleteOne({ email: "kage@example.com" });
++
++const result = await sessions.deleteMany({ expiresAt: { $lt: new Date() } });
++result.deletedCount; // how many were removed
++```
++
++<Api name="SinterCollection.deleteOne">deleteOne</Api> removes the first
++document that matches. <Api name="SinterCollection.deleteMany">deleteMany</Api>
++removes every match. Both return a <Api name="DeleteResult" />. Deleting when
++nothing matches is not an error: `deletedCount` is `0`.
++
++To delete one specific document, filter by its `_id`:
++
++```ts
++await users.deleteOne({ _id: user._id });
++```
++
++## Empty a collection
++
++An empty filter matches every document:
++
++```ts
++await logs.deleteMany({});
++```
++
++The collection itself stays, empty, along with its indexes. You can't drop a collection or a database yet.
++
++<Callout title="Double-check the filter" tone="warning">
++  `deleteMany({})` deletes everything, and there's no undo. Building filters in
++  code? Make sure an empty value doesn't turn into `{}` by accident.
++</Callout>
++
++## Atomicity
++
++A `deleteMany` removes every matching document or none, never part of them. Separate commands aren't grouped into transactions, so another client can write between two of your deletes.
++
++## Getting space back
++
++Deleted documents are gone from queries right away. Disk space comes back gradually, as the server takes new checkpoints and removes log files it no longer needs. It keeps the two newest snapshots, so this takes more than one checkpoint. See [storage.md](https://github.com/SinterDB/sinterdb/blob/main/docs/storage.md#checkpoints-and-compaction) for the details.
+diff --git a/apps/website/src/app/docs/(guides)/documents/page.mdx b/apps/website/src/app/docs/(guides)/documents/page.mdx
+new file mode 100644
+index 0000000..2770051
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/documents/page.mdx
+@@ -0,0 +1,85 @@
++export const metadata = {
++  title: "Documents",
++  description:
++    "The values a document can hold, how _id works, and the limits on document size and shape.",
++};
++
++# Documents
++
++A document is a plain JavaScript object. SinterDB stores it in a compact binary form and returns it as an object again, with the same value types.
++
++## Supported values
++
++| Value        | Example                         |
++| ------------ | ------------------------------- |
++| `null`       | `null`                          |
++| Boolean      | `true`                          |
++| Number       | `42`, `3.14`, `NaN`, `Infinity` |
++| `bigint`     | `9007199254740993n`             |
++| String       | `"hello"`                       |
++| `Date`       | `new Date()`                    |
++| `Uint8Array` | `new Uint8Array([1, 2, 3])`     |
++| `CustomId`   | `CustomId.generate()`           |
++| Array        | `[1, "two", { three: 3 }]`      |
++| Plain object | `{ city: "Paris" }`             |
++
++Anything else is rejected before it is sent, with a <Api name="SinterDocumentError" />. That includes `undefined`, functions, symbols, and class instances such as `Map` and `Set`.
++
++<Callout title="Leave fields out instead of using undefined" tone="warning">
++  `{ nickname: undefined }` is an error, not a missing field. Omit the field, or set it to `null` if you want it present but empty.
++</Callout>
++
++## The `_id` field
++
++Every document has an `_id`, and it is always a <Api name="CustomId" />. If you insert a document without one, the server generates it.
++
++```ts
++import { CustomId } from "sinterdb";
++
++const { insertedId } = await users.insertOne({ name: "Kage" });
++insertedId.toHexString(); // "6710f3c2..."
++insertedId.timestamp; // when it was generated
++
++const id = CustomId.generate();
++await users.insertOne({ _id: id, name: "Rin" });
++
++const same = CustomId.fromHexString(id.toHexString());
++same.equals(id); // true
++```
++
++- Plain strings and numbers are not accepted as `_id`.
++- `_id` cannot be changed after insert.
++- Compare ids with `equals()`, not `===`, since two `CustomId` objects with the same value are different objects.
++
++In TypeScript, <Api name="OptionalId" /> is the shape you insert (with `_id` optional) and <Api name="WithId" /> is the shape you read back (with `_id` always present).
++
++## How values are compared
++
++Values are compared by their stored form, so a few pairs that look alike are different:
++
++- `1` and `1n` are different values, because a number and a bigint are stored differently.
++- `0` and `-0` are different under equality, but equal in ranges and sorting. Avoid storing `-0`.
++- A field set to `null` is not the same as a missing field.
++
++The [Filters](/docs/filters) page covers what this means for queries.
++
++## Field order
++
++Fields come back sorted by name, not in the order you wrote them:
++
++```ts
++await users.insertOne({ name: "Kage", age: 30 });
++await users.findOne({ name: "Kage" });
++// { _id: ..., age: 30, name: "Kage" }
++```
++
++Arrays keep their order. Don't depend on the order of an object's keys.
++
++## Limits
++
++| What                      | Limit                                       |
++| ------------------------- | ------------------------------------------- |
++| One request or response   | 16 MiB, including every document it carries |
++| Nesting inside a document | 98 levels of documents inside the document  |
++
++Keep documents far below 16 MiB. A query result is split into batches automatically, but a single document has to fit in one message.
+diff --git a/apps/website/src/app/docs/(guides)/filters/page.mdx b/apps/website/src/app/docs/(guides)/filters/page.mdx
+new file mode 100644
+index 0000000..a4fc6e6
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/filters/page.mdx
+@@ -0,0 +1,115 @@
++export const metadata = {
++  title: "Filters",
++  description:
++    "Match documents by equality, comparison, logic, nested fields, and array contents.",
++};
++
++# Filters
++
++A filter chooses documents. `find`, `findOne`, `countDocuments`, `distinct`, updates and deletes all take one, and they all match documents the same way.
++
++## Equality
++
++A filter is an object of fields and values. A document matches when every field equals its value.
++
++```ts
++await users.find({ name: "Kage", age: 30 }).toArray();
++await users.find({}).toArray(); // every document
++```
++
++Equality is exact, so values must have the same type: `{ age: 30 }` does not match `"30"`, and `1` does not match `1n`. Nested objects match when they have the same fields with equal values, in any key order.
++
++## Comparison operators
++
++| Operator      | Matches when the field…                  |
++| ------------- | ---------------------------------------- |
++| `$eq`         | equals the value                         |
++| `$ne`         | does not equal the value, or is missing  |
++| `$gt`, `$gte` | is greater than (or equal to) the value  |
++| `$lt`, `$lte` | is less than (or equal to) the value     |
++| `$in`         | equals any value in the list             |
++| `$nin`        | equals none of the values, or is missing |
++| `$exists`     | is present (`true`) or missing (`false`) |
++
++```ts
++await users.find({ age: { $gte: 18, $lt: 65 } }).toArray();
++await users.find({ role: { $in: ["admin", "owner"] } }).toArray();
++await users.find({ deletedAt: { $exists: false } }).toArray();
++```
++
++Range operators only compare values of the same type. `{ age: { $gt: 18 } }` never matches a string, and a number never matches a bigint. Strings compare by Unicode code point, with no case folding: `"B"` comes before `"a"`.
++
++<Callout title="null is not missing" tone="neutral">
++  `{ nickname: null }` matches only documents where `nickname` is set to `null`. Use `{ nickname: { $exists: false } }` for documents without the field.
++</Callout>
++
++## Combining conditions
++
++Fields in one filter are joined by AND. For anything else, use the logical operators:
++
++```ts
++await users
++  .find({
++    $or: [{ role: "admin" }, { age: { $gte: 65 } }],
++  })
++  .toArray();
++
++await users.find({ age: { $not: { $gte: 18 } } }).toArray();
++```
++
++| Operator | Matches when                                       |
++| -------- | -------------------------------------------------- |
++| `$and`   | every filter in the list matches                   |
++| `$or`    | at least one filter matches                        |
++| `$nor`   | no filter matches                                  |
++| `$not`   | the field does not satisfy the operators inside it |
++
++`$and`, `$or` and `$nor` take a non-empty array. `$not` also matches a missing field, or one of another type, since the operator inside didn't match it.
++
++## Nested fields
++
++A dotted path reaches into nested documents:
++
++```ts
++await users.find({ "address.city": "Paris" }).toArray();
++```
++
++A path through something that isn't a document doesn't match. TypeScript checks dotted paths against your document type, so a typo is a compile error.
++
++## Arrays
++
++A filter on an array field looks at the array's elements as well as the array itself:
++
++```ts
++// tags: ["admin", "beta"]
++await users.find({ tags: "admin" }).toArray(); // matches: one element is "admin"
++await users.find({ tags: ["admin", "beta"] }).toArray(); // matches: the exact array
++await users.find({ scores: { $gt: 90 } }).toArray(); // any element above 90
++```
++
++Each condition on an array is checked on its own. `{ scores: { $gt: 90, $lt: 95 } }` matches `[80, 99]`, because one element is above 90 and another is below 95. To require one element to meet every condition, use `$elemMatch`:
++
++```ts
++await users.find({ scores: { $elemMatch: { $gt: 90, $lt: 95 } } }).toArray();
++
++await orders
++  .find({
++    items: { $elemMatch: { sku: "a-1", qty: { $gte: 2 } } },
++  })
++  .toArray();
++```
++
++| Operator     | Matches when                                    |
++| ------------ | ----------------------------------------------- |
++| `$elemMatch` | one element satisfies every condition inside it |
++| `$size`      | the array has exactly this many elements        |
++
++Paths step through arrays too. `"items.sku"` checks the `sku` of every element, and a number picks one position: `"items.0.sku"` is the first item's `sku`.
++
++`$ne` and `$nin` are the exact opposites of `$eq` and `$in`, so `{ tags: { $ne: "admin" } }` does **not** match `["admin", "beta"]`.
++
++## Not supported yet
++
++`$regex`, `$all`, `$type`, `$mod`, `$expr`, `$text` and `$where` are rejected by the server. There is no full-text or geospatial search.
++
++The complete matching rules, with a tested example for each case, are in [query-semantics.md](https://github.com/SinterDB/sinterdb/blob/main/docs/query-semantics.md). The filter types are <Api name="Filter" /> and <Api name="FilterOperators" />.
+diff --git a/apps/website/src/app/docs/(guides)/inserts/page.mdx b/apps/website/src/app/docs/(guides)/inserts/page.mdx
+new file mode 100644
+index 0000000..17c1609
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/inserts/page.mdx
+@@ -0,0 +1,91 @@
++export const metadata = {
++  title: "Inserts",
++  description:
++    "Insert one or many documents, get their ids back, and handle duplicate keys and partial failures.",
++};
++
++# Inserts
++
++Inserting creates the database and collection if they don't exist yet.
++
++## Insert one document
++
++```ts
++const result = await users.insertOne({
++  email: "kage@example.com",
++  name: "Kage",
++  age: 30,
++});
++
++result.insertedId; // the new document's _id
++```
++
++If the document has no `_id`, the server generates one and returns it in `insertedId`. To choose the id yourself, pass a <Api name="CustomId" />:
++
++```ts
++import { CustomId } from "sinterdb";
++
++await users.insertOne({ _id: CustomId.generate(), name: "Rin" });
++```
++
++## Insert many documents
++
++```ts
++const result = await users.insertMany([
++  { name: "Rin", age: 22 },
++  { name: "Sora", age: 41 },
++]);
++
++result.insertedCount; // 2
++result.insertedIds; // one _id per document, in input order
++```
++
++Documents are inserted in order. An empty array is rejected.
++
++## When an insert fails
++
++Inserting a document whose `_id`, or a value in a unique index, already exists fails with a <Api name="SinterServerError" /> named `DuplicateKey`:
++
++```ts
++import { SinterServerError } from "sinterdb";
++
++try {
++  await users.insertOne({ email: "kage@example.com", name: "Kage again" });
++} catch (error) {
++  if (
++    error instanceof SinterServerError &&
++    error.serverErrorName === "DuplicateKey"
++  ) {
++    // That email is taken
++  }
++}
++```
++
++`insertMany` stops at the first document that fails. The documents before it **stay inserted**, and the error is a <Api name="SinterInsertManyError" /> that says how far it got:
++
++```ts
++import { SinterInsertManyError } from "sinterdb";
++
++try {
++  await users.insertMany(newUsers);
++} catch (error) {
++  if (error instanceof SinterInsertManyError) {
++    error.failedIndex; // position of the document that failed
++    error.insertedIds; // ids of the documents inserted before it
++  }
++}
++```
++
++There are no transactions yet, so to make a batch all-or-nothing you have to remove the inserted documents yourself.
++
++## Invalid documents
++
++A document with a value SinterDB can't store, such as `undefined`, a function or a `Map`, fails before anything is sent, with a <Api name="SinterDocumentError" />. See [Documents](/docs/documents#supported-values) for what can be stored.
++
++## Size
++
++A whole request is limited to 16 MiB, so all the documents in one `insertMany` have to fit together. Insert large sets in several calls.
++
++## When is it saved?
++
++An insert resolves when the server acknowledges it, and the server's write concern decides when that is. With the default, `flushed`, the data is on stable storage by then and survives a crash or power loss. Faster levels exist for data you can recreate. See [configuration.md](https://github.com/SinterDB/sinterdb/blob/main/docs/configuration.md#write-concern).
+diff --git a/apps/website/src/app/docs/(guides)/replacements/page.mdx b/apps/website/src/app/docs/(guides)/replacements/page.mdx
+new file mode 100644
+index 0000000..d035bca
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/replacements/page.mdx
+@@ -0,0 +1,64 @@
++export const metadata = {
++  title: "Replacements",
++  description:
++    "Replace a whole document while keeping its _id, and insert a replacement when nothing matches.",
++};
++
++# Replacements
++
++<Api name="SinterCollection.replaceOne">replaceOne</Api> swaps a whole document
++for a new one. Fields that aren't in the replacement are gone afterwards. To
++change only some fields, use an [update](/docs/updates) instead.
++
++## Replace a document
++
++```ts
++const result = await users.replaceOne(
++  { email: "kage@example.com" },
++  { email: "kage@example.com", name: "Kage", age: 31 },
++);
++
++result.matchedCount; // 1
++result.modifiedCount; // 1, or 0 if the replacement was identical
++```
++
++Only the first matching document is replaced. There is no `replaceMany`.
++
++The replacement is a plain document, not an update. It can't contain operators like `$set`.
++
++## The `_id` stays
++
++The replaced document keeps its `_id`. You can leave `_id` out of the replacement, or include the same one. Including a **different** `_id` fails with a <Api name="SinterServerError" /> named `ImmutableId`.
++
++```ts
++const user = await users.findOne({ email: "kage@example.com" });
++
++if (user) {
++  await users.replaceOne({ _id: user._id }, { ...user, age: user.age + 1 });
++}
++```
++
++Reading a document, changing it, and replacing it by `_id` like this is a simple way to make larger edits. Keep in mind that another client could change the document between your read and your write.
++
++## Upsert
++
++With `upsert: true`, the replacement is inserted when nothing matches:
++
++```ts
++const result = await settings.replaceOne(
++  { key: "theme" },
++  { key: "theme", value: "dark" },
++  { upsert: true },
++);
++
++result.upsertedId; // the new _id, or null if a document was replaced
++```
++
++## Replace or update?
++
++| Use          | When                                                    |
++| ------------ | ------------------------------------------------------- |
++| `updateOne`  | You're changing a few fields and want to keep the rest. |
++| `replaceOne` | You have the complete new version of the document.      |
++
++The result is an <Api name="UpdateResult" />, the same as for updates.
+diff --git a/apps/website/src/app/docs/(guides)/sorting/page.mdx b/apps/website/src/app/docs/(guides)/sorting/page.mdx
+new file mode 100644
+index 0000000..6d73852
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/sorting/page.mdx
+@@ -0,0 +1,98 @@
++export const metadata = {
++  title: "Sorting",
++  description:
++    "Sort query results by one or more fields, and page through them with skip and limit.",
++};
++
++# Sorting
++
++Results come back in insertion order unless you sort them. Sorting, skipping and limiting are options of `find`.
++
++## Sort by a field
++
++`sort` is a list of `[field, direction]` pairs. Use `1` for ascending and `-1` for descending.
++
++```ts
++const youngestFirst = await users.find({}, { sort: [["age", 1]] }).toArray();
++const newestFirst = await posts
++  .find({}, { sort: [["createdAt", -1]] })
++  .toArray();
++```
++
++## Sort by several fields
++
++Later pairs break ties left by earlier ones:
++
++```ts
++await users
++  .find(
++    {},
++    {
++      sort: [
++        ["country", 1],
++        ["age", -1],
++      ],
++    },
++  )
++  .toArray();
++```
++
++This sorts by country, then by age from oldest to youngest within each country. Sorting is stable, so documents that tie on every field keep their insertion order.
++
++## Skip and limit
++
++```ts
++const pageSize = 20;
++const page = 3;
++
++const results = await posts
++  .find(
++    { published: true },
++    {
++      sort: [["createdAt", -1]],
++      skip: (page - 1) * pageSize,
++      limit: pageSize,
++    },
++  )
++  .toArray();
++```
++
++The order is always: filter, sort, skip, then limit. `limit` must be at least 1.
++
++<Callout title="Sort before you page">
++  Without `sort`, pages follow insertion order, which changes as documents are
++  deleted and added. Sort by a field that doesn't change, like `createdAt` or
++  `_id`, to get stable pages.
++</Callout>
++
++## How values sort
++
++A field can hold different types in different documents. Sorting orders types first, then values within a type. Ascending order, lowest first:
++
++| Rank | Type              |
++| ---- | ----------------- |
++| 1    | missing field     |
++| 2    | `null`            |
++| 3    | number and bigint |
++| 4    | string            |
++| 5    | `Uint8Array`      |
++| 6    | `CustomId`        |
++| 7    | boolean           |
++| 8    | `Date`            |
++| 9    | array             |
++| 10   | object            |
++
++Descending is the exact reverse, so documents missing the field come last.
++
++Within a type:
++
++- Numbers and bigints sort together by value, so `1n` falls between `0.5` and `1.5`. `NaN` sorts first.
++- Strings sort by Unicode code point: uppercase before lowercase, and no locale rules.
++- `false` sorts before `true`.
++- Arrays all compare equal to each other, and so do objects. Sorting by an array field, or by a path through an array such as `"items.price"`, leaves those documents in their existing order.
++
++## Performance
++
++Sorting is not served by indexes yet. The server finds the matching documents first and sorts them afterwards, so sorting a very large result takes time and memory. Narrow it down with a filter, or use `limit`.
++
++The sort type is <Api name="Sort" />, and the full rules are in [query-semantics.md](https://github.com/SinterDB/sinterdb/blob/main/docs/query-semantics.md#sort-order).
+diff --git a/apps/website/src/app/docs/(guides)/updates/page.mdx b/apps/website/src/app/docs/(guides)/updates/page.mdx
+new file mode 100644
+index 0000000..426bfab
+--- /dev/null
++++ b/apps/website/src/app/docs/(guides)/updates/page.mdx
+@@ -0,0 +1,93 @@
++export const metadata = {
++  title: "Updates",
++  description:
++    "Change fields with update operators, update one or many documents, and insert when nothing matches.",
++};
++
++# Updates
++
++An update changes part of a document with operators such as `$set` and `$inc`. To swap the whole document, see [Replacements](/docs/replacements).
++
++## Update one or many
++
++```ts
++await users.updateOne(
++  { email: "kage@example.com" },
++  { $set: { name: "Kage" } },
++);
++
++await users.updateMany({ age: { $lt: 18 } }, { $set: { minor: true } });
++```
++
++<Api name="SinterCollection.updateOne">updateOne</Api> changes the first
++matching document. <Api name="SinterCollection.updateMany">updateMany</Api>
++changes all of them.
++
++## Operators
++
++| Operator    | What it does                                                 |
++| ----------- | ------------------------------------------------------------ |
++| `$set`      | Sets fields, creating them if they're missing                |
++| `$unset`    | Removes fields                                               |
++| `$inc`      | Adds to a number. A missing field is set to the amount       |
++| `$min`      | Lowers a field to the value, if the value is smaller         |
++| `$max`      | Raises a field to the value, if the value is larger          |
++| `$push`     | Appends to an array, creating it if the field is missing     |
++| `$addToSet` | Appends to an array unless an equal element is already there |
++| `$pull`     | Removes every matching element from an array                 |
++
++One update can use several operators:
++
++```ts
++await users.updateOne(
++  { email: "kage@example.com" },
++  {
++    $set: { "address.city": "Osaka" },
++    $inc: { loginCount: 1 },
++    $max: { lastSeen: new Date() },
++    $addToSet: { tags: "beta" },
++    $unset: { resetToken: true },
++  },
++);
++```
++
++Dotted paths reach into nested documents. TypeScript only lets each operator target fields of the right type: `$inc` only accepts number fields, and `$push` only array fields.
++
++## The result
++
++```ts
++const result = await users.updateMany(
++  { active: false },
++  { $set: { archived: true } },
++);
++
++result.matchedCount; // documents the filter matched
++result.modifiedCount; // documents that actually changed
++```
++
++`modifiedCount` only counts documents whose stored data changed. Setting a field to the value it already has matches the document but doesn't modify it.
++
++## Upsert
++
++With `upsert: true`, an update that matches nothing inserts a new document instead. It starts from the equality conditions in the filter, then the update is applied to it:
++
++```ts
++const result = await counters.updateOne(
++  { name: "page-views" },
++  { $inc: { value: 1 } },
++  { upsert: true },
++);
++
++result.upsertedId; // the new _id, or null if a document matched
++```
++
++The first call inserts `{ name: "page-views", value: 1 }`. Later calls increment it.
++
++## Rules
++
++- **`_id` can't be changed.** Updates can't target `_id`.
++- **Each command is atomic.** An `updateMany` changes every matching document or none: if one document can't be updated, nothing is.
++- **Commands don't form transactions.** Two separate updates can be interleaved with other clients' writes.
++- **Not supported yet:** `$mul`, `$rename`, `$pop`, positional operators like `$`, and update pipelines. The server rejects them with `InvalidUpdate`.
++
++The update type is <Api name="UpdateFilter" />, and the result is <Api name="UpdateResult" />.
+diff --git a/apps/website/src/app/docs/layout.tsx b/apps/website/src/app/docs/layout.tsx
+index a55c1b9..3bbcf33 100644
+--- a/apps/website/src/app/docs/layout.tsx
++++ b/apps/website/src/app/docs/layout.tsx
+@@ -1,30 +1,42 @@
+ import Link from "next/link";
+ import type { ReactNode } from "react";
+
++import { Search } from "@/app/docs/api/_components/search";
+ import { DocsHeaderTabs } from "@/components/docs/header-tabs";
++import { getGuideSearchEntries } from "@/lib/guide-search";
++
++// The search box uses the API theme's styles on guide pages too.
++import "./api/_components/api.css";
+
+ /**
+  * Shared header for guides and the API reference. Each section brings its own
+  * sidebar: `(guides)/layout.tsx` for the hand-written pages and
+  * `api/_components` for the generated reference. The header is 4rem tall,
+  * which the API theme expects (`--tdk-top`).
++ *
++ * The search box covers both: the API index from the generator, plus the
++ * guide pages and their headings.
+  */
+-export default function DocsLayout({
++export default async function DocsLayout({
+   children,
+ }: {
+   readonly children: ReactNode;
+ }) {
++  const guides = await getGuideSearchEntries();
++
+   return (
+     <div className="min-h-screen bg-[#090909] text-zinc-100">
+       <header className="sticky top-0 z-30 border-b border-white/[0.07] bg-[#090909]/90 backdrop-blur-xl">
+         <div className="mx-auto flex h-16 max-w-368 items-center justify-between gap-4 px-5 sm:px-8">
+-          <Link href="/" className="flex items-center gap-3">
++          <Link href="/" className="flex shrink-0 items-center gap-3">
+             <span className="flex size-8 items-center justify-center rounded-lg border border-orange-500/25 bg-orange-500/10 font-mono text-sm font-bold text-orange-400">
+               S
+             </span>
+
+             <span className="flex items-center gap-2">
+-              <span className="text-sm font-semibold">SinterDB</span>
++              <span className="hidden text-sm font-semibold sm:inline">
++                SinterDB
++              </span>
+               <span className="hidden text-sm text-zinc-600 sm:inline">/</span>
+               <span className="hidden text-sm text-zinc-400 sm:inline">
+                 Docs
+@@ -32,6 +44,13 @@ export default function DocsLayout({
+             </span>
+           </Link>
+
++          <div
++            className="tdk-root w-full max-w-64 min-w-0 [&_.tdk-search-button]:mb-0"
++            data-scheme="dark"
++          >
++            <Search label="the docs" extraEntries={guides} />
++          </div>
++
+           <DocsHeaderTabs />
+         </div>
+       </header>
+diff --git a/apps/website/src/components/docs/header-tabs.tsx b/apps/website/src/components/docs/header-tabs.tsx
+index 6c4b4fd..9665527 100644
+--- a/apps/website/src/components/docs/header-tabs.tsx
++++ b/apps/website/src/components/docs/header-tabs.tsx
+@@ -10,12 +10,13 @@ export function DocsHeaderTabs() {
+     "relative flex h-16 items-center transition hover:text-white aria-[current=true]:text-white aria-[current=true]:after:absolute aria-[current=true]:after:inset-x-0 aria-[current=true]:after:-bottom-px aria-[current=true]:after:h-px aria-[current=true]:after:bg-orange-400";
+
+   return (
+-    <nav className="flex items-center gap-5 text-sm text-zinc-400">
++    <nav className="flex shrink-0 items-center gap-4 text-sm text-zinc-400 sm:gap-5">
+       <Link href="/docs" className={tab} aria-current={!inApi}>
+         Guides
+       </Link>
+       <Link href="/docs/api" className={tab} aria-current={inApi}>
+-        API Reference
++        <span className="sm:hidden">API</span>
++        <span className="hidden sm:inline">API Reference</span>
+       </Link>
+       <a
+         href="https://github.com/SinterDB/sinterdb"
+diff --git a/apps/website/src/components/docs/nav.ts b/apps/website/src/components/docs/nav.ts
+index b166ae0..4191c9f 100644
+--- a/apps/website/src/components/docs/nav.ts
++++ b/apps/website/src/components/docs/nav.ts
+@@ -29,26 +29,26 @@ export const docsNav: readonly DocsNavSection[] = [
+   {
+     title: "Core",
+     items: [
+-      { label: "Databases", href: "/docs/databases", soon: true },
+-      { label: "Collections", href: "/docs/collections", soon: true },
+-      { label: "Documents", href: "/docs/documents", soon: true },
++      { label: "Databases", href: "/docs/databases" },
++      { label: "Collections", href: "/docs/collections" },
++      { label: "Documents", href: "/docs/documents" },
+     ],
+   },
+   {
+     title: "Queries",
+     items: [
+-      { label: "Filters", href: "/docs/filters", soon: true },
+-      { label: "Sorting", href: "/docs/sorting", soon: true },
+-      { label: "Cursors", href: "/docs/cursors", soon: true },
++      { label: "Filters", href: "/docs/filters" },
++      { label: "Sorting", href: "/docs/sorting" },
++      { label: "Cursors", href: "/docs/cursors" },
+     ],
+   },
+   {
+     title: "Writing Data",
+     items: [
+-      { label: "Inserts", href: "/docs/inserts", soon: true },
+-      { label: "Updates", href: "/docs/updates", soon: true },
+-      { label: "Replacements", href: "/docs/replacements", soon: true },
+-      { label: "Deletes", href: "/docs/deletes", soon: true },
++      { label: "Inserts", href: "/docs/inserts" },
++      { label: "Updates", href: "/docs/updates" },
++      { label: "Replacements", href: "/docs/replacements" },
++      { label: "Deletes", href: "/docs/deletes" },
+     ],
+   },
+ ];
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 6f3ca50..0d53bc2 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -241,6 +241,9 @@ importers:
+       '@next/mdx':
+         specifier: 16.4.0
+         version: 16.4.0(@mdx-js/loader@3.1.1(supports-color@8.1.1))(@mdx-js/react@3.1.1(@types/react@19.3.0)(react@19.3.0))
++      github-slugger:
++        specifier: ^2.0.0
++        version: 2.0.0
+       next:
+         specifier: 16.4.0
+         version: 16.4.0(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+diff --git a/tools/api-docs/typedoc.json b/tools/api-docs/typedoc.json
+index 7607ade..7b0162e 100644
+--- a/tools/api-docs/typedoc.json
++++ b/tools/api-docs/typedoc.json
+@@ -50,7 +50,9 @@
+       "pageNavigation": true,
+       "sourceLinks": true,
+       "comments": true,
+-      "externalInherited": false
++      "externalInherited": false,
++      "errorGroup": true,
++      "search": false
+     },
+     "theme": {
+       "name": "default",
+diff --git a/tools/typedoc-react-output/README.md b/tools/typedoc-react-output/README.md
+index 40877ce..c887697 100644
+--- a/tools/typedoc-react-output/README.md
++++ b/tools/typedoc-react-output/README.md
+@@ -23,7 +23,7 @@ Used by `tools/api-docs` to generate `apps/website/src/app/docs/api`.
+ }
+ ```
+
+-Every option is described in [`schema.json`](./schema.json).
++Every option is described in the [JSON schema](https://sinterdb.vercel.app/typedoc/react-output/schema.json), which also gives editors autocomplete in `typedoc.json`. Its source is `apps/website/public/typedoc/react-output/schema.json`.
+
+ ## What the pages include
+
+diff --git a/tools/typedoc-react-output/package.json b/tools/typedoc-react-output/package.json
+index 12e2892..a95958d 100644
+--- a/tools/typedoc-react-output/package.json
++++ b/tools/typedoc-react-output/package.json
+@@ -7,12 +7,10 @@
+   "type": "module",
+   "exports": {
+     ".": "./src/index.js",
+-    "./schema.json": "./schema.json",
+     "./package.json": "./package.json"
+   },
+   "files": [
+-    "src",
+-    "schema.json"
++    "src"
+   ],
+   "keywords": [
+     "typedoc",
+diff --git a/tools/typedoc-react-output/schema.json b/tools/typedoc-react-output/schema.json
+deleted file mode 100644
+index b40f424..0000000
+--- a/tools/typedoc-react-output/schema.json
++++ /dev/null
+@@ -1,177 +0,0 @@
+-{
+-  "$schema": "https://json-schema.org/draft/2020-12/schema",
+-  "allOf": [
+-    {
+-      "$ref": "https://sinterdb.vercel.app/typedoc/schema.json"
+-    },
+-    {
+-      "type": "object",
+-      "properties": {
+-        "reactOutput": {
+-          "$ref": "#/$defs/reactOutput"
+-        }
+-      }
+-    }
+-  ],
+-  "$defs": {
+-    "reactOutput": {
+-      "type": "object",
+-      "additionalProperties": false,
+-      "properties": {
+-        "framework": {
+-          "type": "string",
+-          "enum": ["next"],
+-          "default": "next",
+-          "description": "React framework target used by the generated output."
+-        },
+-        "routeBase": {
+-          "type": "string",
+-          "default": "/docs/api",
+-          "description": "Base route used when generating links between API pages."
+-        },
+-        "cleanOutput": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Remove the React output directory before generating documentation."
+-        },
+-        "generated": {
+-          "$ref": "#/$defs/generated"
+-        },
+-        "components": {
+-          "$ref": "#/$defs/components"
+-        },
+-        "declarations": {
+-          "$ref": "#/$defs/declarations"
+-        },
+-        "features": {
+-          "$ref": "#/$defs/features"
+-        },
+-        "theme": {
+-          "$ref": "#/$defs/theme"
+-        },
+-        "repository": {
+-          "type": ["string", "null"],
+-          "default": null,
+-          "description": "Repository URL used for source links, e.g. https://github.com/SinterDB/sinterdb. Detected from the git origin remote when null. Links use TypeDoc's gitRevision option, else the release tag on HEAD, else main."
+-        }
+-      }
+-    },
+-    "generated": {
+-      "type": "object",
+-      "additionalProperties": false,
+-      "properties": {
+-        "directory": {
+-          "type": "string",
+-          "default": "_generated",
+-          "description": "Directory containing generated model and project data."
+-        }
+-      }
+-    },
+-    "components": {
+-      "type": "object",
+-      "additionalProperties": false,
+-      "properties": {
+-        "directory": {
+-          "type": "string",
+-          "default": "_components",
+-          "description": "Directory containing generated React components."
+-        },
+-        "overrides": {
+-          "type": ["string", "null"],
+-          "default": null,
+-          "description": "Folder of the site's own versions of theme files, relative to where TypeDoc runs. Copied over the theme after every regenerate, so edits survive cleanOutput. Markdown files in it are skipped."
+-        }
+-      }
+-    },
+-    "declarations": {
+-      "type": "object",
+-      "additionalProperties": false,
+-      "properties": {
+-        "enabled": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Generate TypeScript declaration files for the React output API."
+-        },
+-        "directory": {
+-          "type": "string",
+-          "default": "_types",
+-          "description": "Directory containing generated TypeScript declaration files."
+-        },
+-        "moduleName": {
+-          "type": ["string", "null"],
+-          "default": null,
+-          "description": "Optional ambient module name exposing the generated React documentation types."
+-        }
+-      }
+-    },
+-    "features": {
+-      "type": "object",
+-      "additionalProperties": false,
+-      "properties": {
+-        "hierarchy": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Generate the API hierarchy page and hierarchy information."
+-        },
+-        "navigation": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Generate site-wide API navigation."
+-        },
+-        "pageNavigation": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Generate per-page member navigation."
+-        },
+-        "sourceLinks": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Link declarations to their original source files (resolved through declaration maps)."
+-        },
+-        "comments": {
+-          "type": "boolean",
+-          "default": true,
+-          "description": "Include TypeDoc comments and documentation blocks."
+-        },
+-        "externalInherited": {
+-          "type": "boolean",
+-          "default": false,
+-          "description": "Show members inherited from outside the project, such as Error.stack."
+-        }
+-      }
+-    },
+-    "theme": {
+-      "type": "object",
+-      "additionalProperties": false,
+-      "properties": {
+-        "name": {
+-          "type": "string",
+-          "default": "default",
+-          "description": "Theme directory under src/themes whose components are copied into the output."
+-        },
+-        "colorScheme": {
+-          "type": "string",
+-          "enum": ["dark", "light", "system"],
+-          "default": "dark",
+-          "description": "Color scheme of the generated pages. \"system\" follows prefers-color-scheme, or a .dark/.light class or data-theme attribute on an ancestor."
+-        },
+-        "codeThemes": {
+-          "type": "object",
+-          "additionalProperties": false,
+-          "properties": {
+-            "light": {
+-              "type": "string",
+-              "default": "github-light-default",
+-              "description": "Shiki theme for code blocks in light mode."
+-            },
+-            "dark": {
+-              "type": "string",
+-              "default": "github-dark-default",
+-              "description": "Shiki theme for code blocks in dark mode."
+-            }
+-          }
+-        }
+-      }
+-    }
+-  }
+-}
+diff --git a/tools/typedoc-react-output/src/model/project.js b/tools/typedoc-react-output/src/model/project.js
+index 54db703..b9686f6 100644
+--- a/tools/typedoc-react-output/src/model/project.js
++++ b/tools/typedoc-react-output/src/model/project.js
+@@ -1,3 +1,5 @@
++import { ReflectionKind } from "typedoc";
++
+ import { createCommentModel } from "./comments.js";
+ import { createHierarchyForest } from "./hierarchy.js";
+ import { createAnchor, getKindLabel, getKindName } from "./navigation.js";
+@@ -10,7 +12,7 @@ export function createProjectModel(ctx) {
+   const { project } = ctx;
+   const pageById = new Map(ctx.pages.map((plan) => [plan.reflection.id, plan]));
+
+-  const groups = (project.groups ?? [])
++  const groups = splitErrorGroup(project.groups ?? [], ctx)
+     .map((group) => ({
+       id: createAnchor(group.title),
+       title: group.title,
+@@ -86,6 +88,63 @@ export function createProjectModel(ctx) {
+   };
+ }
+
++/**
++ * Moves classes that extend `Error` out of "Classes" into an "Errors" group
++ * right after it, so the classes people use most aren't buried among error
++ * types. Turned off with `features.errorGroup: false`.
++ *
++ * @param {import("typedoc").ReflectionGroup[]} groups
++ * @param {import("./context.js").ModelContext} ctx
++ */
++function splitErrorGroup(groups, ctx) {
++  if (!ctx.options.features.errorGroup) {
++    return groups;
++  }
++
++  return groups.flatMap((group) => {
++    if (!group.children.every((child) => child.kindOf(ReflectionKind.Class))) {
++      return [group];
++    }
++
++    const errors = group.children.filter(isErrorClass);
++
++    if (errors.length === 0 || errors.length === group.children.length) {
++      return [group];
++    }
++
++    return [
++      {
++        title: group.title,
++        children: group.children.filter((child) => !errors.includes(child)),
++      },
++      { title: "Errors", children: errors },
++    ];
++  });
++}
++
++/** Whether a class extends `Error`, directly or through other classes. */
++function isErrorClass(reflection) {
++  let type = reflection.extendedTypes?.[0];
++  const seen = new Set();
++
++  while (type?.type === "reference") {
++    const parent = type.reflection;
++
++    if (!parent) {
++      return type.name === "Error";
++    }
++
++    if (seen.has(parent.id) || !parent.isDeclaration()) {
++      return false;
++    }
++
++    seen.add(parent.id);
++    type = parent.extendedTypes?.[0];
++  }
++
++  return false;
++}
++
+ /**
+  * Every page and anchored member with a one-line summary and declaration,
+  * for search and for hover previews of type links.
+diff --git a/tools/typedoc-react-output/src/options.js b/tools/typedoc-react-output/src/options.js
+index b05716f..7ee37bb 100644
+--- a/tools/typedoc-react-output/src/options.js
++++ b/tools/typedoc-react-output/src/options.js
+@@ -24,6 +24,8 @@ const DEFAULT_REACT_OUTPUT_OPTIONS = {
+     sourceLinks: true,
+     comments: true,
+     externalInherited: false,
++    errorGroup: true,
++    search: true,
+   },
+   theme: {
+     name: "default",
+diff --git a/tools/typedoc-react-output/src/themes/default/api.css b/tools/typedoc-react-output/src/themes/default/api.css
+index 39c0ca8..cc58326 100644
+--- a/tools/typedoc-react-output/src/themes/default/api.css
++++ b/tools/typedoc-react-output/src/themes/default/api.css
+@@ -222,6 +222,12 @@
+   transition: border-color 120ms;
+ }
+
++.tdk-search-button > span {
++  overflow: hidden;
++  white-space: nowrap;
++  text-overflow: ellipsis;
++}
++
+ .tdk-search-button:hover {
+   border-color: var(--tdk-border-strong);
+ }
+@@ -863,6 +869,9 @@
+ .tdk-icon[data-kind="function"] {
+   --tdk-kind: var(--tdk-k-function);
+ }
++.tdk-icon:is([data-kind="guide"], [data-kind="section"]) {
++  --tdk-kind: var(--tdk-accent);
++}
+ .tdk-icon[data-kind="class"] {
+   --tdk-kind: var(--tdk-k-class);
+ }
+@@ -1006,6 +1015,34 @@
+   font-size: 0.875rem;
+ }
+
++/* Copy link on # anchors */
++
++.tdk-anchor {
++  position: relative;
++}
++
++.tdk-anchor[data-copied] {
++  opacity: 1;
++}
++
++.tdk-anchor[data-copied]::after {
++  content: "Copied";
++  position: absolute;
++  top: 50%;
++  left: calc(100% + 0.4rem);
++  padding: 0.1rem 0.4rem;
++  border: 1px solid var(--tdk-border-strong);
++  border-radius: 4px;
++  background: light-dark(#ffffff, #141414);
++  color: var(--tdk-fg-strong);
++  font-family: var(--tdk-font-mono);
++  font-size: 0.6875rem;
++  font-weight: 400;
++  white-space: nowrap;
++  transform: translateY(-50%);
++  pointer-events: none;
++}
++
+ /* @since */
+
+ .tdk-since {
+diff --git a/tools/typedoc-react-output/src/themes/default/copy.tsx b/tools/typedoc-react-output/src/themes/default/copy.tsx
+index ee4a986..1886745 100644
+--- a/tools/typedoc-react-output/src/themes/default/copy.tsx
++++ b/tools/typedoc-react-output/src/themes/default/copy.tsx
+@@ -5,11 +5,27 @@ import { useEffect } from "react";
+ /**
+  * One listener for every copy button on the page. Buttons are plain markup
+  * (`data-tdk-copy`), so code blocks inside rendered doc comments work too
+- * and code blocks stay server components.
++ * and code blocks stay server components. Clicking a `#` anchor also copies
++ * the link to that section or member.
+  */
+ export function CopyHandler() {
+   useEffect(() => {
+     function onClick(event: MouseEvent) {
++      const anchor = (
++        event.target as Element | null
++      )?.closest<HTMLAnchorElement>("a.tdk-anchor");
++
++      if (anchor) {
++        // The browser still follows the link, so the address bar updates too.
++        void navigator.clipboard.writeText(anchor.href).then(() => {
++          anchor.dataset.copied = "";
++          setTimeout(() => {
++            delete anchor.dataset.copied;
++          }, 1500);
++        });
++        return;
++      }
++
+       const button = (event.target as Element | null)?.closest<HTMLElement>(
+         "[data-tdk-copy]",
+       );
+diff --git a/tools/typedoc-react-output/src/themes/default/kind-icon.tsx b/tools/typedoc-react-output/src/themes/default/kind-icon.tsx
+index 2682c95..f2b5867 100644
+--- a/tools/typedoc-react-output/src/themes/default/kind-icon.tsx
++++ b/tools/typedoc-react-output/src/themes/default/kind-icon.tsx
+@@ -7,6 +7,7 @@ const LETTERS: Record<string, string> = {
+   enum: "E",
+   "enum-member": "E",
+   function: "F",
++  guide: "G",
+   "index-signature": "S",
+   interface: "I",
+   method: "M",
+@@ -15,6 +16,7 @@ const LETTERS: Record<string, string> = {
+   parameter: "P",
+   property: "P",
+   reference: "R",
++  section: "#",
+   "type-alias": "T",
+   "type-literal": "T",
+   "type-parameter": "T",
+diff --git a/tools/typedoc-react-output/src/themes/default/member.tsx b/tools/typedoc-react-output/src/themes/default/member.tsx
+index e8b590b..3258df9 100644
+--- a/tools/typedoc-react-output/src/themes/default/member.tsx
++++ b/tools/typedoc-react-output/src/themes/default/member.tsx
+@@ -31,7 +31,8 @@ export function MemberCard({ member }: { readonly member: ApiMember }) {
+           <a
+             href={`#${member.anchor}`}
+             className="tdk-anchor"
+-            aria-label={`Link to ${member.name}`}
++            aria-label={`Copy link to ${member.name}`}
++            title="Copy link"
+           >
+             #
+           </a>
+diff --git a/tools/typedoc-react-output/src/themes/default/pages.tsx b/tools/typedoc-react-output/src/themes/default/pages.tsx
+index 79eabd4..ad58218 100644
+--- a/tools/typedoc-react-output/src/themes/default/pages.tsx
++++ b/tools/typedoc-react-output/src/themes/default/pages.tsx
+@@ -434,7 +434,8 @@ function SectionHeading({
+       <a
+         href={`#${id}`}
+         className="tdk-anchor"
+-        aria-label="Link to this section"
++        aria-label="Copy link to this section"
++        title="Copy link"
+       >
+         #
+       </a>
+diff --git a/tools/typedoc-react-output/src/themes/default/search.tsx b/tools/typedoc-react-output/src/themes/default/search.tsx
+index 0a6be89..db71e03 100644
+--- a/tools/typedoc-react-output/src/themes/default/search.tsx
++++ b/tools/typedoc-react-output/src/themes/default/search.tsx
+@@ -74,8 +74,20 @@ function search(entries: readonly ApiSearchEntry[], query: string) {
+     .map((result) => result.entry);
+ }
+
+-/** Search box for the sidebar: opens a palette with ⌘K, Ctrl+K or `/`. */
+-export function Search({ label }: { readonly label: string }) {
++/**
++ * Search box: opens a palette with ⌘K, Ctrl+K or `/`. It searches the API
++ * index plus any `extraEntries`, such as a site's guide pages. Entries of
++ * kind `guide` and `section` show as "Page › Section".
++ *
++ * Render one per page: each instance listens for the shortcut.
++ */
++export function Search({
++  label,
++  extraEntries = [],
++}: {
++  readonly label: string;
++  readonly extraEntries?: readonly ApiSearchEntry[];
++}) {
+   const router = useRouter();
+   const id = useId();
+   const dialogRef = useRef<HTMLDialogElement>(null);
+@@ -90,7 +102,7 @@ export function Search({ label }: { readonly label: string }) {
+   const results = entries ? search(entries, query) : [];
+
+   function open() {
+-    void loadSearchIndex().then(setEntries);
++    void loadSearchIndex().then((api) => setEntries([...extraEntries, ...api]));
+     dialogRef.current?.showModal();
+     inputRef.current?.select();
+   }
+@@ -232,7 +244,8 @@ export function Search({ label }: { readonly label: string }) {
+                       >
+                         {entry.parent && (
+                           <span className="tdk-search-parent">
+-                            {entry.parent}.
++                            {entry.parent}
++                            {entry.kind === "section" ? " › " : "."}
+                           </span>
+                         )}
+                         {entry.name}
+diff --git a/tools/typedoc-react-output/src/themes/default/sidebar.tsx b/tools/typedoc-react-output/src/themes/default/sidebar.tsx
+index 6f25baf..d7e67ec 100644
+--- a/tools/typedoc-react-output/src/themes/default/sidebar.tsx
++++ b/tools/typedoc-react-output/src/themes/default/sidebar.tsx
+@@ -3,6 +3,7 @@
+ import Link from "next/link";
+ import { useEffect, useRef, useState } from "react";
+
++import { config } from "../_generated/config";
+ import type { ApiProject } from "../_generated/model";
+ import { KindIcon } from "./kind-icon";
+ import { Search } from "./search";
+@@ -53,7 +54,7 @@ export function Sidebar({
+           {project.name}
+         </Link>
+
+-        <Search label="the API" />
++        {config.features.search && <Search label="the API" />}
+
+         <nav aria-label="API reference" onClick={() => setOpen(false)}>
+           {groups.map((group) => (
+diff --git a/tools/typedoc-react-output/test/fixtures/full/index.ts b/tools/typedoc-react-output/test/fixtures/full/index.ts
+index a651d1d..d5b58ed 100644
+--- a/tools/typedoc-react-output/test/fixtures/full/index.ts
++++ b/tools/typedoc-react-output/test/fixtures/full/index.ts
+@@ -48,6 +48,12 @@ export class Store {
+   legacy(): void {}
+ }
+
++/** Something went wrong in a {@link Store}. */
++export class StoreError extends Error {}
++
++/** No item has that key. */
++export class NotFoundError extends StoreError {}
++
+ /**
+  * A store from before {@link Store}.
+  *
+diff --git a/tools/typedoc-react-output/test/generate.test.js b/tools/typedoc-react-output/test/generate.test.js
+index 9ee697a..36339db 100644
+--- a/tools/typedoc-react-output/test/generate.test.js
++++ b/tools/typedoc-react-output/test/generate.test.js
+@@ -49,6 +49,7 @@ async function generate(fixture, reactOutput = {}) {
+   app.logger.log = (message, level) => {
+     if (level === LogLevel.Error) {
+       errors.push(String(message));
++      return;
+     }
+     log(message, level);
+   };
+@@ -179,6 +180,23 @@ describe("a project with deprecations and @since tags", () => {
+     expect(await readPage(output, "classes/OldStore")).toMatch(/usedBy: \[\]/u);
+   });
+
++  it("puts Error subclasses in their own group after Classes", () => {
++    const groups = Object.fromEntries(
++      project.navigation.map((group) => [
++        group.title,
++        group.items.map((item) => item.name),
++      ]),
++    );
++
++    expect(project.navigation.map((group) => group.title)).toEqual([
++      "Classes",
++      "Errors",
++      "Interfaces",
++    ]);
++    expect(groups.Classes).toEqual(["OldStore", "Store"]);
++    expect(groups.Errors).toEqual(["NotFoundError", "StoreError"]);
++  });
++
+   it("collects the newest @since version", () => {
+     expect(project.newIn.version).toBe("1.1.0");
+     expect(project.newIn.items.map((item) => item.name).toSorted()).toEqual([
+@@ -230,6 +248,18 @@ describe("a project with no deprecations or @since tags", () => {
+   });
+ });
+
++describe("features.errorGroup: false", () => {
++  it("keeps error classes in Classes", async () => {
++    const output = await generate("full", { features: { errorGroup: false } });
++    const { project } = await load(output, "project.ts");
++
++    expect(project.navigation.map((group) => group.title)).toEqual([
++      "Classes",
++      "Interfaces",
++    ]);
++  }, 120_000);
++});
++
+ describe("components.overrides", () => {
+   it("copies the site's files over the theme and skips markdown", async () => {
+     const overrides = await mkdtemp(join(tmpdir(), "react-output-overrides-"));

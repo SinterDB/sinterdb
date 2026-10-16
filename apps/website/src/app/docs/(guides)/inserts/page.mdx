@@ -1,0 +1,91 @@
+export const metadata = {
+  title: "Inserts",
+  description:
+    "Insert one or many documents, get their ids back, and handle duplicate keys and partial failures.",
+};
+
+# Inserts
+
+Inserting creates the database and collection if they don't exist yet.
+
+## Insert one document
+
+```ts
+const result = await users.insertOne({
+  email: "kage@example.com",
+  name: "Kage",
+  age: 30,
+});
+
+result.insertedId; // the new document's _id
+```
+
+If the document has no `_id`, the server generates one and returns it in `insertedId`. To choose the id yourself, pass a <Api name="CustomId" />:
+
+```ts
+import { CustomId } from "sinterdb";
+
+await users.insertOne({ _id: CustomId.generate(), name: "Rin" });
+```
+
+## Insert many documents
+
+```ts
+const result = await users.insertMany([
+  { name: "Rin", age: 22 },
+  { name: "Sora", age: 41 },
+]);
+
+result.insertedCount; // 2
+result.insertedIds; // one _id per document, in input order
+```
+
+Documents are inserted in order. An empty array is rejected.
+
+## When an insert fails
+
+Inserting a document whose `_id`, or a value in a unique index, already exists fails with a <Api name="SinterServerError" /> named `DuplicateKey`:
+
+```ts
+import { SinterServerError } from "sinterdb";
+
+try {
+  await users.insertOne({ email: "kage@example.com", name: "Kage again" });
+} catch (error) {
+  if (
+    error instanceof SinterServerError &&
+    error.serverErrorName === "DuplicateKey"
+  ) {
+    // That email is taken
+  }
+}
+```
+
+`insertMany` stops at the first document that fails. The documents before it **stay inserted**, and the error is a <Api name="SinterInsertManyError" /> that says how far it got:
+
+```ts
+import { SinterInsertManyError } from "sinterdb";
+
+try {
+  await users.insertMany(newUsers);
+} catch (error) {
+  if (error instanceof SinterInsertManyError) {
+    error.failedIndex; // position of the document that failed
+    error.insertedIds; // ids of the documents inserted before it
+  }
+}
+```
+
+There are no transactions yet, so to make a batch all-or-nothing you have to remove the inserted documents yourself.
+
+## Invalid documents
+
+A document with a value SinterDB can't store, such as `undefined`, a function or a `Map`, fails before anything is sent, with a <Api name="SinterDocumentError" />. See [Documents](/docs/documents#supported-values) for what can be stored.
+
+## Size
+
+A whole request is limited to 16 MiB, so all the documents in one `insertMany` have to fit together. Insert large sets in several calls.
+
+## When is it saved?
+
+An insert resolves when the server acknowledges it, and the server's write concern decides when that is. With the default, `flushed`, the data is on stable storage by then and survives a crash or power loss. Faster levels exist for data you can recreate. See [configuration.md](https://github.com/SinterDB/sinterdb/blob/main/docs/configuration.md#write-concern).

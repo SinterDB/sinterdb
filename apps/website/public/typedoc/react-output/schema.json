@@ -137,6 +137,16 @@
           "type": "boolean",
           "default": false,
           "description": "Show members inherited from outside the project, such as Error.stack."
+        },
+        "errorGroup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show classes that extend Error in their own \"Errors\" group after \"Classes\", in the sidebar and on the index page."
+        },
+        "search": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the search box in the sidebar. Turn it off when the site renders its own Search component, such as in a shared header."
         }
       }
     },

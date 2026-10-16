@@ -1,0 +1,113 @@
+export const metadata = {
+  title: "Collections",
+  description:
+    "Get typed collection handles, count documents, read distinct values, and manage indexes.",
+};
+
+# Collections
+
+A collection is a group of documents inside a database. Most of the driver's API lives on <Api name="SinterCollection" />.
+
+## Get a collection
+
+<Api name="SinterDatabase.collection">db.collection()</Api> returns a handle.
+Give it your document type, and filters, updates and results are type-checked
+against it.
+
+```ts app.ts
+import { type CustomId, SinterClient } from "sinterdb";
+
+interface User {
+  _id: CustomId;
+  email: string;
+  name: string;
+  age: number;
+  tags: string[];
+}
+
+const client = new SinterClient("sinterdb://localhost/my-app");
+await client.connect();
+
+const users = client.db().collection<User>("users");
+```
+
+No request is sent. Like databases, a collection is created by the first write: an insert, or `createIndex`. Until then, reads return no documents rather than an error.
+
+The type parameter is checked by TypeScript only. The server does not validate documents against a schema, so a document written without types, or by another program, can have any shape.
+
+## Counting
+
+```ts
+const total = await users.estimatedDocumentCount();
+const adults = await users.countDocuments({ age: { $gte: 18 } });
+```
+
+| Method                                                                             | What it counts                                              |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| <Api name="SinterCollection.countDocuments">countDocuments(filter)</Api>           | Documents that match the filter, counted on the server.     |
+| <Api name="SinterCollection.estimatedDocumentCount">estimatedDocumentCount()</Api> | Every document, from the collection's size, without a scan. |
+
+Neither transfers documents. Without a filter, `countDocuments()` counts the whole collection.
+
+## Distinct values
+
+<Api name="SinterCollection.distinct">distinct(field, filter)</Api> returns each
+value of a field once, among the documents that match the filter.
+
+```ts
+const ages = await users.distinct("age");
+// [17, 25, 31]
+
+const adultTags = await users.distinct("tags", { age: { $gte: 18 } });
+// ["admin", "beta"]
+```
+
+- A field that holds an array contributes its elements, so `tags` returns tags, not arrays of tags.
+- Documents without the field contribute nothing. A field holding `null` contributes `null`.
+- Values come back in [sort order](/docs/sorting#how-values-sort), and are distinct by exact equality, so `1` and `1n` are two values.
+
+## Indexes
+
+An index lets the server find matching documents without reading the whole collection. Every collection has a unique index on `_id`. Index the fields you filter on often.
+
+```ts
+await users.createIndex({ field: "email", unique: true });
+await users.createIndex({
+  keys: [
+    ["name", 1],
+    ["age", -1],
+  ],
+});
+
+const indexes = await users.indexes();
+await users.dropIndex("name_1_age_-1");
+```
+
+| Option   | Meaning                                                                |
+| -------- | ---------------------------------------------------------------------- |
+| `field`  | One field to index. Dotted paths reach into nested documents.          |
+| `keys`   | One to eight `[field, direction]` pairs for a compound index.          |
+| `unique` | At most one document may hold a given value, or combination of values. |
+| `sparse` | Documents without the field are left out of the index.                 |
+| `name`   | Defaults to the fields and directions, such as `email_1`.              |
+
+Give either `field` or `keys`, not both. Creating an identical index again succeeds and reports `created: false`. A unique index fails with a `DuplicateKey` server error if existing documents already break it.
+
+<Callout title="Unique indexes and missing fields" tone="warning">
+  A unique index counts a missing field as a value, so only one document can
+  lack it. If the field is optional, add `sparse: true`: documents without it
+  are left out of the index and never conflict.
+</Callout>
+
+An index can serve equality, `$in`, and range filters. It never changes what a query returns, only how fast. Sorting is not served by indexes. The full rules, including how compound indexes are chosen, are in [indexes.md](https://github.com/SinterDB/sinterdb/blob/main/docs/indexes.md).
+
+<Callout title="Building an index pauses the server" tone="neutral">
+  The server does all its work on one thread. Creating an index on a large
+  collection delays other clients until the index is built.
+</Callout>
+
+## Names
+
+Collection names must not be empty, must not contain null characters, and can be at most 255 bytes. Unlike database names, they may contain `/` and `\`.
+
+You cannot drop or rename a collection yet. `deleteMany({})` removes every document and leaves the empty collection, with its indexes.

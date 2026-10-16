@@ -1,0 +1,67 @@
+export const metadata = {
+  title: "Databases",
+  description:
+    "Select a database, list the databases on a server, and understand how databases are created.",
+};
+
+# Databases
+
+A server holds any number of databases, and each database holds collections. You select a database through the client.
+
+## Select a database
+
+<Api name="SinterClient.db">client.db()</Api> returns a handle to a database.
+With no argument, it uses the database named in the connection string.
+
+```ts app.ts
+import { SinterClient } from "sinterdb";
+
+const client = new SinterClient("sinterdb://localhost/my-app");
+await client.connect();
+
+const app = client.db(); // "my-app", from the connection string
+const reports = client.db("reports"); // any other database
+```
+
+Calling `db()` with no name when the connection string has no database throws a <Api name="SinterNamespaceError" />. Getting a handle sends nothing to the server, so it is cheap to call wherever you need one.
+
+## Databases are created by writing
+
+There is no `createDatabase`. A database appears the first time you write to one of its collections, by inserting a document or creating an index.
+
+```ts
+const db = client.db("new-app");
+
+await db.collection("events").insertOne({ type: "signup" });
+// "new-app" now exists
+```
+
+Reading from a database that does not exist is not an error. It simply has no collections and no documents.
+
+## List databases and collections
+
+```ts
+const databases = await client.listDatabases();
+// ["my-app", "new-app", "reports"]
+
+const collections = await client.db().listCollections();
+// ["events", "users"]
+```
+
+Both return names only, as plain strings. See <Api name="SinterClient.listDatabases" /> and <Api name="SinterDatabase.listCollections" />.
+
+## Names
+
+| Rule       | Detail                                    |
+| ---------- | ----------------------------------------- |
+| Not empty  | Whitespace-only names are rejected too.   |
+| Characters | No `/`, `\`, or null characters.          |
+| Length     | At most 255 bytes, checked by the server. |
+
+The driver checks the first two rules when you call `db()`, before anything is sent. The length limit is checked by the server, so a name that is too long fails on the first write with a <Api name="SinterServerError" />.
+
+<Callout title="Dropping and renaming" tone="neutral">
+  You cannot drop or rename a database yet. To empty a collection, use
+  `deleteMany({})`. To remove all data, stop the server and delete its data
+  directory.
+</Callout>

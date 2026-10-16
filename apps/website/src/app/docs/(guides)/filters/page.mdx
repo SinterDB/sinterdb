@@ -1,0 +1,115 @@
+export const metadata = {
+  title: "Filters",
+  description:
+    "Match documents by equality, comparison, logic, nested fields, and array contents.",
+};
+
+# Filters
+
+A filter chooses documents. `find`, `findOne`, `countDocuments`, `distinct`, updates and deletes all take one, and they all match documents the same way.
+
+## Equality
+
+A filter is an object of fields and values. A document matches when every field equals its value.
+
+```ts
+await users.find({ name: "Kage", age: 30 }).toArray();
+await users.find({}).toArray(); // every document
+```
+
+Equality is exact, so values must have the same type: `{ age: 30 }` does not match `"30"`, and `1` does not match `1n`. Nested objects match when they have the same fields with equal values, in any key order.
+
+## Comparison operators
+
+| Operator      | Matches when the field…                  |
+| ------------- | ---------------------------------------- |
+| `$eq`         | equals the value                         |
+| `$ne`         | does not equal the value, or is missing  |
+| `$gt`, `$gte` | is greater than (or equal to) the value  |
+| `$lt`, `$lte` | is less than (or equal to) the value     |
+| `$in`         | equals any value in the list             |
+| `$nin`        | equals none of the values, or is missing |
+| `$exists`     | is present (`true`) or missing (`false`) |
+
+```ts
+await users.find({ age: { $gte: 18, $lt: 65 } }).toArray();
+await users.find({ role: { $in: ["admin", "owner"] } }).toArray();
+await users.find({ deletedAt: { $exists: false } }).toArray();
+```
+
+Range operators only compare values of the same type. `{ age: { $gt: 18 } }` never matches a string, and a number never matches a bigint. Strings compare by Unicode code point, with no case folding: `"B"` comes before `"a"`.
+
+<Callout title="null is not missing" tone="neutral">
+  `{ nickname: null }` matches only documents where `nickname` is set to `null`. Use `{ nickname: { $exists: false } }` for documents without the field.
+</Callout>
+
+## Combining conditions
+
+Fields in one filter are joined by AND. For anything else, use the logical operators:
+
+```ts
+await users
+  .find({
+    $or: [{ role: "admin" }, { age: { $gte: 65 } }],
+  })
+  .toArray();
+
+await users.find({ age: { $not: { $gte: 18 } } }).toArray();
+```
+
+| Operator | Matches when                                       |
+| -------- | -------------------------------------------------- |
+| `$and`   | every filter in the list matches                   |
+| `$or`    | at least one filter matches                        |
+| `$nor`   | no filter matches                                  |
+| `$not`   | the field does not satisfy the operators inside it |
+
+`$and`, `$or` and `$nor` take a non-empty array. `$not` also matches a missing field, or one of another type, since the operator inside didn't match it.
+
+## Nested fields
+
+A dotted path reaches into nested documents:
+
+```ts
+await users.find({ "address.city": "Paris" }).toArray();
+```
+
+A path through something that isn't a document doesn't match. TypeScript checks dotted paths against your document type, so a typo is a compile error.
+
+## Arrays
+
+A filter on an array field looks at the array's elements as well as the array itself:
+
+```ts
+// tags: ["admin", "beta"]
+await users.find({ tags: "admin" }).toArray(); // matches: one element is "admin"
+await users.find({ tags: ["admin", "beta"] }).toArray(); // matches: the exact array
+await users.find({ scores: { $gt: 90 } }).toArray(); // any element above 90
+```
+
+Each condition on an array is checked on its own. `{ scores: { $gt: 90, $lt: 95 } }` matches `[80, 99]`, because one element is above 90 and another is below 95. To require one element to meet every condition, use `$elemMatch`:
+
+```ts
+await users.find({ scores: { $elemMatch: { $gt: 90, $lt: 95 } } }).toArray();
+
+await orders
+  .find({
+    items: { $elemMatch: { sku: "a-1", qty: { $gte: 2 } } },
+  })
+  .toArray();
+```
+
+| Operator     | Matches when                                    |
+| ------------ | ----------------------------------------------- |
+| `$elemMatch` | one element satisfies every condition inside it |
+| `$size`      | the array has exactly this many elements        |
+
+Paths step through arrays too. `"items.sku"` checks the `sku` of every element, and a number picks one position: `"items.0.sku"` is the first item's `sku`.
+
+`$ne` and `$nin` are the exact opposites of `$eq` and `$in`, so `{ tags: { $ne: "admin" } }` does **not** match `["admin", "beta"]`.
+
+## Not supported yet
+
+`$regex`, `$all`, `$type`, `$mod`, `$expr`, `$text` and `$where` are rejected by the server. There is no full-text or geospatial search.
+
+The complete matching rules, with a tested example for each case, are in [query-semantics.md](https://github.com/SinterDB/sinterdb/blob/main/docs/query-semantics.md). The filter types are <Api name="Filter" /> and <Api name="FilterOperators" />.

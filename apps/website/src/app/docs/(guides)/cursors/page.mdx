@@ -1,0 +1,95 @@
+export const metadata = {
+  title: "Cursors",
+  description:
+    "Read query results with find and findOne, iterate cursors, choose fields with projections, and close cursors.",
+};
+
+# Cursors
+
+`find` returns a <Api name="FindCursor" />, a lazy handle to the results. Nothing is sent to the server until you read from it, and documents arrive in batches.
+
+## Read the results
+
+There are three ways to read a cursor:
+
+```ts
+// All at once
+const all = await users.find({ active: true }).toArray();
+
+// One at a time, with for await
+for await (const user of users.find({ active: true })) {
+  console.log(user.name);
+}
+
+// Manually
+const cursor = users.find({ active: true });
+while (await cursor.hasNext()) {
+  const user = await cursor.next();
+}
+```
+
+`toArray()` loads every result into memory. For large results, prefer `for await`, which only holds one batch at a time.
+
+## Find one document
+
+<Api name="SinterCollection.findOne">findOne</Api> returns the first match, or
+`null`. It doesn't need closing.
+
+```ts
+const user = await users.findOne({ email: "kage@example.com" });
+
+if (user) {
+  console.log(user._id.toHexString());
+}
+```
+
+## Close what you don't finish
+
+The server keeps state for an open cursor. `toArray()` and `for await` release it for you, even when you `break` out of the loop or an error is thrown. If you read with `next()` and stop early, call `close()`:
+
+```ts
+const cursor = users.find({}, { sort: [["age", -1]] });
+
+try {
+  const oldest = await cursor.next();
+} finally {
+  await cursor.close();
+}
+```
+
+An idle cursor expires on the server after 10 minutes. A cursor also belongs to its connection, so it is released when the client closes.
+
+## Choose fields
+
+A projection picks which fields come back. Include fields with `1`, or exclude them with `0`:
+
+```ts
+const names = await users
+  .find({}, { projection: { name: 1, email: 1 } })
+  .toArray();
+// [{ _id, name, email }, ...]
+
+const safe = await users.findOne({}, { projection: { passwordHash: 0 } });
+```
+
+- `_id` is included unless you set it to `0`, which works in both kinds: `{ name: 1, _id: 0 }`.
+- You cannot mix including and excluding other fields in one projection.
+- Dotted paths keep the nesting: `{ "address.city": 1 }` returns `{ address: { city } }`.
+- The projection is applied after sorting, so you can sort by a field you don't return.
+
+When the projection is written inline, the result type follows it: `names` above is typed with just `_id`, `name` and `email`.
+
+## Batch size
+
+```ts
+users.find({}, { batchSize: 500 });
+```
+
+The cursor fetches `batchSize` documents per round trip, from 1 to 10,000. The default is 100. Larger batches mean fewer round trips but more memory per batch.
+
+## Things to know
+
+- **A cursor is not a snapshot.** It reads the collection as it goes, so documents written while you iterate may or may not appear.
+- **Ask how a query runs.** `cursor.explain()` returns the plan the server would use, such as which index, without running the query. Its shape may change between releases.
+
+The options are <Api name="FindOptions" />, and the projection type is <Api name="Projection" />.

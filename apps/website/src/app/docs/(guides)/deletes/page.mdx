@@ -1,0 +1,49 @@
+export const metadata = {
+  title: "Deletes",
+  description: "Delete one or many documents that match a filter.",
+};
+
+# Deletes
+
+## Delete one or many
+
+```ts
+await users.deleteOne({ email: "kage@example.com" });
+
+const result = await sessions.deleteMany({ expiresAt: { $lt: new Date() } });
+result.deletedCount; // how many were removed
+```
+
+<Api name="SinterCollection.deleteOne">deleteOne</Api> removes the first
+document that matches. <Api name="SinterCollection.deleteMany">deleteMany</Api>
+removes every match. Both return a <Api name="DeleteResult" />. Deleting when
+nothing matches is not an error: `deletedCount` is `0`.
+
+To delete one specific document, filter by its `_id`:
+
+```ts
+await users.deleteOne({ _id: user._id });
+```
+
+## Empty a collection
+
+An empty filter matches every document:
+
+```ts
+await logs.deleteMany({});
+```
+
+The collection itself stays, empty, along with its indexes. You can't drop a collection or a database yet.
+
+<Callout title="Double-check the filter" tone="warning">
+  `deleteMany({})` deletes everything, and there's no undo. Building filters in
+  code? Make sure an empty value doesn't turn into `{}` by accident.
+</Callout>
+
+## Atomicity
+
+A `deleteMany` removes every matching document or none, never part of them. Separate commands aren't grouped into transactions, so another client can write between two of your deletes.
+
+## Getting space back
+
+Deleted documents are gone from queries right away. Disk space comes back gradually, as the server takes new checkpoints and removes log files it no longer needs. It keeps the two newest snapshots, so this takes more than one checkpoint. See [storage.md](https://github.com/SinterDB/sinterdb/blob/main/docs/storage.md#checkpoints-and-compaction) for the details.

@@ -50,7 +50,9 @@
       "pageNavigation": true,
       "sourceLinks": true,
       "comments": true,
-      "externalInherited": false
+      "externalInherited": false,
+      "errorGroup": true,
+      "search": false
     },
     "theme": {
       "name": "default",

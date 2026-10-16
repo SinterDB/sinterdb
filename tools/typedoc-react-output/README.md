@@ -23,7 +23,7 @@ Used by `tools/api-docs` to generate `apps/website/src/app/docs/api`.
 }
 ```
 
-Every option is described in [`schema.json`](./schema.json).
+Every option is described in the [JSON schema](https://sinterdb.vercel.app/typedoc/react-output/schema.json), which also gives editors autocomplete in `typedoc.json`. Its source is `apps/website/public/typedoc/react-output/schema.json`.
 
 ## What the pages include
 

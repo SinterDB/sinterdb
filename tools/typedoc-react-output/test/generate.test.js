@@ -49,6 +49,7 @@ async function generate(fixture, reactOutput = {}) {
   app.logger.log = (message, level) => {
     if (level === LogLevel.Error) {
       errors.push(String(message));
+      return;
     }
     log(message, level);
   };
@@ -179,6 +180,23 @@ describe("a project with deprecations and @since tags", () => {
     expect(await readPage(output, "classes/OldStore")).toMatch(/usedBy: \[\]/u);
   });
 
+  it("puts Error subclasses in their own group after Classes", () => {
+    const groups = Object.fromEntries(
+      project.navigation.map((group) => [
+        group.title,
+        group.items.map((item) => item.name),
+      ]),
+    );
+
+    expect(project.navigation.map((group) => group.title)).toEqual([
+      "Classes",
+      "Errors",
+      "Interfaces",
+    ]);
+    expect(groups.Classes).toEqual(["OldStore", "Store"]);
+    expect(groups.Errors).toEqual(["NotFoundError", "StoreError"]);
+  });
+
   it("collects the newest @since version", () => {
     expect(project.newIn.version).toBe("1.1.0");
     expect(project.newIn.items.map((item) => item.name).toSorted()).toEqual([
@@ -228,6 +246,18 @@ describe("a project with no deprecations or @since tags", () => {
   it("generates data that type-checks", () => {
     expect(typeErrors(output)).toEqual([]);
   });
+});
+
+describe("features.errorGroup: false", () => {
+  it("keeps error classes in Classes", async () => {
+    const output = await generate("full", { features: { errorGroup: false } });
+    const { project } = await load(output, "project.ts");
+
+    expect(project.navigation.map((group) => group.title)).toEqual([
+      "Classes",
+      "Interfaces",
+    ]);
+  }, 120_000);
 });
 
 describe("components.overrides", () => {

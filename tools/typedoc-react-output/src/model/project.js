@@ -1,3 +1,5 @@
+import { ReflectionKind } from "typedoc";
+
 import { createCommentModel } from "./comments.js";
 import { createHierarchyForest } from "./hierarchy.js";
 import { createAnchor, getKindLabel, getKindName } from "./navigation.js";
@@ -10,7 +12,7 @@ export function createProjectModel(ctx) {
   const { project } = ctx;
   const pageById = new Map(ctx.pages.map((plan) => [plan.reflection.id, plan]));
 
-  const groups = (project.groups ?? [])
+  const groups = splitErrorGroup(project.groups ?? [], ctx)
     .map((group) => ({
       id: createAnchor(group.title),
       title: group.title,
@@ -84,6 +86,63 @@ export function createProjectModel(ctx) {
     pages,
     search,
   };
+}
+
+/**
+ * Moves classes that extend `Error` out of "Classes" into an "Errors" group
+ * right after it, so the classes people use most aren't buried among error
+ * types. Turned off with `features.errorGroup: false`.
+ *
+ * @param {import("typedoc").ReflectionGroup[]} groups
+ * @param {import("./context.js").ModelContext} ctx
+ */
+function splitErrorGroup(groups, ctx) {
+  if (!ctx.options.features.errorGroup) {
+    return groups;
+  }
+
+  return groups.flatMap((group) => {
+    if (!group.children.every((child) => child.kindOf(ReflectionKind.Class))) {
+      return [group];
+    }
+
+    const errors = group.children.filter(isErrorClass);
+
+    if (errors.length === 0 || errors.length === group.children.length) {
+      return [group];
+    }
+
+    return [
+      {
+        title: group.title,
+        children: group.children.filter((child) => !errors.includes(child)),
+      },
+      { title: "Errors", children: errors },
+    ];
+  });
+}
+
+/** Whether a class extends `Error`, directly or through other classes. */
+function isErrorClass(reflection) {
+  let type = reflection.extendedTypes?.[0];
+  const seen = new Set();
+
+  while (type?.type === "reference") {
+    const parent = type.reflection;
+
+    if (!parent) {
+      return type.name === "Error";
+    }
+
+    if (seen.has(parent.id) || !parent.isDeclaration()) {
+      return false;
+    }
+
+    seen.add(parent.id);
+    type = parent.extendedTypes?.[0];
+  }
+
+  return false;
 }
 
 /**

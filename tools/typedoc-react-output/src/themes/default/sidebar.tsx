@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { config } from "../_generated/config";
 import type { ApiProject } from "../_generated/model";
 import { KindIcon } from "./kind-icon";
 import { Search } from "./search";
@@ -53,7 +54,7 @@ export function Sidebar({
           {project.name}
         </Link>
 
-        <Search label="the API" />
+        {config.features.search && <Search label="the API" />}
 
         <nav aria-label="API reference" onClick={() => setOpen(false)}>
           {groups.map((group) => (
