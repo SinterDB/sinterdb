@@ -24,7 +24,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "markdown-it": "^15.0.2",
+    "markdown-it": "^15.0.3",
     "shiki": "^4.5.0"
   },
   "peerDependencies": {
@@ -40,7 +40,7 @@
     "@types/node": "catalog:",
     "prettier": "^3.9.10",
     "typedoc": "^0.28.20",
-    "typescript": "~6.0.0",
+    "typescript": "~7.0.2",
     "vitest": "catalog:"
   }
 }
