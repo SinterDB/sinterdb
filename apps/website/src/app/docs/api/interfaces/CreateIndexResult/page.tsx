@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 770,
+  id: 784,
   name: "CreateIndexResult",
   kind: "interface",
   label: "Interface",
@@ -35,7 +35,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 771,
+          id: 785,
           name: "acknowledged",
           anchor: "acknowledged",
           kind: "property",
@@ -69,7 +69,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 773,
+          id: 787,
           name: "created",
           anchor: "created",
           kind: "property",
@@ -102,7 +102,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 772,
+          id: 786,
           name: "name",
           anchor: "name",
           kind: "property",

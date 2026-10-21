@@ -6,6 +6,8 @@ import {
 } from "sinterdb-protocol";
 
 import type { AggregateOptions, AggregationStage } from "./aggregation.js";
+import type { QueryBudgetOptions } from "./budget.js";
+import { budgetParameters } from "./budget.js";
 import { AggregateCursor, FindCursor } from "./cursor.js";
 import type { SinterDatabase } from "./database.js";
 import {
@@ -74,7 +76,7 @@ export type DistinctValue<
 export interface FindOneOptions<
   TDocument extends object = Document,
   TProjection extends Projection<TDocument> | undefined = undefined,
-> {
+> extends QueryBudgetOptions {
   /**
    * The fields to return. See {@link Projection}. The result type follows the
    * projection when it is written inline.
@@ -86,7 +88,7 @@ export interface FindOneOptions<
 export interface FindOptions<
   TDocument extends object = Document,
   TProjection extends Projection<TDocument> | undefined = undefined,
-> {
+> extends QueryBudgetOptions {
   /**
    * How many documents the cursor fetches from the server per round trip.
    */
@@ -229,6 +231,7 @@ export class SinterCollection<TDocument extends object = Document> {
       ...(options.projection === undefined
         ? {}
         : { projection: options.projection as unknown as Document }),
+      ...budgetParameters(options),
     });
 
     return parseFindOneResult<ProjectedDocument<TDocument, TProjection>>(
@@ -244,10 +247,12 @@ export class SinterCollection<TDocument extends object = Document> {
    */
   public async countDocuments(
     filter: Filter<TDocument> = {} as Filter<TDocument>,
+    options: QueryBudgetOptions = {},
   ): Promise<number> {
     const value = await this.execute("count", {
       collection: this.name,
       filter: filter as unknown as Document,
+      ...budgetParameters(options),
     });
 
     return parseCountResult(value);
@@ -272,11 +277,13 @@ export class SinterCollection<TDocument extends object = Document> {
   public async distinct<TField extends FilterPaths<TDocument> | "_id">(
     field: TField,
     filter: Filter<TDocument> = {} as Filter<TDocument>,
+    options: QueryBudgetOptions = {},
   ): Promise<DistinctValue<TDocument, TField>[]> {
     const value = await this.execute("distinct", {
       collection: this.name,
       field,
       filter: filter as unknown as Document,
+      ...budgetParameters(options),
     });
 
     return parseDistinctResult<DistinctValue<TDocument, TField>>(value);
@@ -439,6 +446,7 @@ export class SinterCollection<TDocument extends object = Document> {
         ...(options.projection === undefined
           ? {}
           : { projection: options.projection as unknown as Document }),
+        ...budgetParameters(options),
       },
     );
   }
@@ -469,13 +477,14 @@ export class SinterCollection<TDocument extends object = Document> {
       this.name,
       pipeline as unknown as readonly Document[],
       options.batchSize,
+      options,
     );
   }
 
   /**
-   * Sends a command, first checking that the server understands a projection
-   * if the command carries one. An older server would ignore it and return
-   * whole documents.
+   * Sends a command, first checking that the server understands the
+   * projection, aggregation or query budget the command carries. An older
+   * server would ignore a projection or a budget and carry on without it.
    */
   private execute(
     command: string,
@@ -490,6 +499,20 @@ export class SinterCollection<TDocument extends object = Document> {
       return Promise.reject(
         new SinterCompatibilityError(
           "The server does not support projection. Upgrade the server to 0.3.0 or later, or remove the projection option.",
+        ),
+      );
+    }
+
+    if (
+      (parameters["maxTimeMS"] !== undefined ||
+        parameters["maxScanned"] !== undefined) &&
+      this.database.client.serverInfo?.capabilities.includes(
+        ProtocolCapability.QueryBudgets,
+      ) === false
+    ) {
+      return Promise.reject(
+        new SinterCompatibilityError(
+          "The server does not support query budgets. Upgrade the server to 0.3.0 or later, or remove the maxTimeMS and maxScanned options.",
         ),
       );
     }

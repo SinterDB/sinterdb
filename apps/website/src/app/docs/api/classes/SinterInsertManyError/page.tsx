@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 609,
+  id: 623,
   name: "SinterInsertManyError",
   kind: "class",
   label: "Class",
@@ -72,7 +72,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 619,
+          id: 633,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -84,7 +84,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 620,
+              id: 634,
               code: [
                 ["new ", "kw"],
                 ["SinterInsertManyError", "name"],
@@ -185,7 +185,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 630,
+          id: 644,
           name: "code",
           anchor: "code",
           kind: "property",
@@ -226,7 +226,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 629,
+          id: 643,
           name: "details",
           anchor: "details",
           kind: "property",
@@ -268,7 +268,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 624,
+          id: 638,
           name: "failedIndex",
           anchor: "failed-index",
           kind: "property",
@@ -303,7 +303,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 625,
+          id: 639,
           name: "insertedIds",
           anchor: "inserted-ids",
           kind: "property",
@@ -340,7 +340,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 628,
+          id: 642,
           name: "retryable",
           anchor: "retryable",
           kind: "property",
@@ -381,7 +381,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 627,
+          id: 641,
           name: "serverErrorName",
           anchor: "server-error-name",
           kind: "property",
@@ -424,7 +424,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 626,
+          id: 640,
           name: "wireCode",
           anchor: "wire-code",
           kind: "property",

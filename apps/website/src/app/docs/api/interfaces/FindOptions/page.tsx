@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 329,
+  id: 338,
   name: "FindOptions",
   kind: "interface",
   label: "Interface",
@@ -32,6 +32,8 @@ const page: ApiPage = {
     [" = ", "pn"],
     ["undefined", "prim"],
     [">", "pn"],
+    [" extends ", "kw"],
+    ["QueryBudgetOptions", "ref", "/docs/api/interfaces/QueryBudgetOptions"],
   ],
   comment: {
     summary:
@@ -70,7 +72,23 @@ const page: ApiPage = {
       comment: null,
     },
   ],
-  hierarchy: null,
+  hierarchy: {
+    name: "QueryBudgetOptions",
+    href: "/docs/api/interfaces/QueryBudgetOptions",
+    kind: "interface",
+    deprecated: false,
+    current: false,
+    children: [
+      {
+        name: "FindOptions",
+        href: null,
+        kind: "interface",
+        deprecated: false,
+        current: true,
+        children: [],
+      },
+    ],
+  },
   signatureSection: null,
   signatures: [],
   sections: [
@@ -79,7 +97,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 332,
+          id: 341,
           name: "batchSize",
           anchor: "batch-size",
           kind: "property",
@@ -108,13 +126,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 93,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L93",
+              line: 95,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L95",
             },
           ],
         },
         {
-          id: 335,
+          id: 344,
           name: "limit",
           anchor: "limit",
           kind: "property",
@@ -141,13 +159,95 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 102,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L102",
+              line: 104,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L104",
             },
           ],
         },
         {
-          id: 336,
+          id: 347,
+          name: "maxScanned",
+          anchor: "max-scanned",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["maxScanned", "name"],
+            ["?: ", "pn"],
+            ["number", "prim"],
+          ],
+          comment: {
+            summary:
+              "<p>The most documents the server may examine for the request, counting every\ndocument it reads, not only the ones it returns. An index lowers the\nnumber. A positive integer.</p>",
+            short:
+              "The most documents the server may examine for the request, counting every document it reads, not only the ones it returns. An index lowers the number. A positive integer.",
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [
+            {
+              label: "Inherited from",
+              name: "QueryBudgetOptions.maxScanned",
+              href: "/docs/api/interfaces/QueryBudgetOptions#max-scanned",
+            },
+          ],
+          sources: [
+            {
+              path: "packages/driver/src/budget.ts",
+              line: 28,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L28",
+            },
+          ],
+        },
+        {
+          id: 346,
+          name: "maxTimeMS",
+          anchor: "max-time-ms",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["maxTimeMS", "name"],
+            ["?: ", "pn"],
+            ["number", "prim"],
+          ],
+          comment: {
+            summary:
+              "<p>The most milliseconds the server may spend on the request. The server\nlooks at the clock while it examines documents, so a limit can be passed\nby a little before the request stops, and a long sort or group is not\ninterrupted once its documents are read. A positive integer.</p>\n<p>This is separate from the client's <code>requestTimeoutMS</code>, which gives up\nwaiting for the answer. Keep <code>requestTimeoutMS</code> larger than <code>maxTimeMS</code>,\nor the client may stop waiting first.</p>",
+            short:
+              "The most milliseconds the server may spend on the request. The server looks at the clock while it examines documents, so a limit can be passed by a little before the request stops, and a long sort or group is not interrupted once its documents are read. A positive integer.",
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [
+            {
+              label: "Inherited from",
+              name: "QueryBudgetOptions.maxTimeMS",
+              href: "/docs/api/interfaces/QueryBudgetOptions#max-time-ms",
+            },
+          ],
+          sources: [
+            {
+              path: "packages/driver/src/budget.ts",
+              line: 22,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L22",
+            },
+          ],
+        },
+        {
+          id: 345,
           name: "projection",
           anchor: "projection",
           kind: "property",
@@ -176,13 +276,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 108,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L108",
+              line: 110,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L110",
             },
           ],
         },
         {
-          id: 334,
+          id: 343,
           name: "skip",
           anchor: "skip",
           kind: "property",
@@ -210,13 +310,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 100,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L100",
+              line: 102,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L102",
             },
           ],
         },
         {
-          id: 333,
+          id: 342,
           name: "sort",
           anchor: "sort",
           kind: "property",
@@ -248,8 +348,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 98,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L98",
+              line: 100,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L100",
             },
           ],
         },
@@ -270,6 +370,18 @@ const page: ApiPage = {
         {
           anchor: "limit",
           name: "limit",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "max-scanned",
+          name: "maxScanned",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "max-time-ms",
+          name: "maxTimeMS",
           kind: "property",
           deprecated: false,
         },
@@ -302,8 +414,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 86,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L86",
+      line: 88,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L88",
     },
   ],
   usedBy: [

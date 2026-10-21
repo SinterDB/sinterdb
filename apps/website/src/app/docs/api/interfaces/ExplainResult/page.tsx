@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 774,
+  id: 788,
   name: "ExplainResult",
   kind: "interface",
   label: "Interface",
@@ -36,7 +36,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 780,
+          id: 794,
           name: "access",
           anchor: "access",
           kind: "property",
@@ -75,7 +75,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 784,
+          id: 798,
           name: "documents",
           anchor: "documents",
           kind: "property",
@@ -108,7 +108,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 783,
+          id: 797,
           name: "estimatedCandidates",
           anchor: "estimated-candidates",
           kind: "property",
@@ -141,7 +141,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 777,
+          id: 791,
           name: "field",
           anchor: "field",
           kind: "property",
@@ -175,7 +175,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 778,
+          id: 792,
           name: "fields",
           anchor: "fields",
           kind: "property",
@@ -212,7 +212,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 776,
+          id: 790,
           name: "index",
           anchor: "index-2",
           kind: "property",
@@ -245,7 +245,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 781,
+          id: 795,
           name: "lower",
           anchor: "lower",
           kind: "property",
@@ -278,7 +278,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 779,
+          id: 793,
           name: "prefixLength",
           anchor: "prefix-length",
           kind: "property",
@@ -313,7 +313,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 775,
+          id: 789,
           name: "stage",
           anchor: "stage",
           kind: "property",
@@ -352,7 +352,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 782,
+          id: 796,
           name: "upper",
           anchor: "upper",
           kind: "property",

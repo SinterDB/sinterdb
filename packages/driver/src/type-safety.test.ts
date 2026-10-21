@@ -632,3 +632,32 @@ describe("AggregationStage<TDocument> types", () => {
     >();
   });
 });
+
+describe("query budget option types", () => {
+  it("accepts maxTimeMS and maxScanned wherever a query runs", () => {
+    function accepted(users: SinterCollection<User>) {
+      const budget = { maxTimeMS: 1000, maxScanned: 50_000 };
+
+      void users.find({}, { ...budget, batchSize: 10 });
+      void users.findOne({}, budget);
+      void users.countDocuments({}, budget);
+      void users.distinct("name", {}, budget);
+      void users.aggregate([{ $limit: 1 }], { ...budget, batchSize: 10 });
+    }
+
+    expect(accepted).toBeTypeOf("function");
+  });
+
+  it("rejects limits that are not numbers", () => {
+    function rejected(users: SinterCollection<User>) {
+      // @ts-expect-error maxTimeMS is a number
+      void users.find({}, { maxTimeMS: "1000" });
+      // @ts-expect-error maxScanned is a number
+      void users.countDocuments({}, { maxScanned: "5" });
+      // @ts-expect-error there is no such limit
+      void users.distinct("name", {}, { maxMemory: 5 });
+    }
+
+    expect(rejected).toBeTypeOf("function");
+  });
+});

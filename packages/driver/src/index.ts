@@ -20,6 +20,7 @@ export type {
   SinterPingResult,
   SinterServerInfo,
 } from "./client.js";
+export type { QueryBudgetOptions } from "./budget.js";
 
 export type {
   AggregateOptions,

@@ -16,6 +16,7 @@ describe("protocol message envelopes", () => {
       Projection: "projection",
       CompoundIndexes: "compound-indexes",
       Aggregation: "aggregation",
+      QueryBudgets: "query-budgets",
     });
   });
 

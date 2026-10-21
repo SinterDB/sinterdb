@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 869,
+  id: 883,
   name: "UpdateResult",
   kind: "interface",
   label: "Interface",
@@ -33,7 +33,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 870,
+          id: 884,
           name: "acknowledged",
           anchor: "acknowledged",
           kind: "property",
@@ -67,7 +67,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 871,
+          id: 885,
           name: "matchedCount",
           anchor: "matched-count",
           kind: "property",
@@ -100,7 +100,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 872,
+          id: 886,
           name: "modifiedCount",
           anchor: "modified-count",
           kind: "property",
@@ -135,7 +135,7 @@ const page: ApiPage = {
           ],
         },
         {
-          id: 873,
+          id: 887,
           name: "upsertedId",
           anchor: "upserted-id",
           kind: "property",

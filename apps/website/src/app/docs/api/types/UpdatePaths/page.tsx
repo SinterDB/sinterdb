@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 867,
+  id: 881,
   name: "UpdatePaths",
   kind: "type-alias",
   label: "Type Alias",

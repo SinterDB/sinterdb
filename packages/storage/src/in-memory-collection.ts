@@ -1,4 +1,5 @@
 import { compilePipeline } from "./aggregation.js";
+import type { OperationBudget } from "./budget.js";
 import {
   CustomId,
   decodeDocument,
@@ -56,10 +57,25 @@ export interface StorageFindOptions {
    * limit, so queries can sort by fields that are not returned.
    */
   readonly projection?: Document;
+  /**
+   * Limits the time and the documents examined. The budget is charged as the
+   * iterator is read, not when `find` is called.
+   */
+  readonly budget?: OperationBudget;
 }
 
 export interface StorageFindOneOptions {
   readonly projection?: Document;
+  /** Limits the time and the documents examined. */
+  readonly budget?: OperationBudget;
+}
+
+export interface StorageAggregateOptions {
+  /**
+   * Limits the time and the documents examined while reading the collection.
+   * Later stages are not charged.
+   */
+  readonly budget?: OperationBudget;
 }
 
 export interface StorageUpdateOptions {
@@ -275,14 +291,17 @@ export class InMemoryCollection {
       options.projection === undefined
         ? undefined
         : compileProjection(options.projection);
-    const found = this.findFirst(filter);
+    const found = this.findFirst(filter, options.budget);
 
     return found === undefined || project === undefined
       ? found
       : project(found);
   }
 
-  private findFirst(filter: Document): Document | undefined {
+  private findFirst(
+    filter: Document,
+    budget?: OperationBudget,
+  ): Document | undefined {
     const matches = compileFilter(filter);
     const id = filter["_id"];
 
@@ -296,7 +315,7 @@ export class InMemoryCollection {
       return matches(document) ? document : undefined;
     }
 
-    for (const [, encoded] of this.candidates(filter)) {
+    for (const [, encoded] of this.candidates(filter, budget)) {
       const document = decodeDocument(encoded);
 
       if (matches(document)) {
@@ -321,7 +340,14 @@ export class InMemoryCollection {
       options.projection === undefined
         ? undefined
         : compileProjection(options.projection);
-    const results = this.scan(filter, matches, sorter, skip, limit);
+    const results = this.scan(
+      filter,
+      matches,
+      sorter,
+      skip,
+      limit,
+      options.budget,
+    );
 
     return project === undefined ? results : projectAll(results, project);
   }
@@ -331,17 +357,24 @@ export class InMemoryCollection {
    * collection. The pipeline is checked before the first document is read. A
    * leading `$match` can use an index.
    */
-  public aggregate(pipeline: readonly Document[]): IterableIterator<Document> {
+  public aggregate(
+    pipeline: readonly Document[],
+    options: StorageAggregateOptions = {},
+  ): IterableIterator<Document> {
     const compiled = compilePipeline(pipeline);
 
-    return compiled.run(this.find(compiled.filter ?? {}));
+    return compiled.run(
+      this.find(compiled.filter ?? {}, {
+        ...(options.budget === undefined ? {} : { budget: options.budget }),
+      }),
+    );
   }
 
   /**
    * How many documents match the filter. An empty filter is answered from the
    * size of the collection without reading any document.
    */
-  public count(filter: Document): number {
+  public count(filter: Document, budget?: OperationBudget): number {
     const matches = compileFilter(filter);
 
     if (Object.keys(filter).length === 0) {
@@ -350,7 +383,7 @@ export class InMemoryCollection {
 
     let total = 0;
 
-    for (const [, encoded] of this.candidates(filter)) {
+    for (const [, encoded] of this.candidates(filter, budget)) {
       if (matches(decodeDocument(encoded))) {
         total += 1;
       }
@@ -366,13 +399,17 @@ export class InMemoryCollection {
    * nothing. Values are distinct by canonical equality, so `1` and `1n` are two
    * values.
    */
-  public distinct(field: string, filter: Document = {}): DocumentValue[] {
+  public distinct(
+    field: string,
+    filter: Document = {},
+    budget?: OperationBudget,
+  ): DocumentValue[] {
     const segments = validateDistinctField(field);
     const matches = compileFilter(filter);
     const seen = new Set<string>();
     const values: DocumentValue[] = [];
 
-    for (const [, encoded] of this.candidates(filter)) {
+    for (const [, encoded] of this.candidates(filter, budget)) {
       const document = decodeDocument(encoded);
 
       if (!matches(document)) {
@@ -813,11 +850,15 @@ export class InMemoryCollection {
    */
   private *candidates(
     filter: Document,
+    budget?: OperationBudget,
   ): IterableIterator<[string, Uint8Array]> {
     const plan = this.indexes.isEmpty ? undefined : this.plan(filter);
 
     if (plan === undefined || plan.stage === "COLLSCAN") {
-      yield* this.documents;
+      for (const entry of this.documents) {
+        budget?.charge();
+        yield entry;
+      }
 
       return;
     }
@@ -834,6 +875,7 @@ export class InMemoryCollection {
       const encoded = this.documents.get(key);
 
       if (encoded !== undefined) {
+        budget?.charge();
         yield [key, encoded];
       }
     }
@@ -947,12 +989,13 @@ export class InMemoryCollection {
     sorter: ((document: readonly Document[]) => Document[]) | undefined,
     skip: number,
     limit: number | undefined,
+    budget: OperationBudget | undefined,
   ): IterableIterator<Document> {
     if (sorter === undefined) {
       let skipped = 0;
       let yielded = 0;
 
-      for (const [, encoded] of this.candidates(filter)) {
+      for (const [, encoded] of this.candidates(filter, budget)) {
         if (limit !== undefined && yielded >= limit) {
           return;
         }
@@ -970,6 +1013,10 @@ export class InMemoryCollection {
 
         yielded += 1;
         yield document;
+
+        if (limit !== undefined && yielded >= limit) {
+          return;
+        }
       }
 
       return;
@@ -977,7 +1024,7 @@ export class InMemoryCollection {
 
     const matched: Document[] = [];
 
-    for (const [, encoded] of this.candidates(filter)) {
+    for (const [, encoded] of this.candidates(filter, budget)) {
       const document = decodeDocument(encoded);
 
       if (matches(document)) {

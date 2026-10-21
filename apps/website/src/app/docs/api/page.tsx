@@ -7,7 +7,7 @@ const groups: readonly ApiIndexGroup[] = [
     title: "Classes",
     items: [
       {
-        id: 365,
+        id: 376,
         name: "AggregateCursor",
         href: "/docs/api/classes/AggregateCursor",
         kind: "class",
@@ -28,7 +28,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 385,
+        id: 397,
         name: "FindCursor",
         href: "/docs/api/classes/FindCursor",
         kind: "class",
@@ -48,7 +48,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 243,
+        id: 248,
         name: "SinterCollection",
         href: "/docs/api/classes/SinterCollection",
         kind: "class",
@@ -58,7 +58,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 423,
+        id: 437,
         name: "SinterDatabase",
         href: "/docs/api/classes/SinterDatabase",
         kind: "class",
@@ -74,7 +74,7 @@ const groups: readonly ApiIndexGroup[] = [
     title: "Errors",
     items: [
       {
-        id: 436,
+        id: 450,
         name: "SinterClientOptionsError",
         href: "/docs/api/classes/SinterClientOptionsError",
         kind: "class",
@@ -85,7 +85,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 455,
+        id: 469,
         name: "SinterClientStateError",
         href: "/docs/api/classes/SinterClientStateError",
         kind: "class",
@@ -96,7 +96,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 475,
+        id: 489,
         name: "SinterCompatibilityError",
         href: "/docs/api/classes/SinterCompatibilityError",
         kind: "class",
@@ -107,7 +107,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 498,
+        id: 512,
         name: "SinterConnectionError",
         href: "/docs/api/classes/SinterConnectionError",
         kind: "class",
@@ -118,7 +118,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 517,
+        id: 531,
         name: "SinterConnectionStringError",
         href: "/docs/api/classes/SinterConnectionStringError",
         kind: "class",
@@ -129,7 +129,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 536,
+        id: 550,
         name: "SinterConnectionTimeoutError",
         href: "/docs/api/classes/SinterConnectionTimeoutError",
         kind: "class",
@@ -139,7 +139,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 555,
+        id: 569,
         name: "SinterDocumentError",
         href: "/docs/api/classes/SinterDocumentError",
         kind: "class",
@@ -150,7 +150,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 574,
+        id: 588,
         name: "SinterError",
         href: "/docs/api/classes/SinterError",
         kind: "class",
@@ -161,7 +161,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 609,
+        id: 623,
         name: "SinterInsertManyError",
         href: "/docs/api/classes/SinterInsertManyError",
         kind: "class",
@@ -172,7 +172,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 823,
+        id: 837,
         name: "SinterNamespaceError",
         href: "/docs/api/classes/SinterNamespaceError",
         kind: "class",
@@ -183,7 +183,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 635,
+        id: 649,
         name: "SinterProtocolError",
         href: "/docs/api/classes/SinterProtocolError",
         kind: "class",
@@ -194,7 +194,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 654,
+        id: 668,
         name: "SinterRequestTimeoutError",
         href: "/docs/api/classes/SinterRequestTimeoutError",
         kind: "class",
@@ -205,7 +205,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 673,
+        id: 687,
         name: "SinterServerError",
         href: "/docs/api/classes/SinterServerError",
         kind: "class",
@@ -215,7 +215,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 696,
+        id: 710,
         name: "SinterSocketTimeoutError",
         href: "/docs/api/classes/SinterSocketTimeoutError",
         kind: "class",
@@ -232,7 +232,7 @@ const groups: readonly ApiIndexGroup[] = [
     title: "Interfaces",
     items: [
       {
-        id: 199,
+        id: 202,
         name: "AggregateOptions",
         href: "/docs/api/interfaces/AggregateOptions",
         kind: "interface",
@@ -243,7 +243,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 770,
+        id: 784,
         name: "CreateIndexResult",
         href: "/docs/api/interfaces/CreateIndexResult",
         kind: "interface",
@@ -254,7 +254,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 846,
+        id: 860,
         name: "DeleteResult",
         href: "/docs/api/interfaces/DeleteResult",
         kind: "interface",
@@ -274,7 +274,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 774,
+        id: 788,
         name: "ExplainResult",
         href: "/docs/api/interfaces/ExplainResult",
         kind: "interface",
@@ -285,7 +285,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 325,
+        id: 332,
         name: "FindOneOptions",
         href: "/docs/api/interfaces/FindOneOptions",
         kind: "interface",
@@ -296,7 +296,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 329,
+        id: 338,
         name: "FindOptions",
         href: "/docs/api/interfaces/FindOptions",
         kind: "interface",
@@ -307,7 +307,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 418,
+        id: 430,
         name: "FindQueryOptions",
         href: "/docs/api/interfaces/FindQueryOptions",
         kind: "interface",
@@ -318,7 +318,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 232,
+        id: 237,
         name: "GroupSpecification",
         href: "/docs/api/interfaces/GroupSpecification",
         kind: "interface",
@@ -329,7 +329,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 787,
+        id: 801,
         name: "IndexBoundInfo",
         href: "/docs/api/interfaces/IndexBoundInfo",
         kind: "interface",
@@ -340,7 +340,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 800,
+        id: 814,
         name: "IndexDefinitionOptions",
         href: "/docs/api/interfaces/IndexDefinitionOptions",
         kind: "interface",
@@ -350,7 +350,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 804,
+        id: 818,
         name: "IndexInfo",
         href: "/docs/api/interfaces/IndexInfo",
         kind: "interface",
@@ -361,7 +361,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 814,
+        id: 828,
         name: "IndexIssue",
         href: "/docs/api/interfaces/IndexIssue",
         kind: "interface",
@@ -372,7 +372,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 811,
+        id: 825,
         name: "IndexKeyInfo",
         href: "/docs/api/interfaces/IndexKeyInfo",
         kind: "interface",
@@ -382,7 +382,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 818,
+        id: 832,
         name: "IndexValidationResult",
         href: "/docs/api/interfaces/IndexValidationResult",
         kind: "interface",
@@ -393,7 +393,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 337,
+        id: 348,
         name: "InsertManyResult",
         href: "/docs/api/interfaces/InsertManyResult",
         kind: "interface",
@@ -404,7 +404,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 341,
+        id: 352,
         name: "InsertOneResult",
         href: "/docs/api/interfaces/InsertOneResult",
         kind: "interface",
@@ -415,13 +415,24 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 361,
+        id: 372,
         name: "ParsedSinterConnectionString",
         href: "/docs/api/interfaces/ParsedSinterConnectionString",
         kind: "interface",
         label: "Interface",
         short:
           'A parsed <code>sinterdb://</code> connection string, available as <a href="/docs/api/classes/SinterClient#target">SinterClient.target</a>.',
+        deprecated: false,
+        since: null,
+      },
+      {
+        id: 199,
+        name: "QueryBudgetOptions",
+        href: "/docs/api/interfaces/QueryBudgetOptions",
+        kind: "interface",
+        label: "Interface",
+        short:
+          'Limits on what one server request may cost. Both are optional, and a request that passes a limit fails with a <a href="/docs/api/classes/SinterServerError">SinterServerError</a> named <code>OperationTimeLimitExceeded</code> or <code>ScanLimitExceeded</code>.',
         deprecated: false,
         since: null,
       },
@@ -459,7 +470,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 715,
+        id: 729,
         name: "SinterServerErrorOptions",
         href: "/docs/api/interfaces/SinterServerErrorOptions",
         kind: "interface",
@@ -480,7 +491,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 865,
+        id: 879,
         name: "UpdateOptions",
         href: "/docs/api/interfaces/UpdateOptions",
         kind: "interface",
@@ -490,7 +501,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 869,
+        id: 883,
         name: "UpdateResult",
         href: "/docs/api/interfaces/UpdateResult",
         kind: "interface",
@@ -506,7 +517,7 @@ const groups: readonly ApiIndexGroup[] = [
     title: "Type Aliases",
     items: [
       {
-        id: 201,
+        id: 206,
         name: "AggregationStage",
         href: "/docs/api/types/AggregationStage",
         kind: "type-alias",
@@ -517,7 +528,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 721,
+        id: 735,
         name: "ArrayOperators",
         href: "/docs/api/types/ArrayOperators",
         kind: "type-alias",
@@ -528,7 +539,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 842,
+        id: 856,
         name: "ArrayPaths",
         href: "/docs/api/types/ArrayPaths",
         kind: "type-alias",
@@ -539,7 +550,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 726,
+        id: 740,
         name: "AtomicValue",
         href: "/docs/api/types/AtomicValue",
         kind: "type-alias",
@@ -550,7 +561,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 844,
+        id: 858,
         name: "ComparablePaths",
         href: "/docs/api/types/ComparablePaths",
         kind: "type-alias",
@@ -561,7 +572,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 727,
+        id: 741,
         name: "ComparableValue",
         href: "/docs/api/types/ComparableValue",
         kind: "type-alias",
@@ -572,7 +583,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 728,
+        id: 742,
         name: "ComparisonOperators",
         href: "/docs/api/types/ComparisonOperators",
         kind: "type-alias",
@@ -583,7 +594,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 413,
+        id: 425,
         name: "CursorExecutor",
         href: "/docs/api/types/CursorExecutor",
         kind: "type-alias",
@@ -594,7 +605,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 320,
+        id: 327,
         name: "DistinctValue",
         href: "/docs/api/types/DistinctValue",
         kind: "type-alias",
@@ -605,7 +616,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 735,
+        id: 749,
         name: "ElementMatch",
         href: "/docs/api/types/ElementMatch",
         kind: "type-alias",
@@ -616,7 +627,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 737,
+        id: 751,
         name: "ElementOf",
         href: "/docs/api/types/ElementOf",
         kind: "type-alias",
@@ -627,7 +638,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 323,
+        id: 330,
         name: "EqualityFilter",
         href: "/docs/api/types/EqualityFilter",
         kind: "type-alias",
@@ -637,7 +648,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 739,
+        id: 753,
         name: "FieldPaths",
         href: "/docs/api/types/FieldPaths",
         kind: "type-alias",
@@ -648,7 +659,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 742,
+        id: 756,
         name: "Filter",
         href: "/docs/api/types/Filter",
         kind: "type-alias",
@@ -659,7 +670,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 749,
+        id: 763,
         name: "FilterOperators",
         href: "/docs/api/types/FilterOperators",
         kind: "type-alias",
@@ -670,7 +681,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 758,
+        id: 772,
         name: "FilterPaths",
         href: "/docs/api/types/FilterPaths",
         kind: "type-alias",
@@ -681,7 +692,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 761,
+        id: 775,
         name: "FilterPathValue",
         href: "/docs/api/types/FilterPathValue",
         kind: "type-alias",
@@ -692,7 +703,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 217,
+        id: 222,
         name: "GroupAccumulator",
         href: "/docs/api/types/GroupAccumulator",
         kind: "type-alias",
@@ -703,7 +714,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 242,
+        id: 247,
         name: "GroupValue",
         href: "/docs/api/types/GroupValue",
         kind: "type-alias",
@@ -714,7 +725,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 785,
+        id: 799,
         name: "IndexablePath",
         href: "/docs/api/types/IndexablePath",
         kind: "type-alias",
@@ -725,7 +736,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 790,
+        id: 804,
         name: "IndexDefinition",
         href: "/docs/api/types/IndexDefinition",
         kind: "type-alias",
@@ -736,7 +747,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 764,
+        id: 778,
         name: "MaxPathDepth",
         href: "/docs/api/types/MaxPathDepth",
         kind: "type-alias",
@@ -747,7 +758,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 849,
+        id: 863,
         name: "NumericPaths",
         href: "/docs/api/types/NumericPaths",
         kind: "type-alias",
@@ -758,7 +769,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 344,
+        id: 355,
         name: "OptionalId",
         href: "/docs/api/types/OptionalId",
         kind: "type-alias",
@@ -769,7 +780,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 765,
+        id: 779,
         name: "PathChild",
         href: "/docs/api/types/PathChild",
         kind: "type-alias",
@@ -780,7 +791,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 851,
+        id: 865,
         name: "PathsMatching",
         href: "/docs/api/types/PathsMatching",
         kind: "type-alias",
@@ -791,7 +802,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 352,
+        id: 363,
         name: "ProjectedDocument",
         href: "/docs/api/types/ProjectedDocument",
         kind: "type-alias",
@@ -801,7 +812,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 357,
+        id: 368,
         name: "Projection",
         href: "/docs/api/types/Projection",
         kind: "type-alias",
@@ -811,7 +822,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 359,
+        id: 370,
         name: "ProjectionFlag",
         href: "/docs/api/types/ProjectionFlag",
         kind: "type-alias",
@@ -833,7 +844,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 608,
+        id: 622,
         name: "SinterErrorCode",
         href: "/docs/api/types/SinterErrorCode",
         kind: "type-alias",
@@ -844,7 +855,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 767,
+        id: 781,
         name: "Sort",
         href: "/docs/api/types/Sort",
         kind: "type-alias",
@@ -855,7 +866,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 769,
+        id: 783,
         name: "SortDirection",
         href: "/docs/api/types/SortDirection",
         kind: "type-alias",
@@ -866,7 +877,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 854,
+        id: 868,
         name: "UpdateFilter",
         href: "/docs/api/types/UpdateFilter",
         kind: "type-alias",
@@ -877,7 +888,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 867,
+        id: 881,
         name: "UpdatePaths",
         href: "/docs/api/types/UpdatePaths",
         kind: "type-alias",
@@ -888,7 +899,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 348,
+        id: 359,
         name: "WithId",
         href: "/docs/api/types/WithId",
         kind: "type-alias",
@@ -925,7 +936,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 360,
+        id: 371,
         name: "DEFAULT_SINTERDB_PORT",
         href: "/docs/api/variables/DEFAULT_SINTERDB_PORT",
         kind: "variable",
@@ -958,7 +969,7 @@ const groups: readonly ApiIndexGroup[] = [
         since: null,
       },
       {
-        id: 594,
+        id: 608,
         name: "SinterErrorCode",
         href: "/docs/api/variables/SinterErrorCode",
         kind: "variable",

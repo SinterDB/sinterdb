@@ -195,6 +195,7 @@ error with the reason, and exits with code 1.
 - [Configuration reference](./configuration.md): every server and driver option.
 - [Indexes](./indexes.md): make queries fast and enforce unique values.
 - [Aggregation](./aggregation.md): count, sort, page and reshape results.
+- [Query budgets](./query-budgets.md): cap the time and documents a query may cost.
 - [Storage](./storage.md): durability, checkpoints, and recovery.
 - [Running in Docker](./docker.md): the server in a container, with a volume.
 - [Known limitations](./limitations.md): what SinterDB does not do yet.

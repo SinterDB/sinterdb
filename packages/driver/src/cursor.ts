@@ -1,5 +1,6 @@
 import { CustomId, type Document, type DocumentValue } from "sinterdb-protocol";
 
+import { budgetParameters, type QueryBudgetOptions } from "./budget.js";
 import type { WithId } from "./collection.js";
 import { SinterProtocolError } from "./errors.js";
 import type { SortDirection } from "./filter.js";
@@ -15,7 +16,7 @@ export type CursorExecutor = (
 ) => Promise<DocumentValue>;
 
 /** The query parts of a find that are sent with the first request. */
-export interface FindQueryOptions {
+export interface FindQueryOptions extends QueryBudgetOptions {
   /** Sort order as `[path, direction]` pairs. */
   readonly sort?: readonly (readonly [string, SortDirection])[];
   /** How many matching documents to skip. */
@@ -43,6 +44,7 @@ class BatchReader<TResult extends object> {
     },
     private readonly batchSize: number | undefined,
     private readonly requireId: boolean,
+    private readonly budget: Document = {},
   ) {}
 
   public async hasNext(): Promise<boolean> {
@@ -119,6 +121,7 @@ class BatchReader<TResult extends object> {
       value = await this.execute("getMore", {
         cursorId: this.cursorId,
         ...size,
+        ...this.budget,
       });
     }
 
@@ -168,10 +171,12 @@ export class FindCursor<
           ...(query.projection === undefined
             ? {}
             : { projection: query.projection }),
+          ...budgetParameters(query),
         },
       }),
       batchSize,
       query.projection === undefined,
+      budgetParameters(query),
     );
   }
 
@@ -244,15 +249,22 @@ export class AggregateCursor<
     collection: string,
     pipeline: readonly Document[],
     batchSize: number | undefined,
+    budget: QueryBudgetOptions = {},
   ) {
     this.reader = new BatchReader<TResult>(
       execute,
       (size) => ({
         command: "aggregate",
-        parameters: { collection, pipeline: [...pipeline], ...size },
+        parameters: {
+          collection,
+          pipeline: [...pipeline],
+          ...size,
+          ...budgetParameters(budget),
+        },
       }),
       batchSize,
       false,
+      budgetParameters(budget),
     );
   }
 

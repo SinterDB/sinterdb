@@ -134,6 +134,10 @@ Also missing:
   memory, at most 100,000 of them, and fails with `DocumentValidationFailed`
   beyond that. A field reference cannot step into arrays, and a literal string
   that starts with `$` cannot be written.
+- **Query budgets are approximate and per request.** `maxTimeMS` is checked
+  once for every 64 documents examined, and does not interrupt a sort or group
+  that has read all of its documents. Budgets apply to each round trip of a
+  cursor, not to the whole cursor. There is no server-wide default or maximum.
 - **No full-text, geospatial, or regular-expression search.**
 - **A cursor is not a snapshot.** It reads the collection as it goes, so
   documents written while you iterate may or may not show up, and the document

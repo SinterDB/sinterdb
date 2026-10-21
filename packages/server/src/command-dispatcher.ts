@@ -5,9 +5,11 @@ import {
   validateDistinctField,
   compileUpdate,
   normalizeIndexSpec,
+  OperationBudget,
   StorageError,
   StorageErrorCode,
   StorageInsertManyError,
+  type BudgetLimits,
   type CreateIndexInput,
   type SortSpecification,
   type StorageFindOptions,
@@ -84,6 +86,8 @@ export class CommandExecutionError extends Error {
       | "IndexNotFound"
       | "IndexConflict"
       | "NamespaceConflict"
+      | "OperationTimeLimitExceeded"
+      | "ScanLimitExceeded"
       | "UnknownCommand",
     message: string,
     options: {
@@ -202,6 +206,7 @@ export class CommandDispatcher {
         ProtocolCapability.Projection,
         ProtocolCapability.CompoundIndexes,
         ProtocolCapability.Aggregation,
+        ProtocolCapability.QueryBudgets,
       ],
     };
   }
@@ -595,6 +600,7 @@ export class CommandDispatcher {
       command.parameters,
       "projection",
     );
+    const limits = parseBudgetLimits(command.parameters);
 
     try {
       const collection = this.catalog.getCollection(
@@ -612,10 +618,10 @@ export class CommandDispatcher {
 
       return {
         document:
-          collection.findOne(
-            filter,
-            projection === undefined ? {} : { projection },
-          ) ?? null,
+          collection.findOne(filter, {
+            ...(projection === undefined ? {} : { projection }),
+            budget: new OperationBudget(limits),
+          }) ?? null,
       };
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
@@ -635,6 +641,7 @@ export class CommandDispatcher {
     const filter = requireDocumentParameter(command.parameters, "filter");
     const batchSize = optionalBatchSize(command.parameters);
     const findOptions = parseFindOptions(command.parameters);
+    const limits = parseBudgetLimits(command.parameters);
 
     try {
       const collection = this.catalog.getCollection(
@@ -652,8 +659,14 @@ export class CommandDispatcher {
         return { cursorId: null, documents: [] };
       }
 
+      const budget = new OperationBudget(limits);
+
       return toBatchDocument(
-        cursors.open(collection.find(filter, findOptions), batchSize),
+        cursors.open(
+          collection.find(filter, { ...findOptions, budget }),
+          batchSize,
+          budget,
+        ),
       );
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
@@ -671,6 +684,7 @@ export class CommandDispatcher {
       "collection",
     );
     const filter = requireDocumentParameter(command.parameters, "filter");
+    const limits = parseBudgetLimits(command.parameters);
 
     try {
       const collection = this.catalog.getCollection(
@@ -684,7 +698,9 @@ export class CommandDispatcher {
         return { count: 0 };
       }
 
-      return { count: collection.count(filter) };
+      return {
+        count: collection.count(filter, new OperationBudget(limits)),
+      };
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
         throw translateCatalogError(error);
@@ -702,6 +718,7 @@ export class CommandDispatcher {
     );
     const field = requireStringParameter(command.parameters, "field");
     const filter = requireDocumentParameter(command.parameters, "filter");
+    const limits = parseBudgetLimits(command.parameters);
 
     try {
       const collection = this.catalog.getCollection(
@@ -716,7 +733,9 @@ export class CommandDispatcher {
         return { values: [] };
       }
 
-      return { values: collection.distinct(field, filter) };
+      return {
+        values: collection.distinct(field, filter, new OperationBudget(limits)),
+      };
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
         throw translateCatalogError(error);
@@ -737,6 +756,7 @@ export class CommandDispatcher {
     );
     const pipeline = requirePipelineParameter(command.parameters);
     const batchSize = optionalBatchSize(command.parameters);
+    const limits = parseBudgetLimits(command.parameters);
 
     try {
       const collection = this.catalog.getCollection(
@@ -750,8 +770,14 @@ export class CommandDispatcher {
         return { cursorId: null, documents: [] };
       }
 
+      const budget = new OperationBudget(limits);
+
       return toBatchDocument(
-        cursors.open(collection.aggregate(pipeline), batchSize),
+        cursors.open(
+          collection.aggregate(pipeline, { budget }),
+          batchSize,
+          budget,
+        ),
       );
     } catch (error: unknown) {
       if (error instanceof CatalogError) {
@@ -765,9 +791,10 @@ export class CommandDispatcher {
   private getMore(command: CommandEnvelope, cursors: CursorManager): Document {
     const cursorId = requireCursorId(command.parameters);
     const batchSize = optionalBatchSize(command.parameters);
+    const limits = parseBudgetLimits(command.parameters);
 
     try {
-      return toBatchDocument(cursors.getMore(cursorId, batchSize));
+      return toBatchDocument(cursors.getMore(cursorId, batchSize, limits));
     } catch (error: unknown) {
       if (error instanceof CursorNotFoundError) {
         throw new CommandExecutionError(
@@ -1021,6 +1048,24 @@ function translateStorageError(error: unknown): CommandExecutionError {
     );
   }
 
+  if (error.code === StorageErrorCode.OperationTimeLimitExceeded) {
+    return new CommandExecutionError(
+      WireErrorCode.OperationTimeLimitExceeded,
+      "OperationTimeLimitExceeded",
+      error.message,
+      { details: { storageErrorCode: error.code } },
+    );
+  }
+
+  if (error.code === StorageErrorCode.ScanLimitExceeded) {
+    return new CommandExecutionError(
+      WireErrorCode.ScanLimitExceeded,
+      "ScanLimitExceeded",
+      error.message,
+      { details: { storageErrorCode: error.code } },
+    );
+  }
+
   if (error.code === StorageErrorCode.InvalidUpdate) {
     return new CommandExecutionError(
       WireErrorCode.InvalidUpdate,
@@ -1155,6 +1200,21 @@ function parseFindOptions(parameters: Document): StorageFindOptions {
     ...(skip === undefined ? {} : { skip }),
     ...(limit === undefined ? {} : { limit }),
     ...(projection === undefined ? {} : { projection }),
+  };
+}
+
+/**
+ * The `maxTimeMS` and `maxScanned` of a command. Both are optional, and the
+ * clock starts when the budget is made from them, so make it when the command
+ * starts to run.
+ */
+function parseBudgetLimits(parameters: Document): BudgetLimits {
+  const maxTimeMS = optionalIntegerParameter(parameters, "maxTimeMS", 1);
+  const maxScanned = optionalIntegerParameter(parameters, "maxScanned", 1);
+
+  return {
+    ...(maxTimeMS === undefined ? {} : { maxTimeMS }),
+    ...(maxScanned === undefined ? {} : { maxScanned }),
   };
 }
 

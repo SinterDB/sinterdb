@@ -123,6 +123,13 @@ Each breaking change lands here in the release that makes it.
   `AggregationStage`, `AggregateOptions`, `GroupSpecification`,
   `GroupAccumulator` and `GroupValue` types. Nothing that worked before
   changes.
+- **Query budgets need a 0.3.0 server.** The server advertises a new
+  `query-budgets` capability and accepts `maxTimeMS` and `maxScanned` on its
+  query commands, with two new wire errors, `OperationTimeLimitExceeded` (7000)
+  and `ScanLimitExceeded` (7001). A 0.3.0 driver refuses to send a limit to a
+  server without the capability (`SinterCompatibilityError`). The driver exports
+  the `QueryBudgetOptions` type. `countDocuments()` and `distinct()` take an
+  options argument after their filter. Nothing that worked before changes.
 - **Projection needs a 0.3.0 server.** The server advertises a new `projection`
   capability. A 0.3.0 driver refuses to send a projection to a server without
   it (`SinterCompatibilityError`) instead of getting whole documents back.

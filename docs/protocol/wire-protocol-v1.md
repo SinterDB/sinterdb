@@ -318,6 +318,7 @@ Initial known capabilities are:
   whole documents, so clients MUST NOT send a projection to such a server.
 - `compound-indexes`: the server understands the `keys` option of `createIndex`. A server without it rejects the option as unknown, and clients SHOULD NOT send it.
 - `aggregation`: the server understands the `aggregate` command. A server without it answers `UnknownCommand`.
+- `query-budgets`: the server understands the optional `maxTimeMS` and `maxScanned` parameters of `find`, `findOne`, `aggregate`, `count`, `distinct` and `getMore`. A server without it ignores them, so clients MUST NOT send them to such a server.
 
 Unknown capability strings MUST be preserved during decoding and MAY be
 ignored when determining the negotiated feature set.
@@ -444,6 +445,17 @@ Notes:
   `details.storageErrorCode` set to `INVALID_FIND_OPTIONS`. A result larger than
   one message returns `ResultTooLarge`. A server that predates these commands
   answers `UnknownCommand`.
+- `find`, `findOne`, `aggregate`, `count`, `distinct` and `getMore` accept two
+  optional budget parameters, `maxTimeMS` and `maxScanned`, each an integer of at
+  least 1 (anything else returns `InvalidRequest`, even for a collection that
+  does not exist). `maxScanned` is the most documents the command may examine,
+  and `maxTimeMS` the most time it may take, measured from when the server
+  starts the command. A command that passes one fails with
+  `OperationTimeLimitExceeded` or `ScanLimitExceeded`, with
+  `details.storageErrorCode` set to `OPERATION_TIME_LIMIT_EXCEEDED` or
+  `SCAN_LIMIT_EXCEEDED`. A cursor's budget is per command: `getMore` uses the
+  limits it carries, or none, and a `getMore` that fails closes the cursor.
+  Only servers that advertise the `query-budgets` capability understand them.
 - An invalid `filter` is rejected with `DocumentValidationFailed` whether or not
   the collection exists, for every command that takes one.
 - `skip` is a non-negative integer. `limit` is a positive integer. `batchSize`
@@ -548,7 +560,14 @@ across a connection use numeric `WireErrorCode` values.
 | 6001 | `IndexNotFound` |
 | 6002 | `IndexConflict` |
 
-### 6.7 Internal errors
+### 6.7 Query budget errors
+
+| Code | Name                         |
+| ---: | ---------------------------- |
+| 7000 | `OperationTimeLimitExceeded` |
+| 7001 | `ScanLimitExceeded`          |
+
+### 6.8 Internal errors
 
 | Code | Name            |
 | ---: | --------------- |

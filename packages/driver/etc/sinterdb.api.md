@@ -12,7 +12,7 @@ import { EventEmitter } from 'node:events';
 // @public
 export class AggregateCursor<TResult extends object = Document> implements AsyncIterable<TResult> {
     [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined>;
-    constructor(execute: CursorExecutor, collection: string, pipeline: readonly Document[], batchSize: number | undefined);
+    constructor(execute: CursorExecutor, collection: string, pipeline: readonly Document[], batchSize: number | undefined, budget?: QueryBudgetOptions);
     close(): Promise<void>;
     hasNext(): Promise<boolean>;
     next(): Promise<TResult | null>;
@@ -20,7 +20,7 @@ export class AggregateCursor<TResult extends object = Document> implements Async
 }
 
 // @public
-export interface AggregateOptions {
+export interface AggregateOptions extends QueryBudgetOptions {
     readonly batchSize?: number;
 }
 
@@ -179,12 +179,12 @@ export class FindCursor<TDocument extends object = Document, TResult extends obj
 }
 
 // @public
-export interface FindOneOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> {
+export interface FindOneOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> extends QueryBudgetOptions {
     readonly projection?: TProjection;
 }
 
 // @public
-export interface FindOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> {
+export interface FindOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> extends QueryBudgetOptions {
     readonly batchSize?: number;
     readonly limit?: number;
     readonly projection?: TProjection;
@@ -193,7 +193,7 @@ export interface FindOptions<TDocument extends object = Document, TProjection ex
 }
 
 // @public
-export interface FindQueryOptions {
+export interface FindQueryOptions extends QueryBudgetOptions {
     readonly limit?: number;
     readonly projection?: Document;
     readonly skip?: number;
@@ -357,6 +357,12 @@ export type Projection<TDocument extends object> = {
 export type ProjectionFlag = 0 | 1 | boolean;
 
 // @public
+export interface QueryBudgetOptions {
+    readonly maxScanned?: number;
+    readonly maxTimeMS?: number;
+}
+
+// @public
 export class SinterClient extends EventEmitter<SinterClientEvents> {
     constructor(connectionString: string, options?: SinterClientOptions);
     close(): Promise<void>;
@@ -418,12 +424,12 @@ export class SinterCollection<TDocument extends object = Document> {
     constructor(
     database: SinterDatabase, name: string);
     aggregate<TResult extends object = Document>(pipeline: readonly AggregationStage<TDocument>[], options?: AggregateOptions): AggregateCursor<TResult>;
-    countDocuments(filter?: Filter<TDocument>): Promise<number>;
+    countDocuments(filter?: Filter<TDocument>, options?: QueryBudgetOptions): Promise<number>;
     createIndex(definition: IndexDefinition<TDocument>): Promise<CreateIndexResult>;
     readonly database: SinterDatabase;
     deleteMany(filter: Filter<TDocument>): Promise<DeleteResult>;
     deleteOne(filter: Filter<TDocument>): Promise<DeleteResult>;
-    distinct<TField extends FilterPaths<TDocument> | "_id">(field: TField, filter?: Filter<TDocument>): Promise<DistinctValue<TDocument, TField>[]>;
+    distinct<TField extends FilterPaths<TDocument> | "_id">(field: TField, filter?: Filter<TDocument>, options?: QueryBudgetOptions): Promise<DistinctValue<TDocument, TField>[]>;
     protected readonly documentType: TDocument;
     dropIndex(name: string): Promise<void>;
     estimatedDocumentCount(): Promise<number>;

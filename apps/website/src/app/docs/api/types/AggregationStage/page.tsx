@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 201,
+  id: 206,
   name: "AggregationStage",
   kind: "type-alias",
   label: "Type Alias",
@@ -111,8 +111,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/aggregation.ts",
-      line: 27,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L27",
+      line: 28,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L28",
     },
   ],
   usedBy: [

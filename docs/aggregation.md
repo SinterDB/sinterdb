@@ -142,6 +142,8 @@ not be empty, start with `$`, contain `.`, or be `__proto__`.
 - A collection that does not exist has no documents, so its pipeline returns
   nothing.
 - Documents come back in insertion order until a `$sort` changes it.
+- `aggregate()` accepts `maxTimeMS` and `maxScanned`. They limit the documents
+  the pipeline reads from the collection. See [Query budgets](./query-budgets.md).
 - Results are read as the cursor advances, and are not a snapshot. See
   [Known limitations](./limitations.md).
 - Documents that no stage has reshaped keep their `_id`. After a `$project`

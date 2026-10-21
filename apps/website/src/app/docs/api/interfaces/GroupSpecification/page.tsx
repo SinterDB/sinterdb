@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 232,
+  id: 237,
   name: "GroupSpecification",
   kind: "interface",
   label: "Interface",
@@ -36,7 +36,7 @@ const page: ApiPage = {
       title: "Index signature",
       members: [
         {
-          id: 237,
+          id: 242,
           name: "[field]",
           anchor: "index-signature",
           kind: "index-signature",
@@ -79,8 +79,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/aggregation.ts",
-              line: 133,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L133",
+              line: 134,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L134",
             },
           ],
         },
@@ -91,7 +91,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 233,
+          id: 238,
           name: "_id",
           anchor: "_id",
           kind: "property",
@@ -129,8 +129,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/aggregation.ts",
-              line: 128,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L128",
+              line: 129,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L129",
             },
           ],
         },
@@ -171,8 +171,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/aggregation.ts",
-      line: 126,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L126",
+      line: 127,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L127",
     },
   ],
   usedBy: [

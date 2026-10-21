@@ -1,5 +1,6 @@
 import type { CustomId } from "sinterdb-protocol";
 
+import type { QueryBudgetOptions } from "./budget.js";
 import type { Filter, Sort } from "./filter.js";
 import type { Projection } from "./projection.js";
 
@@ -135,7 +136,7 @@ export interface GroupSpecification {
 }
 
 /** Options for {@link SinterCollection.aggregate}. */
-export interface AggregateOptions {
+export interface AggregateOptions extends QueryBudgetOptions {
   /**
    * How many documents the cursor fetches from the server per round trip.
    */

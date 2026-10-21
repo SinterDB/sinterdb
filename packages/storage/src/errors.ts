@@ -8,6 +8,8 @@ export const StorageErrorCode = {
   InvalidBatch: "INVALID_BATCH",
   InvalidPipeline: "INVALID_PIPELINE",
   InvalidUpdate: "INVALID_UPDATE",
+  OperationTimeLimitExceeded: "OPERATION_TIME_LIMIT_EXCEEDED",
+  ScanLimitExceeded: "SCAN_LIMIT_EXCEEDED",
   ImmutableId: "IMMUTABLE_ID",
   DuplicateId: "DUPLICATE_ID",
   Corruption: "CORRUPTION",

@@ -7,6 +7,7 @@ export const ProtocolCapability = {
   Projection: "projection",
   CompoundIndexes: "compound-indexes",
   Aggregation: "aggregation",
+  QueryBudgets: "query-budgets",
 } as const;
 
 export type ProtocolCapability =

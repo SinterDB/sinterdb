@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 365,
+  id: 376,
   name: "AggregateCursor",
   kind: "class",
   label: "Class",
@@ -60,7 +60,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 367,
+          id: 378,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -72,7 +72,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 368,
+              id: 379,
               code: [
                 ["new ", "kw"],
                 ["AggregateCursor", "name"],
@@ -105,6 +105,15 @@ const page: ApiPage = {
                 ["number", "prim"],
                 [" | ", "pn"],
                 ["undefined", "prim"],
+                [",", "pn"],
+                ["\n  "],
+                ["budget", "param"],
+                ["?: ", "pn"],
+                [
+                  "QueryBudgetOptions",
+                  "ref",
+                  "/docs/api/interfaces/QueryBudgetOptions",
+                ],
                 [",", "pn"],
                 ["\n"],
                 [")", "pn"],
@@ -168,13 +177,27 @@ const page: ApiPage = {
                   comment: null,
                   members: [],
                 },
+                {
+                  name: "budget",
+                  code: [
+                    ["budget", "param"],
+                    ["?: ", "pn"],
+                    [
+                      "QueryBudgetOptions",
+                      "ref",
+                      "/docs/api/interfaces/QueryBudgetOptions",
+                    ],
+                  ],
+                  comment: null,
+                  members: [],
+                },
               ],
               returns: null,
               sources: [
                 {
                   path: "packages/driver/src/cursor.ts",
-                  line: 242,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L242",
+                  line: 247,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L247",
                 },
               ],
             },
@@ -184,8 +207,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/cursor.ts",
-              line: 242,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L242",
+              line: 247,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L247",
             },
           ],
         },
@@ -196,7 +219,7 @@ const page: ApiPage = {
       title: "Methods",
       members: [
         {
-          id: 383,
+          id: 395,
           name: "[asyncIterator]",
           anchor: "async-iterator",
           kind: "method",
@@ -208,7 +231,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 384,
+              id: 396,
               code: [
                 ["[asyncIterator]", "name"],
                 ["(): ", "pn"],
@@ -248,8 +271,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/cursor.ts",
-                  line: 291,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L291",
+                  line: 303,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L303",
                 },
               ],
             },
@@ -259,13 +282,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/cursor.ts",
-              line: 291,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L291",
+              line: 303,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L303",
             },
           ],
         },
         {
-          id: 381,
+          id: 393,
           name: "close",
           anchor: "close",
           kind: "method",
@@ -277,7 +300,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 382,
+              id: 394,
               code: [
                 ["close", "name"],
                 ["(): ", "pn"],
@@ -309,8 +332,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/cursor.ts",
-                  line: 284,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L284",
+                  line: 296,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L296",
                 },
               ],
             },
@@ -320,13 +343,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/cursor.ts",
-              line: 284,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L284",
+              line: 296,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L296",
             },
           ],
         },
         {
-          id: 375,
+          id: 387,
           name: "hasNext",
           anchor: "has-next",
           kind: "method",
@@ -338,7 +361,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 376,
+              id: 388,
               code: [
                 ["hasNext", "name"],
                 ["(): ", "pn"],
@@ -370,8 +393,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/cursor.ts",
-                  line: 260,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L260",
+                  line: 272,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L272",
                 },
               ],
             },
@@ -381,13 +404,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/cursor.ts",
-              line: 260,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L260",
+              line: 272,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L272",
             },
           ],
         },
         {
-          id: 377,
+          id: 389,
           name: "next",
           anchor: "next",
           kind: "method",
@@ -399,7 +422,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 378,
+              id: 390,
               code: [
                 ["next", "name"],
                 ["(): ", "pn"],
@@ -435,8 +458,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/cursor.ts",
-                  line: 268,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L268",
+                  line: 280,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L280",
                 },
               ],
             },
@@ -446,13 +469,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/cursor.ts",
-              line: 268,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L268",
+              line: 280,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L280",
             },
           ],
         },
         {
-          id: 379,
+          id: 391,
           name: "toArray",
           anchor: "to-array",
           kind: "method",
@@ -464,7 +487,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 380,
+              id: 392,
               code: [
                 ["toArray", "name"],
                 ["(): ", "pn"],
@@ -496,8 +519,8 @@ const page: ApiPage = {
               sources: [
                 {
                   path: "packages/driver/src/cursor.ts",
-                  line: 276,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L276",
+                  line: 288,
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L288",
                 },
               ],
             },
@@ -507,8 +530,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/cursor.ts",
-              line: 276,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L276",
+              line: 288,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L288",
             },
           ],
         },
@@ -573,8 +596,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/cursor.ts",
-      line: 237,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L237",
+      line: 242,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L242",
     },
   ],
   usedBy: [

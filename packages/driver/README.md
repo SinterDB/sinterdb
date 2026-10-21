@@ -369,6 +369,29 @@ pipeline. See [Aggregation](../../docs/aggregation.md) for every stage and its
 rules. A server older than 0.3.0 does not support it, and the driver throws
 `SinterCompatibilityError`.
 
+## Query Budgets
+
+`find()`, `findOne()`, `aggregate()`, `countDocuments()` and `distinct()` accept
+`maxTimeMS` and `maxScanned`, which cap the time and the documents a request may
+cost the server. A request that passes one fails with a `SinterServerError` named
+`OperationTimeLimitExceeded` or `ScanLimitExceeded`.
+
+```ts
+const found = await users
+  .find({ active: true }, { maxTimeMS: 2000, maxScanned: 100_000 })
+  .toArray();
+
+const total = await users.countDocuments(
+  { active: true },
+  { maxScanned: 50_000 },
+);
+```
+
+Cursors apply the limits to every batch. See
+[Query budgets](../../docs/query-budgets.md) for what counts and how the server
+checks. A server older than 0.3.0 does not support them, and the driver throws
+`SinterCompatibilityError`.
+
 ## Update
 
 `updateOne()` changes the first matching document and `updateMany()` changes
@@ -645,6 +668,14 @@ Server rejections of write commands carry a wire code and name:
 | `InvalidIndex`             | A malformed index definition                         |
 | `IndexNotFound`            | Dropping an index or collection that does not exist  |
 | `IndexConflict`            | An index that clashes with an existing one           |
+
+Queries can also fail when they pass a budget (see
+[Query budgets](../../docs/query-budgets.md)):
+
+| Name                         | Cause                                         |
+| ---------------------------- | --------------------------------------------- |
+| `OperationTimeLimitExceeded` | A request ran longer than its `maxTimeMS`     |
+| `ScanLimitExceeded`          | A request examined more than its `maxScanned` |
 
 ## Current Scope
 

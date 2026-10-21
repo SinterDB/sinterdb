@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 325,
+  id: 332,
   name: "FindOneOptions",
   kind: "interface",
   label: "Interface",
@@ -32,6 +32,8 @@ const page: ApiPage = {
     [" = ", "pn"],
     ["undefined", "prim"],
     [">", "pn"],
+    [" extends ", "kw"],
+    ["QueryBudgetOptions", "ref", "/docs/api/interfaces/QueryBudgetOptions"],
   ],
   comment: {
     summary:
@@ -70,7 +72,23 @@ const page: ApiPage = {
       comment: null,
     },
   ],
-  hierarchy: null,
+  hierarchy: {
+    name: "QueryBudgetOptions",
+    href: "/docs/api/interfaces/QueryBudgetOptions",
+    kind: "interface",
+    deprecated: false,
+    current: false,
+    children: [
+      {
+        name: "FindOneOptions",
+        href: null,
+        kind: "interface",
+        deprecated: false,
+        current: true,
+        children: [],
+      },
+    ],
+  },
   signatureSection: null,
   signatures: [],
   sections: [
@@ -79,7 +97,89 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 328,
+          id: 337,
+          name: "maxScanned",
+          anchor: "max-scanned",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["maxScanned", "name"],
+            ["?: ", "pn"],
+            ["number", "prim"],
+          ],
+          comment: {
+            summary:
+              "<p>The most documents the server may examine for the request, counting every\ndocument it reads, not only the ones it returns. An index lowers the\nnumber. A positive integer.</p>",
+            short:
+              "The most documents the server may examine for the request, counting every document it reads, not only the ones it returns. An index lowers the number. A positive integer.",
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [
+            {
+              label: "Inherited from",
+              name: "QueryBudgetOptions.maxScanned",
+              href: "/docs/api/interfaces/QueryBudgetOptions#max-scanned",
+            },
+          ],
+          sources: [
+            {
+              path: "packages/driver/src/budget.ts",
+              line: 28,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L28",
+            },
+          ],
+        },
+        {
+          id: 336,
+          name: "maxTimeMS",
+          anchor: "max-time-ms",
+          kind: "property",
+          deprecated: false,
+          since: null,
+          label: "Property",
+          badges: [],
+          code: [
+            ["readonly ", "kw"],
+            ["maxTimeMS", "name"],
+            ["?: ", "pn"],
+            ["number", "prim"],
+          ],
+          comment: {
+            summary:
+              "<p>The most milliseconds the server may spend on the request. The server\nlooks at the clock while it examines documents, so a limit can be passed\nby a little before the request stops, and a long sort or group is not\ninterrupted once its documents are read. A positive integer.</p>\n<p>This is separate from the client's <code>requestTimeoutMS</code>, which gives up\nwaiting for the answer. Keep <code>requestTimeoutMS</code> larger than <code>maxTimeMS</code>,\nor the client may stop waiting first.</p>",
+            short:
+              "The most milliseconds the server may spend on the request. The server looks at the clock while it examines documents, so a limit can be passed by a little before the request stops, and a long sort or group is not interrupted once its documents are read. A positive integer.",
+            deprecated: null,
+            modifiers: [],
+            blocks: [],
+          },
+          signatures: [],
+          members: [],
+          relations: [
+            {
+              label: "Inherited from",
+              name: "QueryBudgetOptions.maxTimeMS",
+              href: "/docs/api/interfaces/QueryBudgetOptions#max-time-ms",
+            },
+          ],
+          sources: [
+            {
+              path: "packages/driver/src/budget.ts",
+              line: 22,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L22",
+            },
+          ],
+        },
+        {
+          id: 335,
           name: "projection",
           anchor: "projection",
           kind: "property",
@@ -108,8 +208,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/collection.ts",
-              line: 82,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L82",
+              line: 84,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L84",
             },
           ],
         },
@@ -121,6 +221,18 @@ const page: ApiPage = {
       id: "properties",
       title: "Properties",
       items: [
+        {
+          anchor: "max-scanned",
+          name: "maxScanned",
+          kind: "property",
+          deprecated: false,
+        },
+        {
+          anchor: "max-time-ms",
+          name: "maxTimeMS",
+          kind: "property",
+          deprecated: false,
+        },
         {
           anchor: "projection",
           name: "projection",
@@ -138,8 +250,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/collection.ts",
-      line: 74,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L74",
+      line: 76,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L76",
     },
   ],
   usedBy: [

@@ -44,6 +44,8 @@ describe("WireErrorCode", () => {
       InvalidIndex: 6000,
       IndexNotFound: 6001,
       IndexConflict: 6002,
+      OperationTimeLimitExceeded: 7000,
+      ScanLimitExceeded: 7001,
       InternalError: 9000,
     });
   });
