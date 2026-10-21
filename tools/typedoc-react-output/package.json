@@ -40,7 +40,7 @@
     "@types/node": "catalog:",
     "prettier": "^3.9.10",
     "typedoc": "^0.28.20",
-    "typescript": "~7.0.2",
+    "typescript": "~6.0.0",
     "vitest": "catalog:"
   }
 }
