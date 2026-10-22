@@ -32,6 +32,15 @@ describe("parseCliArguments", () => {
     expect(parseCliArguments([])).not.toHaveProperty("logOperations");
   });
 
+  it("parses --config, and leaves it out when absent", () => {
+    expect(parseCliArguments(["--config", "c.json"])).toEqual({
+      kind: "start",
+      config: "c.json",
+    });
+    expect(parseCliArguments([])).not.toHaveProperty("config");
+    expect(() => parseCliArguments(["--config"])).toThrow(CliUsageError);
+  });
+
   it("parses the help option", () => {
     expect(parseCliArguments(["--help"])).toEqual({
       kind: "help",

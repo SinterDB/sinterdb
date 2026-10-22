@@ -6,6 +6,7 @@ Usage:
   sinterd [options]
   sinterd backup | restore | verify-backup (see sinterd backup --help)
   sinterd inspect | repair (see sinterd inspect --help)
+  sinterd config list | get | set | unset | path (see sinterd config --help)
 
 Options:
   --host <host>       Address to listen on
@@ -26,6 +27,8 @@ Options:
   --reclaim-lock      Take over a data directory lock left by another host or
                       container. Only use it when no other server can be using
                       the directory
+  --config <path>     Read settings from this config file (default: the
+                      sinterdb/config.json in your user config directory)
   --log-operations    Log one "operation" event for every command the server
                       runs: the command, database, collection, how long it
                       took, and whether it worked
@@ -76,6 +79,7 @@ export type CliCommand =
       checkpointKeep?: string;
       reclaimLock?: boolean;
       logOperations?: boolean;
+      config?: string;
     }
   | {
       kind: "help";
@@ -125,6 +129,9 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
         "log-operations": {
           type: "boolean",
         },
+        config: {
+          type: "string",
+        },
         "checkpoint-interval": {
           type: "string",
         },
@@ -164,6 +171,7 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
   const checkpointKeep = readStringOption(parsed.values, "checkpoint-keep");
   const reclaimLock = readBooleanOption(parsed.values, "reclaim-lock");
   const logOperations = readBooleanOption(parsed.values, "log-operations");
+  const config = readStringOption(parsed.values, "config");
 
   if (help && version) {
     throw new CliUsageError("--help and --version cannot be used together.");
@@ -193,6 +201,7 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
     ...(checkpointKeep === undefined ? {} : { checkpointKeep }),
     ...(reclaimLock ? { reclaimLock } : {}),
     ...(logOperations ? { logOperations } : {}),
+    ...(config === undefined ? {} : { config }),
   };
 }
 

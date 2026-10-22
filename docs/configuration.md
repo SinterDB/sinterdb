@@ -8,9 +8,10 @@ For connection strings, see [connection-strings.md](./connection-strings.md).
 
 ## Server
 
-Start the server with options on the command line, in environment variables, or
-both. When both are set, **the command line wins**, then the environment, then
-the default.
+Start the server with options on the command line, in environment variables, in
+a [config file](#config-file), or any mix of them. When several are set, **the
+command line wins**, then the environment, then the config file, then the
+default.
 
 | Option                       | Flag                             | Environment variable           | Default     |
 | ---------------------------- | -------------------------------- | ------------------------------ | ----------- |
@@ -24,6 +25,7 @@ the default.
 | Snapshots kept               | `--checkpoint-keep <n>`          | `SINTERDB_CHECKPOINT_KEEP`     | `2`         |
 | Reclaim lock                 | `--reclaim-lock`                 | `SINTERDB_RECLAIM_LOCK`        | `false`     |
 | Operation log                | `--log-operations`               | `SINTERDB_LOG_OPERATIONS`      | `false`     |
+| Config file                  | `--config <path>`                | none                           | see below   |
 
 Two more flags do not start a server: `-h, --help` prints the usage text, and
 `-v, --version` prints the server version.
@@ -140,6 +142,72 @@ to 100. The server also keeps the log since the oldest kept snapshot, so keeping
 more snapshots uses more disk and gives recovery more older states to fall back
 on if the newest ones are damaged. Two is the smallest allowed value, because two
 is what makes a damaged newest snapshot recoverable.
+
+### Config file
+
+A config file keeps settings so you do not have to type them every time. It is
+a JSON object, and every key is optional:
+
+```json
+{
+  "host": "0.0.0.0",
+  "port": 4721,
+  "dataDir": "/var/lib/sinterdb",
+  "writeConcern": "flushed",
+  "checkpointBytes": 67108864,
+  "checkpointInterval": 300,
+  "checkpointKeep": 2,
+  "reclaimLock": false,
+  "logOperations": false
+}
+```
+
+| Key                  | Type    | Same as                 |
+| -------------------- | ------- | ----------------------- |
+| `host`               | string  | `--host`                |
+| `port`               | number  | `--port`                |
+| `dataDir`            | string  | `--data-dir`            |
+| `writeConcern`       | string  | `--write-concern`       |
+| `checkpointBytes`    | number  | `--checkpoint-bytes`    |
+| `checkpointInterval` | number  | `--checkpoint-interval` |
+| `checkpointKeep`     | number  | `--checkpoint-keep`     |
+| `reclaimLock`        | boolean | `--reclaim-lock`        |
+| `logOperations`      | boolean | `--log-operations`      |
+
+The server reads `$XDG_CONFIG_HOME/sinterdb/config.json`, or
+`~/.config/sinterdb/config.json` when `XDG_CONFIG_HOME` is not set
+(`%APPDATA%\sinterdb\config.json` on Windows). `--config <path>` reads another
+file instead, and the server refuses to start when that file does not exist. A
+missing default file is the same as an empty one, so a server without a config
+file starts exactly as before. When a file was read, the `server.started` event
+reports its path as `configFile`.
+
+An invalid file stops the server from starting, and the message names the file
+and the setting: invalid JSON, an unknown key, a value of the wrong type, or a
+value the server would refuse on the command line.
+
+`writeConcern`, `checkpointBytes`, `checkpointInterval`, `checkpointKeep` and
+`reclaimLock` only apply with a data directory. A value for one of them in the
+file is ignored when no data directory is set by a flag, a variable or the file
+itself, and while the deprecated `--durability` is set, so a shared file never
+stops an in-memory server from starting. `sinterd config list` shows which file
+values are in use.
+
+Manage the file with the `config` command instead of editing it by hand:
+
+| Command                            | What it does                                                                  |
+| ---------------------------------- | ----------------------------------------------------------------------------- |
+| `sinterd config list`              | Every key with its effective value and where the value comes from.            |
+| `sinterd config get <key>`         | Prints one effective value. Exits with `1` and prints nothing if none is set. |
+| `sinterd config set <key> <value>` | Checks the value with the server's own rules, then saves it.                  |
+| `sinterd config unset <key>`       | Removes the key from the file.                                                |
+| `sinterd config path`              | Prints the file in use.                                                       |
+
+All of them accept `--config <path>`. A running server does not notice changes:
+they take effect the next time it starts, and `set` and `unset` say so. When an
+environment variable sets the same key, `set` also warns that the variable
+overrides the file. The `backup`, `restore`, `inspect` and `repair` commands do
+not read the config file.
 
 ### Stopping the server
 

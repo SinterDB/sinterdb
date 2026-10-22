@@ -6,6 +6,17 @@ import {
 
 import { HELP_TEXT, parseCliArguments, type CliCommand } from "./cli.js";
 import {
+  isConfigCommandName,
+  parseConfigArguments,
+  runConfigCommand,
+} from "./config-command.js";
+import {
+  ConfigFileError,
+  applyConfigFile,
+  defaultConfigPath,
+  readConfigFile,
+} from "./config-file.js";
+import {
   isBackupCommandName,
   parseBackupArguments,
   runBackupCommand,
@@ -34,6 +45,11 @@ export async function main(
     return;
   }
 
+  if (isConfigCommandName(first)) {
+    runConfigCommand(parseConfigArguments(rest));
+    return;
+  }
+
   if (isMaintenanceCommandName(first)) {
     runMaintenanceCommand(parseMaintenanceArguments(first, rest));
     return;
@@ -58,7 +74,7 @@ export async function main(
 async function startServer(
   command: Extract<CliCommand, { kind: "start" }>,
 ): Promise<void> {
-  const config: ServerConfigInput = {
+  const flags: ServerConfigInput = {
     ...(command.host === undefined ? {} : { host: command.host }),
     ...(command.port === undefined ? {} : { port: command.port }),
     ...(command.dataDir === undefined
@@ -83,7 +99,16 @@ async function startServer(
     ...(command.logOperations === true ? { logOperations: true } : {}),
   };
 
-  const server = new SinterServer(config);
+  const configPath = command.config ?? defaultConfigPath();
+  const file = readConfigFile(configPath);
+
+  if (command.config !== undefined && !file.exists) {
+    throw new ConfigFileError(`The config file ${configPath} does not exist.`);
+  }
+
+  const server = new SinterServer(
+    applyConfigFile(flags, file.values, process.env),
+  );
   let shutdownOperation: Promise<void> | undefined;
 
   const shutdown = (reason: string): Promise<void> => {
@@ -161,6 +186,7 @@ async function startServer(
     port: address.port,
     family: address.family,
     version: SERVER_PRODUCT_VERSION,
+    ...(file.exists ? { configFile: file.path } : {}),
     ...(server.config.dataDirectory === undefined
       ? { storage: "memory" }
       : {
