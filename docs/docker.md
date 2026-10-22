@@ -4,7 +4,7 @@ The repository includes a [`Dockerfile`](../Dockerfile) for the server and a
 [Compose example](../examples/docker/compose.yaml). Use them to run `sinterd`
 without installing Node.js packages on your machine.
 
-> SinterDB `0.2.0` is a developer preview, and there is no published image yet.
+> SinterDB `0.3.0` is a developer preview, and there is no published image yet.
 > You build the image yourself from a clone of this repository, as shown below.
 
 > **Authentication and TLS are not implemented yet.** Anyone who can reach the

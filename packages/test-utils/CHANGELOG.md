@@ -1,5 +1,11 @@
 # @sinterdb-internal/test-utils
 
+## 0.3.0
+
+### Patch Changes
+
+- @sinterdb-internal/server@0.3.0
+
 ## 0.2.0
 
 ### Patch Changes

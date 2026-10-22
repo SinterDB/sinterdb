@@ -171,6 +171,19 @@ Each breaking change lands here in the release that makes it.
   `{ a: { $nope: 1 } }`. They now fail with `DocumentValidationFailed`, like
   every other command that takes a filter.
 
+- **Queries now look inside arrays.** `{ tags: "x" }` matches
+  `{ tags: ["x", "y"] }`, and `{ scores: { $gt: 90 } }` matches when any element
+  is above 90. `{ tags: { $ne: "x" } }` and `$nin` now exclude documents whose
+  array holds the value; before, they wrongly included them. Dotted paths step
+  through arrays of documents (`"items.sku"`) or pick an element by position
+  (`"items.0"`). An index is not used once any indexed document has an array on
+  the indexed path, so such queries scan the collection. They return the same
+  documents, only slower. See [Arrays](./query-semantics.md#arrays).
+- **`IndexDefinition` is now a type, not an interface.** It is a union of the
+  single-field and the `keys` form. Code that builds a definition or passes one
+  to `createIndex()` compiles as before. Code that `extends` or `implements` it
+  needs to change.
+
 ### 0.2.0
 
 - **Write concerns replace durability modes.** `--write-concern <level>` and

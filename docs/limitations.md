@@ -1,6 +1,6 @@
 # Known limitations
 
-SinterDB `0.2.0` is a developer preview. This page lists what it does not do
+SinterDB `0.3.0` is a developer preview. This page lists what it does not do
 yet, the hard limits it enforces, and the rough edges you may meet. Tests check
 the numbers and the "not supported" lists against the code, so this page stays
 true as the code changes. If something here surprises you, please open an

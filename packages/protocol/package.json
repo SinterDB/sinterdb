@@ -1,6 +1,6 @@
 {
   "name": "sinterdb-protocol",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Wire protocol primitives shared by the SinterDB server and official driver.",
   "type": "module",
   "sideEffects": false,

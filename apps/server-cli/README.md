@@ -7,7 +7,7 @@ Command-line server for SinterDB. The package installs the `sinterd` executable.
 
 ## Installation
 
-The `0.2.0` developer preview is on npm:
+The `0.3.0` developer preview is on npm:
 
 ```bash
 npm install --global @sinterdb/cli
@@ -136,7 +136,7 @@ Lifecycle events are written as newline-delimited JSON:
     "host": "127.0.0.1",
     "port": 4721,
     "family": "IPv4",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "storage": "disk",
     "dataDirectory": "/var/lib/sinterdb",
     "writeConcern": "flushed",

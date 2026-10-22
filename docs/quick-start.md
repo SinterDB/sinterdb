@@ -6,7 +6,7 @@ data still there. It takes about five minutes.
 
 You need **Node.js 24 or later**.
 
-> SinterDB `0.2.0` is a developer preview. The APIs and the protocol may still
+> SinterDB `0.3.0` is a developer preview. The APIs and the protocol may still
 > change before `1.0.0`.
 
 ## 1. Install the server
