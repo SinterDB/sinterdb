@@ -24,6 +24,14 @@ describe("parseCliArguments", () => {
     });
   });
 
+  it("parses --log-operations, and leaves it out when absent", () => {
+    expect(parseCliArguments(["--log-operations"])).toEqual({
+      kind: "start",
+      logOperations: true,
+    });
+    expect(parseCliArguments([])).not.toHaveProperty("logOperations");
+  });
+
   it("parses the help option", () => {
     expect(parseCliArguments(["--help"])).toEqual({
       kind: "help",

@@ -23,6 +23,7 @@ the default.
 | Checkpoint interval          | `--checkpoint-interval <seconds` | `SINTERDB_CHECKPOINT_INTERVAL` | none        |
 | Snapshots kept               | `--checkpoint-keep <n>`          | `SINTERDB_CHECKPOINT_KEEP`     | `2`         |
 | Reclaim lock                 | `--reclaim-lock`                 | `SINTERDB_RECLAIM_LOCK`        | `false`     |
+| Operation log                | `--log-operations`               | `SINTERDB_LOG_OPERATIONS`      | `false`     |
 
 Two more flags do not start a server: `-h, --help` prints the usage text, and
 `-v, --version` prints the server version.
@@ -59,6 +60,46 @@ lock that a process on another host or container left behind. Leave it off
 unless the directory is only ever used by one server at a time and the host name
 changes between runs, which is the case for containers. The Docker image turns
 it on. See [the data directory lock](./storage.md#the-data-directory-lock).
+
+### Operation log
+
+`--log-operations` (or `SINTERDB_LOG_OPERATIONS=true`) logs one `operation`
+event for every command the server runs. It works with or without a data
+directory, and it is off by default, so a server that does not use it does no
+extra work and prints exactly what it printed before.
+
+```json
+{
+  "timestamp": "2026-10-22T01:50:12.431Z",
+  "level": "info",
+  "event": "operation",
+  "message": "find app.users",
+  "details": {
+    "command": "find",
+    "database": "app",
+    "collection": "users",
+    "durationMs": 0.412,
+    "ok": true
+  }
+}
+```
+
+| Detail       | Meaning                                                                         |
+| ------------ | ------------------------------------------------------------------------------- |
+| `command`    | The command name, such as `find`, `insertOne` or `aggregate`.                   |
+| `database`   | The database it ran in. Left out for server-wide commands.                      |
+| `collection` | The collection it used. Left out when the command has none.                     |
+| `durationMs` | Milliseconds the server spent running it. It excludes waiting for a flush.      |
+| `ok`         | `true` when the command worked.                                                 |
+| `error`      | The error name when it failed, such as `DuplicateKey`. Left out when it worked. |
+
+A command that fails because of the request (a duplicate key, a bad filter, an
+unknown command) logs at level `warn`, because the server is fine. Both levels
+go to standard output so the lines of one run stay in order. On a terminal the
+same event prints as readable, colored lines.
+
+Document contents and filters are never logged. A busy server writes a lot of
+lines with this on.
 
 ### Write concern
 

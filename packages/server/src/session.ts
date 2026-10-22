@@ -38,6 +38,22 @@ export const ServerSessionState = {
 export type ServerSessionState =
   (typeof ServerSessionState)[keyof typeof ServerSessionState];
 
+/** What the server reports about one command it ran, when asked to. */
+export interface ServerCommandEvent {
+  /** The command name, such as `find` or `insertOne`. */
+  readonly command: string;
+  readonly database?: string;
+  readonly collection?: string;
+  /**
+   * Milliseconds the server spent running the command. It does not include
+   * time spent waiting for a flush to stable storage.
+   */
+  readonly durationMs: number;
+  readonly ok: boolean;
+  /** The error name when the command failed, such as `DuplicateKey`. */
+  readonly error?: string;
+}
+
 export interface ServerSessionOptions {
   dispatcher: CommandDispatcher;
   /**
@@ -57,6 +73,11 @@ export interface ServerSessionOptions {
    * only this session and never the server.
    */
   onConnectionError?: (error: Error) => void;
+  /**
+   * Called once for every command, after it ran, whether it worked or failed.
+   * Leave it out and the session does no timing at all.
+   */
+  onCommand?: (event: ServerCommandEvent) => void;
 }
 
 export class ServerSession {
@@ -69,6 +90,7 @@ export class ServerSession {
   private readonly productVersion: string;
   private readonly onError: (error: Error) => void;
   private readonly onConnectionError: (error: Error) => void;
+  private readonly onCommand: ((event: ServerCommandEvent) => void) | undefined;
   private held: Uint8Array[] = [];
   private holding = false;
   private endAfterRelease = false;
@@ -85,6 +107,7 @@ export class ServerSession {
     this.productVersion = options.productVersion ?? SERVER_PRODUCT_VERSION;
     this.onError = options.onError ?? (() => undefined);
     this.onConnectionError = options.onConnectionError ?? (() => undefined);
+    this.onCommand = options.onCommand;
     this.sweepTimer = setInterval(() => {
       this.cursors.sweepExpired();
     }, CURSOR_SWEEP_INTERVAL_MS);
@@ -215,10 +238,16 @@ export class ServerSession {
 
   private handleCommand(requestId: number, command: CommandEnvelope): void {
     let value: DocumentValue;
+    const started = this.onCommand === undefined ? 0 : performance.now();
 
     try {
       value = this.dispatcher.dispatch(command, this.cursors);
     } catch (error: unknown) {
+      this.reportCommand(
+        command,
+        started,
+        error instanceof CommandExecutionError ? error.name : "InternalError",
+      );
       this.holdUntilDurable();
 
       if (error instanceof CommandExecutionError) {
@@ -237,6 +266,7 @@ export class ServerSession {
       return;
     }
 
+    this.reportCommand(command, started, undefined);
     this.holdUntilDurable();
 
     try {
@@ -259,6 +289,34 @@ export class ServerSession {
       }
 
       this.failCommand(requestId, error);
+    }
+  }
+
+  private reportCommand(
+    command: CommandEnvelope,
+    started: number,
+    error: string | undefined,
+  ): void {
+    if (this.onCommand === undefined) {
+      return;
+    }
+
+    const collection = command.parameters["collection"];
+
+    try {
+      this.onCommand({
+        command: command.command,
+        ...(command.database === undefined
+          ? {}
+          : { database: command.database }),
+        ...(typeof collection === "string" ? { collection } : {}),
+        durationMs: performance.now() - started,
+        ok: error === undefined,
+        ...(error === undefined ? {} : { error }),
+      });
+    } catch {
+      // Reporting is for people watching the server. If it fails, the command
+      // it was reporting must still get its reply.
     }
   }
 

@@ -268,6 +268,9 @@ export class SinterServer extends EventEmitter {
       ...(this.committer === undefined ? {} : { durability: this.committer }),
       onError: (error) => this.emit("error", error),
       onConnectionError: (error) => this.emit("connectionError", error),
+      ...(this.config.logOperations
+        ? { onCommand: (event) => this.emit("command", event) }
+        : {}),
     });
 
     socket.once("close", () => {

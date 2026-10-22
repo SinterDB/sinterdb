@@ -15,6 +15,7 @@ describe("resolveServerConfig", () => {
       writeConcern: "flushed",
       checkpointKeep: 2,
       reclaimLock: false,
+      logOperations: false,
     });
   });
 
@@ -33,6 +34,7 @@ describe("resolveServerConfig", () => {
       writeConcern: "flushed",
       checkpointKeep: 2,
       reclaimLock: false,
+      logOperations: false,
     });
   });
 
@@ -54,6 +56,7 @@ describe("resolveServerConfig", () => {
       writeConcern: "flushed",
       checkpointKeep: 2,
       reclaimLock: false,
+      logOperations: false,
     });
   });
 
@@ -123,6 +126,7 @@ describe("resolveServerConfig storage options", () => {
     expect(resolveServerConfig({ dataDirectory: "/data" }, {})).toMatchObject({
       writeConcern: "flushed",
       reclaimLock: false,
+      logOperations: false,
     });
   });
 
@@ -352,5 +356,33 @@ describe("resolveServerConfig checkpoint schedule and retention", () => {
     expect(() => resolveServerConfig({ checkpointKeep: 3 }, {})).toThrow(
       ServerConfigurationError,
     );
+  });
+});
+
+describe("resolveServerConfig log operations", () => {
+  it("is off by default and needs no data directory", () => {
+    expect(resolveServerConfig({}, {}).logOperations).toBe(false);
+    expect(resolveServerConfig({ logOperations: true }, {}).logOperations).toBe(
+      true,
+    );
+  });
+
+  it("reads true and false from the environment, and lets input win", () => {
+    expect(
+      resolveServerConfig({}, { SINTERDB_LOG_OPERATIONS: " true " })
+        .logOperations,
+    ).toBe(true);
+    expect(
+      resolveServerConfig(
+        { logOperations: false },
+        { SINTERDB_LOG_OPERATIONS: "true" },
+      ).logOperations,
+    ).toBe(false);
+  });
+
+  it("rejects any other text", () => {
+    expect(() =>
+      resolveServerConfig({}, { SINTERDB_LOG_OPERATIONS: "yes" }),
+    ).toThrow(/Log operations must be "true" or "false"/);
   });
 });

@@ -106,7 +106,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/budget.ts",
               line: 28,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L28",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/budget.ts#L28",
             },
           ],
         },
@@ -141,7 +141,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/budget.ts",
               line: 22,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L22",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/budget.ts#L22",
             },
           ],
         },
@@ -177,7 +177,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/budget.ts",
       line: 11,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/budget.ts#L11",
+      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/budget.ts#L11",
     },
   ],
   usedBy: [

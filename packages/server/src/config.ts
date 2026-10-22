@@ -28,6 +28,11 @@ export interface ServerConfig {
    * container. Off by default.
    */
   reclaimLock: boolean;
+  /**
+   * Emit a `command` event on the server for every command it runs. Off by
+   * default, so a server pays nothing for events nobody asked for.
+   */
+  logOperations: boolean;
 }
 
 export interface ServerConfigInput {
@@ -45,6 +50,7 @@ export interface ServerConfigInput {
   checkpointIntervalSeconds?: number | string;
   checkpointKeep?: number | string;
   reclaimLock?: boolean | string;
+  logOperations?: boolean | string;
 }
 
 /**
@@ -61,6 +67,7 @@ export const SERVER_ENVIRONMENT_VARIABLES = [
   "SINTERDB_CHECKPOINT_INTERVAL",
   "SINTERDB_CHECKPOINT_KEEP",
   "SINTERDB_RECLAIM_LOCK",
+  "SINTERDB_LOG_OPERATIONS",
 ] as const;
 
 export type ServerEnvironment = Readonly<{
@@ -76,7 +83,8 @@ export type ServerConfigurationOption =
   | "checkpointThresholdBytes"
   | "checkpointIntervalSeconds"
   | "checkpointKeep"
-  | "reclaimLock";
+  | "reclaimLock"
+  | "logOperations";
 
 export class ServerConfigurationError extends Error {
   public readonly option: ServerConfigurationOption;
@@ -151,6 +159,12 @@ export function resolveServerConfig(
     );
   }
 
+  const logOperations = resolveBooleanOption(
+    "logOperations",
+    "Log operations",
+    input.logOperations ?? environment.SINTERDB_LOG_OPERATIONS,
+  );
+
   return {
     host,
     port,
@@ -164,6 +178,7 @@ export function resolveServerConfig(
       : { checkpointIntervalSeconds }),
     checkpointKeep,
     reclaimLock,
+    logOperations,
   };
 }
 
@@ -333,6 +348,14 @@ function toNumber(value: number | string): number {
 }
 
 function resolveReclaimLock(value: boolean | string | undefined): boolean {
+  return resolveBooleanOption("reclaimLock", "Reclaim lock", value);
+}
+
+function resolveBooleanOption(
+  option: ServerConfigurationOption,
+  label: string,
+  value: boolean | string | undefined,
+): boolean {
   if (value === undefined) {
     return false;
   }
@@ -345,8 +368,8 @@ function resolveReclaimLock(value: boolean | string | undefined): boolean {
 
   if (text !== "true" && text !== "false") {
     throw new ServerConfigurationError(
-      "reclaimLock",
-      `Reclaim lock must be "true" or "false"; received ${JSON.stringify(value)}.`,
+      option,
+      `${label} must be "true" or "false"; received ${JSON.stringify(value)}.`,
     );
   }
 

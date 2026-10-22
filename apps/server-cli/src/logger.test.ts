@@ -6,6 +6,7 @@ import {
   formatPrettyLog,
   logError,
   logInfo,
+  logOperation,
   logWarning,
   type LogEntry,
 } from "./logger.js";
@@ -199,5 +200,77 @@ describe("log output", () => {
     setTerminal(process.stderr, false);
 
     expect(activeLogFormat()).toBe("json");
+  });
+
+  it("writes an operation as one JSON line with only the details it has", () => {
+    const written = capture();
+
+    logOperation({
+      command: "find",
+      database: "app",
+      collection: "users",
+      durationMs: 0.41234,
+      ok: true,
+    });
+    logOperation({ command: "listDatabases", durationMs: 2, ok: true });
+
+    const [first, second] = written
+      .out()
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+
+    expect(first).toMatchObject({
+      level: "info",
+      event: "operation",
+      message: "find app.users",
+      details: {
+        command: "find",
+        database: "app",
+        collection: "users",
+        durationMs: 0.412,
+        ok: true,
+      },
+    });
+    expect(first?.["details"]).not.toHaveProperty("error");
+    expect(second).toMatchObject({ message: "listDatabases" });
+    expect(second?.["details"]).not.toHaveProperty("database");
+    expect(second?.["details"]).not.toHaveProperty("collection");
+  });
+
+  it("logs a failed operation as a warning on standard output", () => {
+    const written = capture();
+
+    logOperation({
+      command: "insertOne",
+      database: "app",
+      collection: "users",
+      durationMs: 1,
+      ok: false,
+      error: "DuplicateKey",
+    });
+
+    expect(written.err()).toBe("");
+    expect(JSON.parse(written.out())).toMatchObject({
+      level: "warn",
+      event: "operation",
+      message: "insertOne app.users",
+      details: { ok: false, error: "DuplicateKey" },
+    });
+  });
+
+  it("names only the database when a command has no collection", () => {
+    const written = capture();
+
+    logOperation({
+      command: "listCollections",
+      database: "app",
+      durationMs: 1,
+      ok: true,
+    });
+
+    expect(JSON.parse(written.out())).toMatchObject({
+      message: "listCollections app",
+    });
   });
 });

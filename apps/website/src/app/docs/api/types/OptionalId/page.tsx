@@ -92,7 +92,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/collection.ts",
               line: 50,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L50",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/collection.ts#L50",
             },
           ],
         },
@@ -122,7 +122,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/collection.ts",
       line: 48,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/collection.ts#L48",
+      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/collection.ts#L48",
     },
   ],
   usedBy: [

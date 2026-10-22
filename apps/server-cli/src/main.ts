@@ -15,7 +15,7 @@ import {
   parseMaintenanceArguments,
   runMaintenanceCommand,
 } from "./maintenance-command.js";
-import { logError, logInfo, logWarning } from "./logger.js";
+import { logError, logInfo, logOperation, logWarning } from "./logger.js";
 import { createStyle, styleHelp } from "./style.js";
 
 export async function main(
@@ -74,6 +74,7 @@ async function startServer(
       ? {}
       : { checkpointKeep: command.checkpointKeep }),
     ...(command.reclaimLock === true ? { reclaimLock: true } : {}),
+    ...(command.logOperations === true ? { logOperations: true } : {}),
   };
 
   const server = new SinterServer(config);
@@ -123,6 +124,10 @@ async function startServer(
       error,
     );
   });
+
+  if (server.config.logOperations) {
+    server.on("command", logOperation);
+  }
 
   server.on("error", (error: Error) => {
     process.exitCode = 1;

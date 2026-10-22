@@ -26,6 +26,9 @@ Options:
   --reclaim-lock      Take over a data directory lock left by another host or
                       container. Only use it when no other server can be using
                       the directory
+  --log-operations    Log one "operation" event for every command the server
+                      runs: the command, database, collection, how long it
+                      took, and whether it worked
   -h, --help          Show this help message
   -v, --version       Show the server version
 
@@ -55,6 +58,8 @@ Environment:
   SINTERDB_CHECKPOINT_KEEP
                          Default number of snapshots to keep
   SINTERDB_RECLAIM_LOCK  Set to true to take over a lock left by another host
+  SINTERDB_LOG_OPERATIONS
+                         Set to true to log every command (--log-operations)
 
 `;
 
@@ -70,6 +75,7 @@ export type CliCommand =
       checkpointInterval?: string;
       checkpointKeep?: string;
       reclaimLock?: boolean;
+      logOperations?: boolean;
     }
   | {
       kind: "help";
@@ -116,6 +122,9 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
         "reclaim-lock": {
           type: "boolean",
         },
+        "log-operations": {
+          type: "boolean",
+        },
         "checkpoint-interval": {
           type: "string",
         },
@@ -154,6 +163,7 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
   );
   const checkpointKeep = readStringOption(parsed.values, "checkpoint-keep");
   const reclaimLock = readBooleanOption(parsed.values, "reclaim-lock");
+  const logOperations = readBooleanOption(parsed.values, "log-operations");
 
   if (help && version) {
     throw new CliUsageError("--help and --version cannot be used together.");
@@ -182,6 +192,7 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
     ...(checkpointInterval === undefined ? {} : { checkpointInterval }),
     ...(checkpointKeep === undefined ? {} : { checkpointKeep }),
     ...(reclaimLock ? { reclaimLock } : {}),
+    ...(logOperations ? { logOperations } : {}),
   };
 }
 

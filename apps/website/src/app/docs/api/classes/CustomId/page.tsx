@@ -57,7 +57,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 58,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L58",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L58",
                 },
               ],
             },
@@ -68,7 +68,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 58,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L58",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L58",
             },
           ],
         },
@@ -123,7 +123,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 68,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L68",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L68",
                 },
               ],
             },
@@ -134,7 +134,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 68,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L68",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L68",
             },
           ],
         },
@@ -168,7 +168,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 76,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L76",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L76",
                 },
               ],
             },
@@ -179,7 +179,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 76,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L76",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L76",
             },
           ],
         },
@@ -213,7 +213,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 80,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L80",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L80",
                 },
               ],
             },
@@ -224,7 +224,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 80,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L80",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L80",
             },
           ],
         },
@@ -258,7 +258,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 90,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L90",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L90",
                 },
               ],
             },
@@ -269,7 +269,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 90,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L90",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L90",
             },
           ],
         },
@@ -303,7 +303,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 86,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L86",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L86",
                 },
               ],
             },
@@ -314,7 +314,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 86,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L86",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L86",
             },
           ],
         },
@@ -364,7 +364,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 23,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L23",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L23",
                 },
               ],
             },
@@ -375,7 +375,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 23,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L23",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L23",
             },
           ],
         },
@@ -425,7 +425,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 37,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L37",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L37",
                 },
               ],
             },
@@ -436,7 +436,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 37,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L37",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L37",
             },
           ],
         },
@@ -471,7 +471,7 @@ const page: ApiPage = {
                 {
                   path: "packages/protocol/src/custom-id.ts",
                   line: 13,
-                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L13",
+                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L13",
                 },
               ],
             },
@@ -482,7 +482,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/custom-id.ts",
               line: 13,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L13",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L13",
             },
           ],
         },
@@ -566,7 +566,7 @@ const page: ApiPage = {
     {
       path: "packages/protocol/src/custom-id.ts",
       line: 10,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/custom-id.ts#L10",
+      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/protocol/src/custom-id.ts#L10",
     },
   ],
   usedBy: [

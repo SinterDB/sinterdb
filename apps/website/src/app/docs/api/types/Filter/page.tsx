@@ -162,7 +162,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/filter.ts",
               line: 174,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L174",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/filter.ts#L174",
             },
           ],
         },
@@ -199,7 +199,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/filter.ts",
               line: 176,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L176",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/filter.ts#L176",
             },
           ],
         },
@@ -236,7 +236,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/filter.ts",
               line: 180,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L180",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/filter.ts#L180",
             },
           ],
         },
@@ -273,7 +273,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/filter.ts",
               line: 178,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L178",
+              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/filter.ts#L178",
             },
           ],
         },
@@ -321,7 +321,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/filter.ts",
       line: 167,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L167",
+      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/filter.ts#L167",
     },
   ],
   usedBy: [

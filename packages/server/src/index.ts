@@ -60,6 +60,7 @@ export type {
   SinterServerState as SinterServerStateValue,
 } from "./server.js";
 export type {
+  ServerCommandEvent,
   ServerSessionOptions,
   ServerSessionState as ServerSessionStateValue,
 } from "./session.js";

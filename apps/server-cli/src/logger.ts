@@ -44,6 +44,49 @@ export function logError(event: string, message: string, error: unknown): void {
   );
 }
 
+/** The part of a server command event that the log needs. */
+export interface OperationDetails {
+  readonly command: string;
+  readonly database?: string;
+  readonly collection?: string;
+  readonly durationMs: number;
+  readonly ok: boolean;
+  readonly error?: string;
+}
+
+/**
+ * One command the server ran. A command that failed (a duplicate key, a bad
+ * filter) is a `warn`, because the server itself is fine. Both go to standard
+ * output, so the lines of one run stay in order.
+ */
+export function logOperation(operation: OperationDetails): void {
+  const target =
+    operation.database === undefined
+      ? ""
+      : operation.collection === undefined
+        ? ` ${operation.database}`
+        : ` ${operation.database}.${operation.collection}`;
+
+  writeLog(
+    operation.ok ? "info" : "warn",
+    "operation",
+    `${operation.command}${target}`,
+    {
+      command: operation.command,
+      ...(operation.database === undefined
+        ? {}
+        : { database: operation.database }),
+      ...(operation.collection === undefined
+        ? {}
+        : { collection: operation.collection }),
+      durationMs: Math.round(operation.durationMs * 1000) / 1000,
+      ok: operation.ok,
+      ...(operation.error === undefined ? {} : { error: operation.error }),
+    },
+    process.stdout,
+  );
+}
+
 /**
  * A problem that affects one connection or request but not the server, such
  * as a client that disconnected abruptly.
