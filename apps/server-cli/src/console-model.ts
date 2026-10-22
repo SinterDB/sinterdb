@@ -39,18 +39,16 @@ export interface ConsoleOverlay {
 }
 
 export const CONSOLE_HELP_LINES: readonly string[] = [
-  "s  start the server         x  stop the server",
-  "r  restart the server       q  quit (stops the server first)",
-  "p  pause or resume the log  l  cycle the level: all, warn, error",
-  "/  filter the log by text   f  follow the newest line",
-  "c  clear the log            :  type a command",
+  "s  start or restart    x  stop          q  quit",
+  "p  pause or resume     l  cycle level   f  follow",
+  "/  filter by text      c  clear         :  command",
+  "i  inspect   b  backup   r  repair   (coming soon)",
   "",
-  "up, down, pgup, pgdn, home  scroll the log",
+  "up down pgup pgdn home   scroll the log",
   "",
   "Commands (after :)",
-  "start, stop, restart, quit, clear, help",
-  "level all|warn|error",
-  "filter [text]",
+  "start  stop  restart  quit  clear  help",
+  "level all|warn|error   filter [text]",
   "",
   "esc closes this panel or cancels what you are typing.",
 ];
@@ -60,7 +58,7 @@ export const MIN_COLUMNS = 60;
 export const MIN_ROWS = 16;
 
 /** Rows taken by everything except the log lines. */
-export const CHROME_ROWS = 6;
+export const CHROME_ROWS = 11;
 
 /** Ops per second are averaged over this many milliseconds. */
 export const RATE_WINDOW_MS = 5000;
@@ -78,6 +76,8 @@ export interface ConsoleSnapshot {
   readonly rows: number;
   readonly server: SupervisorState;
   readonly address?: SupervisorAddress;
+  /** Where the server keeps data: a directory, or `in memory`. */
+  readonly storage?: string;
   /** Milliseconds since the server became ready, while it is up. */
   readonly uptimeMs?: number;
   /** How the server ended when it was not asked to stop. */
@@ -119,6 +119,7 @@ export class ConsoleModel {
   private rows = 24;
   private server: SupervisorState = SupervisorState.Stopped;
   private address: SupervisorAddress | undefined;
+  private storage: string | undefined;
   private startedAt: number | undefined;
   private exitText: string | undefined;
   private commands = 0;
@@ -165,6 +166,7 @@ export class ConsoleModel {
       this.active = 0;
       this.recent = [];
       this.exitText = undefined;
+      this.storage = undefined;
     }
 
     if (state === SupervisorState.Running && this.startedAt === undefined) {
@@ -196,6 +198,12 @@ export class ConsoleModel {
   /** Adds a line from the server and updates the counters. */
   public addLog(entry: LogEntry): void {
     this.logs.push(entry);
+
+    if (entry.event === "server.started") {
+      const where = entry.details?.["dataDirectory"];
+
+      this.storage = typeof where === "string" ? where : "in memory";
+    }
 
     if (entry.event === "operation") {
       this.commands += 1;
@@ -299,11 +307,20 @@ export class ConsoleModel {
         this.input = "";
         return undefined;
       case "s":
-        return this.requestStart();
+        return this.server === SupervisorState.Running
+          ? this.requestRestart()
+          : this.requestStart();
       case "x":
         return this.requestStop();
+      case "i":
+        this.notice = "Inspect is not available yet.";
+        return undefined;
+      case "b":
+        this.notice = "Backup is not available yet.";
+        return undefined;
       case "r":
-        return this.requestRestart();
+        this.notice = "Repair is not available yet.";
+        return undefined;
       case "q":
         return { kind: "quit" };
       default:
@@ -327,6 +344,7 @@ export class ConsoleModel {
       rows: this.rows,
       server: this.server,
       ...(this.address === undefined ? {} : { address: this.address }),
+      ...(this.storage === undefined ? {} : { storage: this.storage }),
       ...(this.startedAt === undefined
         ? {}
         : { uptimeMs: Math.max(0, now - this.startedAt) }),
@@ -479,7 +497,9 @@ export class ConsoleModel {
     this.notice =
       this.server === SupervisorState.Stopping
         ? "The server is still stopping."
-        : "The server is already running.";
+        : this.server === SupervisorState.Starting
+          ? "The server is already starting."
+          : "The server is already running.";
     return undefined;
   }
 

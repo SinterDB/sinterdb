@@ -14,10 +14,45 @@ interface Segment {
   readonly paint?: ((text: string) => string) | undefined;
 }
 
+interface Box {
+  readonly topLeft: string;
+  readonly topRight: string;
+  readonly bottomLeft: string;
+  readonly bottomRight: string;
+  readonly across: string;
+  readonly down: string;
+  readonly teeLeft: string;
+  readonly teeRight: string;
+}
+
+const UNICODE_BOX: Box = {
+  topLeft: "┌",
+  topRight: "┐",
+  bottomLeft: "└",
+  bottomRight: "┘",
+  across: "─",
+  down: "│",
+  teeLeft: "├",
+  teeRight: "┤",
+};
+
+const ASCII_BOX: Box = {
+  topLeft: "+",
+  topRight: "+",
+  bottomLeft: "+",
+  bottomRight: "+",
+  across: "-",
+  down: "|",
+  teeLeft: "+",
+  teeRight: "+",
+};
+
 /**
  * Draws the console as exactly `snapshot.rows` lines, none wider than
- * `snapshot.columns`. It only builds text: moving the cursor and writing to
- * the terminal belong to the terminal code, so tests compare plain strings.
+ * `snapshot.columns`: a box with a header, a stats row, the log, two rows of
+ * buttons and a line for typing. It only builds text: moving the cursor and
+ * writing to the terminal belong to the terminal code, so tests compare
+ * plain strings.
  */
 export function renderConsole(
   snapshot: ConsoleSnapshot,
@@ -29,24 +64,37 @@ export function renderConsole(
     return tooSmall(snapshot, style);
   }
 
+  const box = style.unicode ? UNICODE_BOX : ASCII_BOX;
+  const inner = columns - 2;
   const height = rows - CHROME_ROWS;
+  const edge = (text: string): string => style.dim(text);
+  const row = (segments: readonly Segment[]): string =>
+    `${edge(box.down)}${fit(segments, inner, true)}${edge(box.down)}`;
+  const line = (left: string, right: string): string =>
+    edge(`${left}${box.across.repeat(inner)}${right}`);
   const body =
     snapshot.overlay === undefined
-      ? snapshot.lines.map((item) => logLine(item.entry, columns, style))
+      ? snapshot.lines.map((item) => logLine(item.entry, style))
       : overlayLines(snapshot, style);
   const padded = [
     ...body.slice(0, height),
-    ...Array.from({ length: Math.max(0, height - body.length) }, () => ""),
+    ...Array.from({ length: Math.max(0, height - body.length) }, () => []),
   ];
+  const [firstButtons, secondButtons] = buttons(snapshot, style);
 
   return [
-    header(snapshot, style),
-    stats(snapshot, style),
-    rule(snapshot, style),
-    ...padded,
-    fill(style.symbols.rule, columns, style),
-    buttons(snapshot, style),
-    prompt(snapshot, style),
+    line(box.topLeft, box.topRight),
+    row(header(snapshot, style)),
+    line(box.teeLeft, box.teeRight),
+    row(stats(snapshot, style)),
+    logTitle(snapshot, style, box),
+    ...padded.map((segments) => row(segments)),
+    line(box.teeLeft, box.teeRight),
+    row(firstButtons),
+    row(secondButtons),
+    line(box.teeLeft, box.teeRight),
+    row(prompt(snapshot, style)),
+    line(box.bottomLeft, box.bottomRight),
   ];
 }
 
@@ -71,24 +119,32 @@ function tooSmall(snapshot: ConsoleSnapshot, style: Style): string[] {
   );
 }
 
-function header(snapshot: ConsoleSnapshot, style: Style): string {
+function header(snapshot: ConsoleSnapshot, style: Style): Segment[] {
   const dot = style.unicode ? "●" : "*";
   const [label, paint] = stateLook(snapshot, style);
   const segments: Segment[] = [
-    { text: ` SinterDB ${snapshot.version}  `, paint: style.bold },
-    { text: `${dot} ${label}`, paint },
+    { text: ` SinterDB v${snapshot.version}`, paint: style.bold },
+    { text: `   ${dot} ${label}`, paint },
   ];
 
   if (snapshot.address !== undefined) {
-    segments.push(
-      { text: `  ${snapshot.address.host}:${snapshot.address.port}` },
-      { text: `  pid ${snapshot.address.pid}`, paint: style.dim },
-    );
+    segments.push({ text: `   ${hostPort(snapshot.address)}` });
+
+    if (snapshot.storage !== undefined) {
+      segments.push({ text: `   ${snapshot.storage}`, paint: style.dim });
+    }
   } else if (snapshot.exit !== undefined) {
-    segments.push({ text: `  ${snapshot.exit}`, paint: style.red });
+    segments.push({ text: `   ${snapshot.exit}`, paint: style.red });
   }
 
-  return fit(segments, snapshot.columns);
+  return segments;
+}
+
+/** `:27017` for this machine, `host:27017` otherwise. */
+function hostPort(address: { host: string; port: number }): string {
+  const local = ["127.0.0.1", "localhost", "::1"].includes(address.host);
+
+  return `${local ? "" : address.host}:${address.port}`;
 }
 
 function stateLook(
@@ -109,7 +165,7 @@ function stateLook(
   }
 }
 
-function stats(snapshot: ConsoleSnapshot, style: Style): string {
+function stats(snapshot: ConsoleSnapshot, style: Style): Segment[] {
   const up =
     snapshot.uptimeMs === undefined ? "-" : formatUptime(snapshot.uptimeMs);
   const rate =
@@ -117,23 +173,21 @@ function stats(snapshot: ConsoleSnapshot, style: Style): string {
       ? String(Math.round(snapshot.opsPerSecond))
       : snapshot.opsPerSecond.toFixed(1);
 
-  return fit(
-    [
-      { text: " up ", paint: style.dim },
-      { text: up },
-      { text: "   connections ", paint: style.dim },
-      { text: String(snapshot.active) },
-      { text: "   commands ", paint: style.dim },
-      { text: snapshot.commands.toLocaleString("en-US") },
-      { text: ` (${rate}/s)`, paint: style.dim },
-      { text: "   failed ", paint: style.dim },
-      {
-        text: String(snapshot.failed),
-        paint: snapshot.failed > 0 ? style.yellow : undefined,
-      },
-    ],
-    snapshot.columns,
-  );
+  return [
+    { text: " Uptime ", paint: style.dim },
+    { text: up },
+    { text: "   Conns ", paint: style.dim },
+    { text: String(snapshot.active) },
+    { text: "   Ops/s ", paint: style.dim },
+    { text: rate },
+    { text: "   Cmds ", paint: style.dim },
+    { text: snapshot.commands.toLocaleString("en-US") },
+    { text: "   Failed ", paint: style.dim },
+    {
+      text: String(snapshot.failed),
+      paint: snapshot.failed > 0 ? style.yellow : undefined,
+    },
+  ];
 }
 
 /** `3725000` becomes `01:02:05`; a day or more shows `2d 01:02:05`. */
@@ -146,87 +200,117 @@ export function formatUptime(milliseconds: number): string {
   return days > 0 ? `${days}d ${clockText}` : clockText;
 }
 
-function rule(snapshot: ConsoleSnapshot, style: Style): string {
-  const parts = [
+/** `├─ Logs ──────── [follow] [all ▾] ─┤`, with the filter text when set. */
+function logTitle(snapshot: ConsoleSnapshot, style: Style, box: Box): string {
+  const arrow = style.unicode ? "▾" : "v";
+  const tags = [
     snapshot.paused
-      ? `paused (+${snapshot.pendingWhilePaused})`
+      ? `[paused +${snapshot.pendingWhilePaused}]`
       : snapshot.offset > 0
-        ? `scrolled up ${snapshot.offset}`
-        : "following",
-    `level ${snapshot.level}`,
-    ...(snapshot.search === "" ? [] : [`filter "${snapshot.search}"`]),
-    `${snapshot.matched}/${snapshot.total}`,
-  ];
-  const bar = style.symbols.rule;
-  const label = ` Log ${bar} ${parts.join(` ${bar} `)} `;
+        ? `[up ${snapshot.offset}]`
+        : "[follow]",
+    ...(snapshot.search === "" ? [] : [`[/${shorten(snapshot.search, 14)}]`]),
+    `[${snapshot.level} ${arrow}]`,
+  ].join(" ");
+  const left = `${box.teeLeft}${box.across} Logs `;
+  const right = ` ${tags} ${box.across}${box.teeRight}`;
+  const fill = Math.max(1, snapshot.columns - left.length - right.length);
 
   return fit(
     [
-      { text: bar, paint: style.dim },
-      { text: label, paint: style.bold },
-      {
-        text: bar.repeat(Math.max(0, snapshot.columns - label.length - 1)),
-        paint: style.dim,
-      },
+      { text: left, paint: style.dim },
+      { text: box.across.repeat(fill), paint: style.dim },
+      { text: right, paint: style.dim },
     ],
     snapshot.columns,
   );
 }
 
-function fill(character: string, width: number, style: Style): string {
-  return style.dim(character.repeat(width));
+function shorten(text: string, length: number): string {
+  return text.length <= length ? text : `${text.slice(0, length - 1)}~`;
 }
 
 const BADGES = { info: "INFO ", warn: "WARN ", error: "ERROR" } as const;
 
-function logLine(entry: LogEntry, columns: number, style: Style): string {
+function logLine(entry: LogEntry, style: Style): Segment[] {
   const paint =
     entry.level === "error"
       ? (text: string) => style.bold(style.red(text))
       : entry.level === "warn"
         ? style.yellow
         : style.cyan;
+  const [text, extra] = lineText(entry);
 
-  return fit(
-    [
-      { text: ` ${clock(entry.timestamp)}  `, paint: style.dim },
-      { text: BADGES[entry.level], paint },
-      { text: `  ${entry.event}`, paint: style.bold },
-      { text: `  ${entry.message}` },
-      { text: detailsSummary(entry), paint: style.dim },
-    ],
-    columns,
-  );
+  return [
+    { text: ` ${clock(entry.timestamp)} `, paint: style.dim },
+    { text: BADGES[entry.level], paint },
+    { text: ` ${text}` },
+    { text: extra === "" ? "" : `  ${extra}`, paint: style.dim },
+  ];
 }
 
-/** ` name=value` for each simple detail, and the error message. */
-export function detailsSummary(entry: LogEntry): string {
+/**
+ * What a log line says, and a dim note after it: the time a command took, or
+ * the error. `insertOne app.users` and `2ms`; `conn #3 opened`.
+ */
+export function lineText(entry: LogEntry): [text: string, extra: string] {
   const details = entry.details;
+  const error = errorText(details);
 
-  if (details === undefined) {
-    return "";
+  if (
+    entry.event === "operation" &&
+    typeof details?.["durationMs"] === "number"
+  ) {
+    return [
+      entry.message,
+      [formatDuration(details["durationMs"]), error]
+        .filter((part) => part !== "")
+        .join("  "),
+    ];
   }
 
-  const pairs: string[] = [];
-
-  for (const [key, value] of Object.entries(details)) {
-    if (key === "error" && typeof value === "object" && value !== null) {
-      const message = (value as { message?: unknown }).message;
-
-      pairs.push(`error=${typeof message === "string" ? message : "?"}`);
-    } else if (
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean"
-    ) {
-      pairs.push(`${key}=${String(value)}`);
-    }
+  if (
+    (entry.event === "connection.opened" ||
+      entry.event === "connection.closed") &&
+    typeof details?.["id"] === "number"
+  ) {
+    return [
+      `conn #${details["id"]} ${entry.event.slice("connection.".length)}`,
+      error,
+    ];
   }
 
-  return pairs.length === 0 ? "" : `  ${pairs.join(" ")}`;
+  return [entry.message, error];
 }
 
-function overlayLines(snapshot: ConsoleSnapshot, style: Style): string[] {
+function errorText(details: LogEntry["details"]): string {
+  const error = details?.["error"];
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (typeof error === "object" && error !== null) {
+    const message = (error as { message?: unknown }).message;
+
+    return typeof message === "string" ? message : "";
+  }
+
+  return "";
+}
+
+/** `0.4ms`, `2ms`, `212ms`, `1.5s`. */
+export function formatDuration(milliseconds: number): string {
+  if (milliseconds >= 1000) {
+    return `${(milliseconds / 1000).toFixed(1)}s`;
+  }
+
+  return milliseconds >= 10
+    ? `${Math.round(milliseconds)}ms`
+    : `${Number(milliseconds.toFixed(1))}ms`;
+}
+
+function overlayLines(snapshot: ConsoleSnapshot, style: Style): Segment[][] {
   const overlay = snapshot.overlay;
 
   if (overlay === undefined) {
@@ -234,125 +318,111 @@ function overlayLines(snapshot: ConsoleSnapshot, style: Style): string[] {
   }
 
   const height = snapshot.rows - CHROME_ROWS;
-  const lines = [
-    fit([{ text: ` ${overlay.title}`, paint: style.bold }], snapshot.columns),
-    "",
-    ...overlay.lines.map((line) =>
-      fit([{ text: `  ${line}` }], snapshot.columns),
-    ),
+  const lines: Segment[][] = [
+    [{ text: ` ${overlay.title}`, paint: style.bold }],
+    [],
+    ...overlay.lines.map((line): Segment[] => [{ text: `  ${line}` }]),
   ];
 
   while (lines.length < height - 1) {
-    lines.push("");
+    lines.push([]);
   }
 
   lines.length = Math.min(lines.length, height - 1);
-  lines.push(
-    fit(
-      [{ text: "  Press esc to close.", paint: style.dim }],
-      snapshot.columns,
-    ),
-  );
+  lines.push([{ text: "  Press esc to close.", paint: style.dim }]);
 
   return lines;
 }
 
-function buttons(snapshot: ConsoleSnapshot, style: Style): string {
+/** Two rows of `[Label key]` buttons. */
+function buttons(
+  snapshot: ConsoleSnapshot,
+  style: Style,
+): [Segment[], Segment[]] {
   const state = snapshot.server;
   const canStart =
-    state === SupervisorState.Stopped || state === SupervisorState.Crashed;
-  const canStop =
-    state === SupervisorState.Running || state === SupervisorState.Starting;
-  const canRestart =
-    state !== SupervisorState.Starting && state !== SupervisorState.Stopping;
-  const items: [key: string, label: string, enabled: boolean][] = [
-    ["s", "Start", canStart],
-    ["x", "Stop", canStop],
-    ["r", "Restart", canRestart],
-    ["p", snapshot.paused ? "Resume" : "Pause", true],
-    ["l", "Level", true],
-    ["/", "Filter", true],
-    ["?", "Help", true],
-    ["q", "Quit", true],
+    state === SupervisorState.Stopped ||
+    state === SupervisorState.Crashed ||
+    state === SupervisorState.Running;
+  const first: Button[] = [
+    ["Help", "?", true],
+    ["Inspect", "i", true],
+    ["Backup", "b", true],
+    ["Repair", "r", true],
+  ];
+  const second: Button[] = [
+    [snapshot.paused ? "Resume" : "Pause", "p", true],
+    ["Filter", "/", true],
+    [state === SupervisorState.Running ? "Restart" : "Start", "s", canStart],
+    ["Quit", "q", true],
   ];
 
-  // On a narrow terminal, drop the less important buttons before cutting
-  // the row. The keys still work.
-  const width = (list: typeof items): number =>
-    1 +
-    list.reduce((sum, [key, label]) => sum + key.length + label.length + 3, 0);
-  let shown = items;
+  return [buttonRow(first, style), buttonRow(second, style)];
+}
 
-  for (const droppable of ["l", "p", "/"]) {
-    if (width(shown) > snapshot.columns) {
-      shown = shown.filter(([key]) => key !== droppable);
-    }
-  }
+type Button = [label: string, key: string, enabled: boolean];
 
+function buttonRow(items: readonly Button[], style: Style): Segment[] {
   const segments: Segment[] = [{ text: " " }];
 
-  for (const [key, label, enabled] of shown) {
+  for (const [label, key, enabled] of items) {
     segments.push(
+      { text: "[", paint: style.dim },
+      { text: `${label} `, paint: enabled ? undefined : style.dim },
       {
         text: key,
         paint: enabled ? (text) => style.bold(style.cyan(text)) : style.dim,
       },
-      { text: ` ${label}  `, paint: enabled ? undefined : style.dim },
+      { text: "] ", paint: style.dim },
     );
   }
 
-  return fit(segments, snapshot.columns);
+  return segments;
 }
 
-function prompt(snapshot: ConsoleSnapshot, style: Style): string {
-  const cursor = style.unicode ? "▌" : "_";
+function prompt(snapshot: ConsoleSnapshot, style: Style): Segment[] {
+  const cursor = style.unicode ? "█" : "_";
 
   if (snapshot.mode === "filter") {
-    return fit(
-      [
-        { text: " Filter: ", paint: style.bold },
-        { text: snapshot.input },
-        { text: cursor, paint: style.dim },
-        { text: "   enter applies, esc cancels", paint: style.dim },
-      ],
-      snapshot.columns,
-    );
+    return [
+      { text: " / ", paint: style.bold },
+      { text: snapshot.input },
+      { text: cursor, paint: style.dim },
+      { text: "   enter applies, esc cancels", paint: style.dim },
+    ];
   }
 
   if (snapshot.mode === "command") {
-    return fit(
-      [
-        { text: " > ", paint: style.bold },
-        { text: snapshot.input },
-        { text: cursor, paint: style.dim },
-      ],
-      snapshot.columns,
-    );
+    return [
+      { text: " > ", paint: style.bold },
+      { text: snapshot.input },
+      { text: cursor, paint: style.dim },
+    ];
   }
 
   if (snapshot.notice !== undefined) {
-    return fit(
-      [{ text: ` ${snapshot.notice}`, paint: style.yellow }],
-      snapshot.columns,
-    );
+    return [
+      { text: " > ", paint: style.bold },
+      { text: snapshot.notice, paint: style.yellow },
+    ];
   }
 
-  return fit(
-    [
-      {
-        text: " Press : for commands, / to filter, ? for help",
-        paint: style.dim,
-      },
-    ],
-    snapshot.columns,
-  );
+  return [
+    { text: " > ", paint: style.bold },
+    {
+      text: style.unicode ? "type a command…" : "type a command...",
+      paint: style.dim,
+    },
+    { text: "   press : to type", paint: style.dim },
+  ];
 }
 
 /**
  * Joins the segments into one line of at most `width` columns, cutting the
- * text (not the color codes) where it runs out and marking the cut.
+ * text (not the color codes) where it runs out and marking the cut. With
+ * `pad`, spaces fill the line out to `width`.
  */
-function fit(segments: readonly Segment[], width: number): string {
+function fit(segments: readonly Segment[], width: number, pad = false): string {
   let used = 0;
   let line = "";
 
@@ -372,5 +442,5 @@ function fit(segments: readonly Segment[], width: number): string {
     used += text.length;
   }
 
-  return line;
+  return pad ? line + " ".repeat(Math.max(0, width - used)) : line;
 }

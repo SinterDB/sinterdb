@@ -163,14 +163,15 @@ every script that passes options are not affected. A script that ran a bare
 `sinterd` from a terminal needs `--no-ui` (or any option) to keep that
 behavior.
 
-The top of the screen shows the server state, address and process id, then how
-long it has been up, the open connections, the commands run (with a rate over
-the last 5 seconds) and how many failed. Below that is the log, then the
-keys, then a line for typing.
+The console is a box. The top row shows the server state, address and where
+it keeps its data. Below it are the uptime, open connections, commands per
+second (over the last 5 seconds), commands run and how many failed. Then comes
+the log, two rows of buttons and a line for typing.
 
 | Key                                  | What it does                                                   |
 | ------------------------------------ | -------------------------------------------------------------- |
-| `s`, `x`, `r`                        | Start, stop or restart the server.                             |
+| `s`                                  | Start the server, or restart it while it runs.                 |
+| `x`                                  | Stop the server.                                               |
 | `p`                                  | Pause or resume the log. Lines still arrive.                   |
 | `l`                                  | Cycle between all lines, warnings and errors, and errors only. |
 | `/`                                  | Show only lines that contain some text.                        |
@@ -180,6 +181,9 @@ keys, then a line for typing.
 | `:`                                  | Type a command. See `help` for the list.                       |
 | `?`                                  | Show the help panel. `Esc` closes it.                          |
 | `q`, `Ctrl+C`                        | Quit. A running server is stopped first.                       |
+
+`i`, `b` and `r` are reserved for Inspect, Backup and Repair, which are not
+available yet.
 
 The log keeps the newest 1000 lines. The console needs a terminal of at least
 60 columns and 16 rows, and says so when it is smaller. It gives the screen
