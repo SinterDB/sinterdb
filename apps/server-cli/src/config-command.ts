@@ -48,6 +48,8 @@ Keys:
   checkpointKeep       Snapshots to keep, at least 2
   reclaimLock          Take over a lock left by another host
   logOperations        Log every command the server runs
+  ui                   Open the interactive console when sinterd is run with
+                       no options in a terminal (true or false)
 
 writeConcern, checkpointBytes, checkpointInterval, checkpointKeep and
 reclaimLock only apply when a data directory is set. The default file is
@@ -307,7 +309,7 @@ function notice(
   ];
   const variable = configKeyVariable(key);
 
-  if (environment[variable] !== undefined) {
+  if (variable !== undefined && environment[variable] !== undefined) {
     lines.push(
       `  ${style.yellow(`${variable} is set and overrides the file.`)}`,
     );

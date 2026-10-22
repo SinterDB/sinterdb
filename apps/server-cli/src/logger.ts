@@ -260,7 +260,7 @@ function formatValue(value: unknown): string {
   );
 }
 
-function clock(timestamp: string): string {
+export function clock(timestamp: string): string {
   const date = new Date(timestamp);
   const two = (value: number): string => String(value).padStart(2, "0");
 

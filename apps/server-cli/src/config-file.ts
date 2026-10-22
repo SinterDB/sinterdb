@@ -31,6 +31,7 @@ export const CONFIG_KEYS = [
   "checkpointKeep",
   "reclaimLock",
   "logOperations",
+  "ui",
 ] as const;
 
 export type ConfigKey = (typeof CONFIG_KEYS)[number];
@@ -44,9 +45,13 @@ type ValueType = "string" | "number" | "boolean";
 
 interface KeySpec {
   readonly type: ValueType;
-  /** The matching field of the server's configuration input. */
-  readonly input: keyof ServerConfigInput;
-  readonly variable: string;
+  /**
+   * The matching field of the server's configuration input. Keys that are
+   * not server settings, such as `ui`, have none.
+   */
+  readonly input?: keyof ServerConfigInput;
+  /** The environment variable that sets the same thing, if there is one. */
+  readonly variable?: string;
   /** Needs a data directory to mean anything. */
   readonly needsDataDir: boolean;
   readonly defaultValue?: string;
@@ -114,14 +119,19 @@ const SPECS: Readonly<Record<ConfigKey, KeySpec>> = {
     needsDataDir: false,
     defaultValue: "false",
   },
+  ui: {
+    type: "boolean",
+    needsDataDir: false,
+    defaultValue: "true",
+  },
 };
 
 export function isConfigKey(value: string): value is ConfigKey {
   return (CONFIG_KEYS as readonly string[]).includes(value);
 }
 
-/** The environment variable that sets the same thing as this key. */
-export function configKeyVariable(key: ConfigKey): string {
+/** The environment variable that sets the same thing as this key, if any. */
+export function configKeyVariable(key: ConfigKey): string | undefined {
   return SPECS[key].variable;
 }
 
@@ -238,6 +248,21 @@ export function readConfigFile(path: string): LoadedConfigFile {
 }
 
 /**
+ * Reads the config file the server uses: the one `--config` names, which must
+ * exist, or else the default one, which may be missing.
+ */
+export function loadConfigFile(explicitPath?: string): LoadedConfigFile {
+  const path = explicitPath ?? defaultConfigPath();
+  const file = readConfigFile(path);
+
+  if (explicitPath !== undefined && !file.exists) {
+    throw new ConfigFileError(`The config file ${path} does not exist.`);
+  }
+
+  return file;
+}
+
+/**
  * Writes the file in one step: a temporary file next to it, then a rename, so
  * a crash never leaves half a file. Keys are written in a fixed order.
  */
@@ -303,6 +328,11 @@ export function parseConfigValue(key: ConfigKey, text: string): ConfigValue {
  */
 export function validateConfigValue(key: ConfigKey, value: ConfigValue): void {
   const spec = SPECS[key];
+
+  if (spec.input === undefined) {
+    return;
+  }
+
   const input: Record<string, ConfigValue> = { [spec.input]: value };
 
   if (spec.needsDataDir) {
@@ -328,7 +358,7 @@ export interface ConfigEntry {
   readonly value: string | undefined;
   readonly source: ConfigSource;
   /** The environment variable that is the source when `source` is "env". */
-  readonly variable: string;
+  readonly variable: string | undefined;
   /** Why a value in the file is not used. */
   readonly note?: string;
 }
@@ -353,12 +383,16 @@ export function resolveConfigEntries(
     const fromFlag =
       key === "writeConcern"
         ? (flags.writeConcern ?? flags.durability)
-        : flags[spec.input];
+        : spec.input === undefined
+          ? undefined
+          : flags[spec.input];
     const fromEnvironment =
       key === "writeConcern"
         ? (environment.SINTERDB_WRITE_CONCERN ??
           environment.SINTERDB_DURABILITY)
-        : (environment as Record<string, string | undefined>)[spec.variable];
+        : spec.variable === undefined
+          ? undefined
+          : (environment as Record<string, string | undefined>)[spec.variable];
     const variable =
       key === "writeConcern" &&
       environment.SINTERDB_WRITE_CONCERN === undefined &&
@@ -427,9 +461,10 @@ export function applyConfigFile(
 
   for (const entry of resolveConfigEntries(file, environment, flags)) {
     const value = file[entry.key];
+    const input = SPECS[entry.key].input;
 
-    if (entry.source === "file" && value !== undefined) {
-      added[SPECS[entry.key].input] = value;
+    if (entry.source === "file" && value !== undefined && input !== undefined) {
+      added[input] = value;
     }
   }
 

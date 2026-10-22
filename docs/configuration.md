@@ -26,6 +26,7 @@ default.
 | Reclaim lock                 | `--reclaim-lock`                 | `SINTERDB_RECLAIM_LOCK`        | `false`     |
 | Operation log                | `--log-operations`               | `SINTERDB_LOG_OPERATIONS`      | `false`     |
 | Config file                  | `--config <path>`                | none                           | see below   |
+| Interactive console          | `--no-ui` turns it off           | none                           | see below   |
 
 Two more flags do not start a server: `-h, --help` prints the usage text, and
 `-v, --version` prints the server version.
@@ -143,6 +144,48 @@ more snapshots uses more disk and gives recovery more older states to fall back
 on if the newest ones are damaged. Two is the smallest allowed value, because two
 is what makes a damaged newest snapshot recoverable.
 
+### Interactive console
+
+Run `sinterd` with no options in a terminal and it opens a full-screen console
+instead of starting a server in that terminal. The console starts stopped. It
+runs the server as a separate process, the same `sinterd` that a service or a
+container runs, with `--log-operations` added so it can show each command.
+
+The console opens only when all of these are true:
+
+- standard input, output and error are all terminals, and `TERM` is not `dumb`;
+- no server option is given on the command line (`--config` is fine), and no
+  `SINTERDB_*` environment variable is set;
+- `--no-ui` is not given, and the config file does not say `"ui": false`.
+
+Everything else starts a server exactly as before, so Docker, systemd, CI and
+every script that passes options are not affected. A script that ran a bare
+`sinterd` from a terminal needs `--no-ui` (or any option) to keep that
+behavior.
+
+The top of the screen shows the server state, address and process id, then how
+long it has been up, the open connections, the commands run (with a rate over
+the last 5 seconds) and how many failed. Below that is the log, then the
+keys, then a line for typing.
+
+| Key                                  | What it does                                                   |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `s`, `x`, `r`                        | Start, stop or restart the server.                             |
+| `p`                                  | Pause or resume the log. Lines still arrive.                   |
+| `l`                                  | Cycle between all lines, warnings and errors, and errors only. |
+| `/`                                  | Show only lines that contain some text.                        |
+| `f`, `End`                           | Follow the newest line again.                                  |
+| `Up`, `Down`, `PgUp`, `PgDn`, `Home` | Scroll the log.                                                |
+| `c`                                  | Clear the log.                                                 |
+| `:`                                  | Type a command. See `help` for the list.                       |
+| `?`                                  | Show the help panel. `Esc` closes it.                          |
+| `q`, `Ctrl+C`                        | Quit. A running server is stopped first.                       |
+
+The log keeps the newest 1000 lines. The console needs a terminal of at least
+60 columns and 16 rows, and says so when it is smaller. It gives the screen
+back when it quits, when it gets `SIGINT`, `SIGTERM` or `SIGHUP`, and when it
+fails.
+
 ### Config file
 
 A config file keeps settings so you do not have to type them every time. It is
@@ -158,7 +201,8 @@ a JSON object, and every key is optional:
   "checkpointInterval": 300,
   "checkpointKeep": 2,
   "reclaimLock": false,
-  "logOperations": false
+  "logOperations": false,
+  "ui": true
 }
 ```
 
@@ -173,6 +217,7 @@ a JSON object, and every key is optional:
 | `checkpointKeep`     | number  | `--checkpoint-keep`     |
 | `reclaimLock`        | boolean | `--reclaim-lock`        |
 | `logOperations`      | boolean | `--log-operations`      |
+| `ui`                 | boolean | `--no-ui` turns it off  |
 
 The server reads `$XDG_CONFIG_HOME/sinterdb/config.json`, or
 `~/.config/sinterdb/config.json` when `XDG_CONFIG_HOME` is not set

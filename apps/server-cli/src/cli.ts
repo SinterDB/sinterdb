@@ -29,6 +29,7 @@ Options:
                       the directory
   --config <path>     Read settings from this config file (default: the
                       sinterdb/config.json in your user config directory)
+  --no-ui             Do not open the interactive console, even in a terminal
   --log-operations    Log one "operation" event for every command the server
                       runs: the command, database, collection, how long it
                       took, and whether it worked
@@ -36,6 +37,9 @@ Options:
   -v, --version       Show the server version
 
 Without --data-dir all data is kept in memory and lost on shutdown.
+
+Run sinterd with no options in a terminal to open the interactive console
+(stop it from opening with --no-ui or "ui": false in the config file).
 
 Write concerns (with --data-dir):
   flushed    A write is acknowledged after it reaches stable storage. It
@@ -80,6 +84,7 @@ export type CliCommand =
       reclaimLock?: boolean;
       logOperations?: boolean;
       config?: string;
+      noUi?: boolean;
     }
   | {
       kind: "help";
@@ -132,6 +137,9 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
         config: {
           type: "string",
         },
+        "no-ui": {
+          type: "boolean",
+        },
         "checkpoint-interval": {
           type: "string",
         },
@@ -172,6 +180,7 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
   const reclaimLock = readBooleanOption(parsed.values, "reclaim-lock");
   const logOperations = readBooleanOption(parsed.values, "log-operations");
   const config = readStringOption(parsed.values, "config");
+  const noUi = readBooleanOption(parsed.values, "no-ui");
 
   if (help && version) {
     throw new CliUsageError("--help and --version cannot be used together.");
@@ -202,6 +211,7 @@ export function parseCliArguments(arguments_: readonly string[]): CliCommand {
     ...(reclaimLock ? { reclaimLock } : {}),
     ...(logOperations ? { logOperations } : {}),
     ...(config === undefined ? {} : { config }),
+    ...(noUi ? { noUi } : {}),
   };
 }
 

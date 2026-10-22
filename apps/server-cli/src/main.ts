@@ -11,11 +11,15 @@ import {
   runConfigCommand,
 } from "./config-command.js";
 import {
-  ConfigFileError,
   applyConfigFile,
-  defaultConfigPath,
-  readConfigFile,
+  loadConfigFile,
+  type LoadedConfigFile,
 } from "./config-file.js";
+import {
+  isInteractiveTerminal,
+  openConsole,
+  shouldOpenConsole,
+} from "./console-launch.js";
 import {
   isBackupCommandName,
   parseBackupArguments,
@@ -66,13 +70,29 @@ export async function main(
       process.stdout.write(`${SERVER_PRODUCT_VERSION}\n`);
       return;
 
-    case "start":
-      await startServer(command);
+    case "start": {
+      const file = loadConfigFile(command.config);
+
+      if (
+        shouldOpenConsole({
+          command,
+          environment: process.env,
+          file: file.values,
+          interactive: isInteractiveTerminal(),
+        })
+      ) {
+        await openConsole(command);
+        return;
+      }
+
+      await startServer(command, file);
+    }
   }
 }
 
 async function startServer(
   command: Extract<CliCommand, { kind: "start" }>,
+  file: LoadedConfigFile,
 ): Promise<void> {
   const flags: ServerConfigInput = {
     ...(command.host === undefined ? {} : { host: command.host }),
@@ -98,13 +118,6 @@ async function startServer(
     ...(command.reclaimLock === true ? { reclaimLock: true } : {}),
     ...(command.logOperations === true ? { logOperations: true } : {}),
   };
-
-  const configPath = command.config ?? defaultConfigPath();
-  const file = readConfigFile(configPath);
-
-  if (command.config !== undefined && !file.exists) {
-    throw new ConfigFileError(`The config file ${configPath} does not exist.`);
-  }
 
   const server = new SinterServer(
     applyConfigFile(flags, file.values, process.env),
