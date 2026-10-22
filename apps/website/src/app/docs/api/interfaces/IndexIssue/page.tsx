@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 691,
+  id: 828,
   name: "IndexIssue",
   kind: "interface",
   label: "Interface",
@@ -35,7 +35,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 694,
+          id: 831,
           name: "detail",
           anchor: "detail",
           kind: "property",
@@ -62,13 +62,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 104,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L104",
+              line: 159,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L159",
             },
           ],
         },
         {
-          id: 692,
+          id: 829,
           name: "index",
           anchor: "index-2",
           kind: "property",
@@ -95,13 +95,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 100,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L100",
+              line: 155,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L155",
             },
           ],
         },
         {
-          id: 693,
+          id: 830,
           name: "problem",
           anchor: "problem",
           kind: "property",
@@ -128,8 +128,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 102,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L102",
+              line: 157,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L157",
             },
           ],
         },
@@ -170,8 +170,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/indexes.ts",
-      line: 98,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L98",
+      line: 153,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L153",
     },
   ],
   usedBy: [

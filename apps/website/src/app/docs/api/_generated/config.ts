@@ -8,5 +8,7 @@ export const config = {
     sourceLinks: true,
     comments: true,
     externalInherited: false,
+    errorGroup: true,
+    search: false,
   },
 } as const;

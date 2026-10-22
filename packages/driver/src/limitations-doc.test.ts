@@ -49,8 +49,6 @@ async function serverError(
 describe("docs/limitations.md: queries", () => {
   const unsupportedFilters = [
     "$regex",
-    "$elemMatch",
-    "$size",
     "$all",
     "$type",
     "$mod",
@@ -85,7 +83,7 @@ describe("docs/limitations.md: queries", () => {
       ...(section.split("\n\n")[0] ?? "").matchAll(/`(\$[a-zA-Z]+)`/g),
     ];
 
-    expect(listed.length).toBeGreaterThanOrEqual(13);
+    expect(listed.length).toBeGreaterThanOrEqual(15);
 
     await inDatabase(async (client) => {
       const items = client.db().collection<Record<string, unknown>>("items");
@@ -102,7 +100,9 @@ describe("docs/limitations.md: queries", () => {
                 ? { n: { [operator as string]: [1] } }
                 : operator === "$exists"
                   ? { n: { $exists: true } }
-                  : { n: { [operator as string]: 1 } };
+                  : operator === "$elemMatch"
+                    ? { n: { $elemMatch: { $gt: 0 } } }
+                    : { n: { [operator as string]: 1 } };
 
         await expect(
           items.find(filter as never).toArray(),
@@ -111,17 +111,55 @@ describe("docs/limitations.md: queries", () => {
     });
   });
 
-  it("has no projection, count, distinct or aggregation", async () => {
+  it.each(["$lookup", "$unwind", "$addFields"])(
+    "rejects the aggregation stage %s",
+    async (stage) => {
+      expect(markdown).toContain(`\`${stage}\``);
+
+      await inDatabase(async (client) => {
+        const items = client.db().collection("items");
+
+        await items.insertOne({ n: 1 });
+
+        const error = await serverError(
+          items.aggregate([{ [stage]: {} } as never]).toArray(),
+        );
+
+        expect(error.serverErrorName).toBe("DocumentValidationFailed");
+      });
+    },
+  );
+
+  it.each(["$push", "$addToSet"])(
+    "rejects the $group accumulator %s",
+    async (accumulator) => {
+      expect(markdown).toContain(`\`${accumulator}\``);
+
+      await inDatabase(async (client) => {
+        const items = client.db().collection("items");
+
+        await items.insertOne({ n: 1 });
+
+        const error = await serverError(
+          items
+            .aggregate([
+              { $group: { _id: null, all: { [accumulator]: "$n" } } } as never,
+            ])
+            .toArray(),
+        );
+
+        expect(error.serverErrorName).toBe("DocumentValidationFailed");
+      });
+    },
+  );
+
+  it("has no findOneAnd*, bulkWrite or watch", async () => {
     await inDatabase(async (client) => {
       const items = client.db().collection("items");
       const names = Object.getOwnPropertyNames(Object.getPrototypeOf(items));
 
       for (const missing of [
-        "countDocuments",
-        "estimatedDocumentCount",
         "count",
-        "distinct",
-        "aggregate",
         "findOneAndUpdate",
         "findOneAndReplace",
         "findOneAndDelete",
@@ -130,15 +168,6 @@ describe("docs/limitations.md: queries", () => {
       ]) {
         expect(names, missing).not.toContain(missing);
       }
-
-      // Every query returns whole documents.
-      await items.insertOne({ a: 1, b: 2 });
-
-      const found = await items
-        .find({}, { projection: { a: 1 } } as never)
-        .toArray();
-
-      expect(Object.keys(found[0] ?? {}).sort()).toEqual(["_id", "a", "b"]);
     });
   });
 

@@ -1,5 +1,21 @@
 # sinterdb-server
 
+## 0.3.0
+
+### Minor Changes
+
+- Query Engine and Driver Contract.
+
+  - Add projection with inclusion and exclusion, and result types that follow the projection.
+  - Add array queries: `$elemMatch`, `$size`, dotted paths through arrays, and matching on any array element.
+  - Add `countDocuments()`, `estimatedDocumentCount()` and `distinct()`.
+  - Add sorting by several fields, and compound indexes (up to 8 keys) that serve equality, `$in` and one range on their leading fields.
+  - Add aggregation with `$match`, `$project`, `$sort`, `$skip`, `$limit`, `$count` and `$group`, with the accumulators `$count`, `$sum`, `$avg`, `$min`, `$max`, `$first` and `$last`.
+  - Add query budgets: `maxTimeMS` and `maxScanned` on every query, with the new errors `OperationTimeLimitExceeded` and `ScanLimitExceeded`.
+  - Document the collation rules, and check in a contract test that an ODM can build on the public `sinterdb` exports alone.
+  - Behavior change: `{ tags: "x" }` now matches `{ tags: ["x", "y"] }`, and `$ne` and `$nin` exclude documents whose array holds the value.
+  - Storage format 2 becomes 3. Directories upgrade in place and the upgrade is one way, so copy your data directory first.
+
 ## 0.2.0
 
 ### Minor Changes

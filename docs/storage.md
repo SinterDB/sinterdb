@@ -198,14 +198,20 @@ The data directory records a format version in `manifest.json`.
 | ------: | ---------- | ----------------------------------------------- |
 |       1 | 0.0.8      | Documents and collections                       |
 |       2 | 0.0.9      | Adds index definitions to the log and snapshots |
+|       3 | 0.3.0      | An index definition can cover several fields    |
 
 A version 1 directory is upgraded to version 2 in place the first time 0.0.9
 opens it, before anything is written. The manifest then records `upgradedFrom`.
 Version 1 snapshots and logs are still read.
 
-The upgrade is one way. A 0.0.8 server refuses a version 2 directory with an
-"Upgrade" error instead of ignoring the indexes. Make a backup before upgrading
-if you may want to go back.
+The same happens for a version 2 directory the first time 0.3.0 opens it.
+Nothing needs rewriting, because a version 2 index definition is already a
+valid single-field definition in version 3.
+
+The upgrade is one way. A 0.0.8 server refuses a version 2 directory, and a
+0.2.0 server refuses a version 3 directory, with an "Upgrade" error instead of
+ignoring the indexes. Make a backup before upgrading if you may want to go
+back.
 
 ### How upgrades work
 

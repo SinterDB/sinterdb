@@ -22,9 +22,10 @@ import {
 
 /**
  * Version 1 had no index definitions. Version 2 stores them before each
- * collection's documents. Both can be read; new snapshots use version 2.
+ * collection's documents. Version 3 lets a definition cover several fields.
+ * All three can be read; new snapshots use version 3.
  */
-export const CHECKPOINT_FORMAT_VERSION = 2;
+export const CHECKPOINT_FORMAT_VERSION = 3;
 const OLDEST_READABLE_VERSION = 1;
 
 const MAGIC = Buffer.from("SINTSNP\0", "latin1");

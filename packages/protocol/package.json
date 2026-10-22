@@ -1,6 +1,6 @@
 {
   "name": "sinterdb-protocol",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Wire protocol primitives shared by the SinterDB server and official driver.",
   "type": "module",
   "sideEffects": false,
@@ -45,7 +45,7 @@
     "url": "git+https://github.com/SinterDB/sinterdb.git",
     "directory": "packages/protocol"
   },
-  "homepage": "https://github.com/SinterDB/sinterdb#readme",
+  "homepage": "https://sinterdb.vercel.app",
   "bugs": {
     "url": "https://github.com/SinterDB/sinterdb/issues"
   }

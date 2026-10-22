@@ -20,8 +20,8 @@ export const VERSIONED_DIRECTORIES = [
 
 export const REPOSITORY_URL = "git+https://github.com/SinterDB/sinterdb.git";
 
-/** The npm dist-tag a developer preview is published under. */
-export const PREVIEW_DIST_TAG = "next";
+/** The npm dist-tag a release is published under. */
+export const RELEASE_DIST_TAG = "latest";
 
 /**
  * The form of a tarball path to hand to npm. npm reads `release/x.tgz` as the

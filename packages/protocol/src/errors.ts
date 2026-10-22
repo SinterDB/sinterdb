@@ -23,6 +23,9 @@ export const WireErrorCode = {
   IndexNotFound: 6001,
   IndexConflict: 6002,
 
+  OperationTimeLimitExceeded: 7000,
+  ScanLimitExceeded: 7001,
+
   InternalError: 9000,
 } as const;
 

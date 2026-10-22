@@ -1,30 +1,69 @@
 import type { Document, DocumentValue } from "sinterdb-protocol";
 
 import { SinterProtocolError } from "./errors.js";
-import type { FilterPaths } from "./filter.js";
+import type { FieldPaths } from "./filter.js";
 
 /**
  * Field paths that can be indexed: every known path except `_id`, which
  * always has its own unique index.
  */
 export type IndexablePath<TDocument extends object> = Exclude<
-  FilterPaths<TDocument>,
+  FieldPaths<TDocument>,
   "_id" | `_id.${string}`
 >;
 
-/** How to build an index, passed to {@link SinterCollection.createIndex}. */
-export interface IndexDefinition<TDocument extends object = Document> {
-  /** The field to index. Dotted paths reach into nested documents. */
-  readonly field: IndexablePath<TDocument>;
-  /** Defaults to 1. Both directions serve the same lookups today. */
-  readonly direction?: 1 | -1;
-  /** At most one document may hold a given value, or lack the field. */
+/** The options every index definition accepts. */
+export interface IndexDefinitionOptions {
+  /**
+   * At most one document may hold a given value, or a given combination of
+   * values for a compound index, or lack the field.
+   */
   readonly unique?: boolean;
-  /** Documents without the field are left out, so they never conflict. */
+  /**
+   * Documents without the field are left out, so they never conflict. A
+   * compound index leaves out only the documents that have none of its fields.
+   */
   readonly sparse?: boolean;
-  /** Defaults to the field and direction, such as `email_1`. */
+  /**
+   * Defaults to the fields and directions, such as `email_1` or
+   * `country_1_age_-1`.
+   */
   readonly name?: string;
 }
+
+/**
+ * How to build an index, passed to {@link SinterCollection.createIndex}.
+ *
+ * Give `field` (and optionally `direction`) for an index on one field, or
+ * `keys` for a compound index on several fields in order.
+ */
+export type IndexDefinition<TDocument extends object = Document> =
+  IndexDefinitionOptions &
+    (
+      | {
+          /** The field to index. Dotted paths reach into nested documents. */
+          readonly field: IndexablePath<TDocument>;
+          /** Defaults to 1. Both directions serve the same lookups today. */
+          readonly direction?: 1 | -1;
+          /** Not allowed with `field`; use one or the other. */
+          readonly keys?: never;
+        }
+      | {
+          /**
+           * The fields to index as `[field, direction]` pairs, from one to
+           * eight, each field at most once. A query uses the index when it
+           * fixes the first field, the first two, and so on, by equality.
+           */
+          readonly keys: readonly (readonly [
+            IndexablePath<TDocument>,
+            1 | -1,
+          ])[];
+          /** Not allowed with `keys`; use one or the other. */
+          readonly field?: never;
+          /** Not allowed with `keys`; put each direction in its pair. */
+          readonly direction?: never;
+        }
+    );
 
 /** The result of {@link SinterCollection.createIndex}. */
 export interface CreateIndexResult {
@@ -36,16 +75,26 @@ export interface CreateIndexResult {
   readonly created: boolean;
 }
 
+/** One field of an index and the order it is kept in. */
+export interface IndexKeyInfo {
+  /** The field path. */
+  readonly field: string;
+  /** `1` for ascending or `-1` for descending. */
+  readonly direction: 1 | -1;
+}
+
 /**
  * A description of an index, as returned by {@link SinterCollection.indexes}.
  */
 export interface IndexInfo {
   /** The index name. */
   readonly name: string;
-  /** The indexed field path. */
+  /** The first indexed field path. Use `keys` for a compound index. */
   readonly field: string;
-  /** `1` for ascending or `-1` for descending. */
+  /** `1` for ascending or `-1` for descending, for the first field. */
   readonly direction: 1 | -1;
+  /** Every indexed field in order. One entry unless the index is compound. */
+  readonly keys: readonly IndexKeyInfo[];
   /** Whether the index rejects duplicate values. */
   readonly unique: boolean;
   /** Whether documents without the field are left out of the index. */
@@ -78,8 +127,14 @@ export interface ExplainResult {
   readonly stage: "COLLSCAN" | "IDLOOKUP" | "IXSCAN";
   /** The index used, for `IXSCAN`. */
   readonly index?: string;
-  /** The field the index covers, for `IXSCAN`. */
+  /** The first field the index covers, for `IXSCAN`. */
   readonly field?: string;
+  /** Every field of a compound index, in order, for `IXSCAN`. */
+  readonly fields?: readonly string[];
+  /**
+   * How many leading fields of a compound index the query fixes by equality.
+   */
+  readonly prefixLength?: number;
   /**
    * How the index is read: by equality, by a list of values, or by a range.
    */
@@ -162,10 +217,45 @@ export function parseIndexList(value: DocumentValue): IndexInfo[] {
       name: index["name"],
       field: index["field"],
       direction,
+      keys: parseKeys(index["keys"], index["field"], direction),
       unique: index["unique"],
       sparse: index["sparse"],
     });
   });
+}
+
+/**
+ * A server that predates compound indexes sends no `keys`; its one field and
+ * direction are the whole index.
+ */
+function parseKeys(
+  value: DocumentValue | undefined,
+  field: string,
+  direction: 1 | -1,
+): readonly IndexKeyInfo[] {
+  if (value === undefined) {
+    return Object.freeze([Object.freeze({ field, direction })]);
+  }
+
+  if (!Array.isArray(value) || value.length === 0) {
+    throw invalid("listIndexes");
+  }
+
+  return Object.freeze(
+    value.map((entry) => {
+      const key = asRecord(entry, "listIndexes");
+      const keyDirection = key["direction"];
+
+      if (
+        typeof key["field"] !== "string" ||
+        (keyDirection !== 1 && keyDirection !== -1)
+      ) {
+        throw invalid("listIndexes");
+      }
+
+      return Object.freeze({ field: key["field"], direction: keyDirection });
+    }),
+  );
 }
 
 export function parseExplainResult(value: DocumentValue): ExplainResult {
@@ -191,6 +281,23 @@ export function parseExplainResult(value: DocumentValue): ExplainResult {
     throw invalid("explain");
   }
 
+  const fields = record["fields"];
+
+  if (
+    fields !== undefined &&
+    (!Array.isArray(fields) ||
+      fields.some((entry) => typeof entry !== "string"))
+  ) {
+    throw invalid("explain");
+  }
+
+  if (
+    record["prefixLength"] !== undefined &&
+    !isCount(record["prefixLength"])
+  ) {
+    throw invalid("explain");
+  }
+
   for (const key of ["index", "field"] as const) {
     if (record[key] !== undefined && typeof record[key] !== "string") {
       throw invalid("explain");
@@ -205,6 +312,10 @@ export function parseExplainResult(value: DocumentValue): ExplainResult {
     ...(record["field"] === undefined
       ? {}
       : { field: record["field"] as string }),
+    ...(fields === undefined ? {} : { fields: fields as string[] }),
+    ...(record["prefixLength"] === undefined
+      ? {}
+      : { prefixLength: record["prefixLength"] }),
     ...(access === undefined ? {} : { access }),
     ...(record["lower"] === undefined
       ? {}

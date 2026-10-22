@@ -1,7 +1,10 @@
+import { compilePipeline } from "./aggregation.js";
+import type { OperationBudget } from "./budget.js";
 import {
   CustomId,
   decodeDocument,
   encodeDocument,
+  encodeDocumentValue,
   type Document,
   type DocumentValue,
 } from "sinterdb-protocol";
@@ -11,7 +14,7 @@ import {
   StorageErrorCode,
   StorageInsertManyError,
 } from "./errors.js";
-import { compileFilter } from "./filter.js";
+import { compileFilter, resolveFieldValues } from "./filter.js";
 import {
   ID_INDEX_NAME,
   IndexSet,
@@ -25,7 +28,12 @@ import {
   type IndexSpec,
   type QueryPlan,
 } from "./indexing/index.js";
-import { compileSort, type SortSpecification } from "./sort.js";
+import { compileProjection } from "./projection.js";
+import {
+  compareDocumentValues,
+  compileSort,
+  type SortSpecification,
+} from "./sort.js";
 import {
   compileUpdate,
   seedDocumentFromFilter,
@@ -44,6 +52,30 @@ export interface StorageFindOptions {
   readonly sort?: SortSpecification;
   readonly skip?: number;
   readonly limit?: number;
+  /**
+   * Which fields the returned documents keep. Applied after sort, skip and
+   * limit, so queries can sort by fields that are not returned.
+   */
+  readonly projection?: Document;
+  /**
+   * Limits the time and the documents examined. The budget is charged as the
+   * iterator is read, not when `find` is called.
+   */
+  readonly budget?: OperationBudget;
+}
+
+export interface StorageFindOneOptions {
+  readonly projection?: Document;
+  /** Limits the time and the documents examined. */
+  readonly budget?: OperationBudget;
+}
+
+export interface StorageAggregateOptions {
+  /**
+   * Limits the time and the documents examined while reading the collection.
+   * Later stages are not charged.
+   */
+  readonly budget?: OperationBudget;
 }
 
 export interface StorageUpdateOptions {
@@ -94,7 +126,12 @@ export interface IndexInfo extends IndexSpec {}
 export interface ExplainResult {
   readonly stage: "COLLSCAN" | "IDLOOKUP" | "IXSCAN";
   readonly index?: string;
+  /** The first field the index covers. */
   readonly field?: string;
+  /** Every field of a compound index, in order. */
+  readonly fields?: readonly string[];
+  /** How many leading fields of a compound index the query fixes. */
+  readonly prefixLength?: number;
   readonly access?: "equality" | "in" | "range";
   readonly lower?: {
     readonly value: DocumentValue;
@@ -246,7 +283,25 @@ export class InMemoryCollection {
     };
   }
 
-  public findOne(filter: Document): Document | undefined {
+  public findOne(
+    filter: Document,
+    options: StorageFindOneOptions = {},
+  ): Document | undefined {
+    const project =
+      options.projection === undefined
+        ? undefined
+        : compileProjection(options.projection);
+    const found = this.findFirst(filter, options.budget);
+
+    return found === undefined || project === undefined
+      ? found
+      : project(found);
+  }
+
+  private findFirst(
+    filter: Document,
+    budget?: OperationBudget,
+  ): Document | undefined {
     const matches = compileFilter(filter);
     const id = filter["_id"];
 
@@ -260,7 +315,7 @@ export class InMemoryCollection {
       return matches(document) ? document : undefined;
     }
 
-    for (const [, encoded] of this.candidates(filter)) {
+    for (const [, encoded] of this.candidates(filter, budget)) {
       const document = decodeDocument(encoded);
 
       if (matches(document)) {
@@ -281,7 +336,101 @@ export class InMemoryCollection {
     const skip = validateSkip(options.skip);
     const limit = validateLimit(options.limit);
 
-    return this.scan(filter, matches, sorter, skip, limit);
+    const project =
+      options.projection === undefined
+        ? undefined
+        : compileProjection(options.projection);
+    const results = this.scan(
+      filter,
+      matches,
+      sorter,
+      skip,
+      limit,
+      options.budget,
+    );
+
+    return project === undefined ? results : projectAll(results, project);
+  }
+
+  /**
+   * Runs an aggregation pipeline (see {@link compilePipeline}) over the
+   * collection. The pipeline is checked before the first document is read. A
+   * leading `$match` can use an index.
+   */
+  public aggregate(
+    pipeline: readonly Document[],
+    options: StorageAggregateOptions = {},
+  ): IterableIterator<Document> {
+    const compiled = compilePipeline(pipeline);
+
+    return compiled.run(
+      this.find(compiled.filter ?? {}, {
+        ...(options.budget === undefined ? {} : { budget: options.budget }),
+      }),
+    );
+  }
+
+  /**
+   * How many documents match the filter. An empty filter is answered from the
+   * size of the collection without reading any document.
+   */
+  public count(filter: Document, budget?: OperationBudget): number {
+    const matches = compileFilter(filter);
+
+    if (Object.keys(filter).length === 0) {
+      return this.documents.size;
+    }
+
+    let total = 0;
+
+    for (const [, encoded] of this.candidates(filter, budget)) {
+      if (matches(decodeDocument(encoded))) {
+        total += 1;
+      }
+    }
+
+    return total;
+  }
+
+  /**
+   * The distinct values of a field among the documents that match the filter,
+   * in sort order (see docs/query-semantics.md). An array contributes its
+   * elements instead of itself, and a document without the field contributes
+   * nothing. Values are distinct by canonical equality, so `1` and `1n` are two
+   * values.
+   */
+  public distinct(
+    field: string,
+    filter: Document = {},
+    budget?: OperationBudget,
+  ): DocumentValue[] {
+    const segments = validateDistinctField(field);
+    const matches = compileFilter(filter);
+    const seen = new Set<string>();
+    const values: DocumentValue[] = [];
+
+    for (const [, encoded] of this.candidates(filter, budget)) {
+      const document = decodeDocument(encoded);
+
+      if (!matches(document)) {
+        continue;
+      }
+
+      for (const found of resolveFieldValues(document, segments)) {
+        for (const value of Array.isArray(found) ? found : [found]) {
+          const key = Buffer.from(encodeDocumentValue(value)).toString(
+            "base64",
+          );
+
+          if (!seen.has(key)) {
+            seen.add(key);
+            values.push(value);
+          }
+        }
+      }
+    }
+
+    return values.sort(compareDocumentValues);
   }
 
   public deleteOne(filter: Document): StorageDeleteResult {
@@ -701,11 +850,15 @@ export class InMemoryCollection {
    */
   private *candidates(
     filter: Document,
+    budget?: OperationBudget,
   ): IterableIterator<[string, Uint8Array]> {
     const plan = this.indexes.isEmpty ? undefined : this.plan(filter);
 
     if (plan === undefined || plan.stage === "COLLSCAN") {
-      yield* this.documents;
+      for (const entry of this.documents) {
+        budget?.charge();
+        yield entry;
+      }
 
       return;
     }
@@ -722,6 +875,7 @@ export class InMemoryCollection {
       const encoded = this.documents.get(key);
 
       if (encoded !== undefined) {
+        budget?.charge();
         yield [key, encoded];
       }
     }
@@ -835,12 +989,13 @@ export class InMemoryCollection {
     sorter: ((document: readonly Document[]) => Document[]) | undefined,
     skip: number,
     limit: number | undefined,
+    budget: OperationBudget | undefined,
   ): IterableIterator<Document> {
     if (sorter === undefined) {
       let skipped = 0;
       let yielded = 0;
 
-      for (const [, encoded] of this.candidates(filter)) {
+      for (const [, encoded] of this.candidates(filter, budget)) {
         if (limit !== undefined && yielded >= limit) {
           return;
         }
@@ -858,6 +1013,10 @@ export class InMemoryCollection {
 
         yielded += 1;
         yield document;
+
+        if (limit !== undefined && yielded >= limit) {
+          return;
+        }
       }
 
       return;
@@ -865,7 +1024,7 @@ export class InMemoryCollection {
 
     const matched: Document[] = [];
 
-    for (const [, encoded] of this.candidates(filter)) {
+    for (const [, encoded] of this.candidates(filter, budget)) {
       const document = decodeDocument(encoded);
 
       if (matches(document)) {
@@ -876,6 +1035,41 @@ export class InMemoryCollection {
     const ordered = sorter(matched);
 
     yield* ordered.slice(skip, limit === undefined ? undefined : skip + limit);
+  }
+}
+
+export function validateDistinctField(field: string): string[] {
+  if (typeof field !== "string" || field.length === 0) {
+    throw new StorageError(
+      StorageErrorCode.InvalidFindOptions,
+      "The distinct field must be a non-empty string.",
+    );
+  }
+
+  const segments = field.split(".");
+
+  for (const segment of segments) {
+    if (
+      segment.length === 0 ||
+      segment.startsWith("$") ||
+      segment === "__proto__"
+    ) {
+      throw new StorageError(
+        StorageErrorCode.InvalidFindOptions,
+        `The distinct field ${JSON.stringify(field)} contains an empty or reserved segment.`,
+      );
+    }
+  }
+
+  return segments;
+}
+
+function* projectAll(
+  documents: Iterable<Document>,
+  project: (document: Document) => Document,
+): IterableIterator<Document> {
+  for (const document of documents) {
+    yield project(document);
   }
 }
 
@@ -977,10 +1171,30 @@ function describePlan(plan: QueryPlan, documents: number): ExplainResult {
   const base = {
     stage: "IXSCAN" as const,
     index: plan.index.spec.name,
-    field: plan.index.spec.field,
+    field: (plan.index.spec.keys[0] as { field: string }).field,
     estimatedCandidates: plan.estimated,
     documents,
   };
+
+  if (plan.access.kind === "prefix") {
+    return {
+      ...base,
+      fields: plan.index.spec.keys.map((key) => key.field),
+      prefixLength: plan.access.fixed,
+      access:
+        plan.access.range !== undefined
+          ? "range"
+          : plan.viaMembership
+            ? "in"
+            : "equality",
+      ...(plan.access.range?.lower === undefined
+        ? {}
+        : { lower: plan.access.range.lower }),
+      ...(plan.access.range?.upper === undefined
+        ? {}
+        : { upper: plan.access.range.upper }),
+    };
+  }
 
   if (plan.access.kind === "range") {
     return {

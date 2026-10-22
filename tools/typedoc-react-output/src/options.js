@@ -24,6 +24,8 @@ const DEFAULT_REACT_OUTPUT_OPTIONS = {
     sourceLinks: true,
     comments: true,
     externalInherited: false,
+    errorGroup: true,
+    search: true,
   },
   theme: {
     name: "default",

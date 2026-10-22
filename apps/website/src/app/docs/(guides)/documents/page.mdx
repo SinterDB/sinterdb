@@ -1,0 +1,85 @@
+export const metadata = {
+  title: "Documents",
+  description:
+    "The values a document can hold, how _id works, and the limits on document size and shape.",
+};
+
+# Documents
+
+A document is a plain JavaScript object. SinterDB stores it in a compact binary form and returns it as an object again, with the same value types.
+
+## Supported values
+
+| Value        | Example                         |
+| ------------ | ------------------------------- |
+| `null`       | `null`                          |
+| Boolean      | `true`                          |
+| Number       | `42`, `3.14`, `NaN`, `Infinity` |
+| `bigint`     | `9007199254740993n`             |
+| String       | `"hello"`                       |
+| `Date`       | `new Date()`                    |
+| `Uint8Array` | `new Uint8Array([1, 2, 3])`     |
+| `CustomId`   | `CustomId.generate()`           |
+| Array        | `[1, "two", { three: 3 }]`      |
+| Plain object | `{ city: "Paris" }`             |
+
+Anything else is rejected before it is sent, with a <Api name="SinterDocumentError" />. That includes `undefined`, functions, symbols, and class instances such as `Map` and `Set`.
+
+<Callout title="Leave fields out instead of using undefined" tone="warning">
+  `{ nickname: undefined }` is an error, not a missing field. Omit the field, or set it to `null` if you want it present but empty.
+</Callout>
+
+## The `_id` field
+
+Every document has an `_id`, and it is always a <Api name="CustomId" />. If you insert a document without one, the server generates it.
+
+```ts
+import { CustomId } from "sinterdb";
+
+const { insertedId } = await users.insertOne({ name: "Kage" });
+insertedId.toHexString(); // "6710f3c2..."
+insertedId.timestamp; // when it was generated
+
+const id = CustomId.generate();
+await users.insertOne({ _id: id, name: "Rin" });
+
+const same = CustomId.fromHexString(id.toHexString());
+same.equals(id); // true
+```
+
+- Plain strings and numbers are not accepted as `_id`.
+- `_id` cannot be changed after insert.
+- Compare ids with `equals()`, not `===`, since two `CustomId` objects with the same value are different objects.
+
+In TypeScript, <Api name="OptionalId" /> is the shape you insert (with `_id` optional) and <Api name="WithId" /> is the shape you read back (with `_id` always present).
+
+## How values are compared
+
+Values are compared by their stored form, so a few pairs that look alike are different:
+
+- `1` and `1n` are different values, because a number and a bigint are stored differently.
+- `0` and `-0` are different under equality, but equal in ranges and sorting. Avoid storing `-0`.
+- A field set to `null` is not the same as a missing field.
+
+The [Filters](/docs/filters) page covers what this means for queries.
+
+## Field order
+
+Fields come back sorted by name, not in the order you wrote them:
+
+```ts
+await users.insertOne({ name: "Kage", age: 30 });
+await users.findOne({ name: "Kage" });
+// { _id: ..., age: 30, name: "Kage" }
+```
+
+Arrays keep their order. Don't depend on the order of an object's keys.
+
+## Limits
+
+| What                      | Limit                                       |
+| ------------------------- | ------------------------------------------- |
+| One request or response   | 16 MiB, including every document it carries |
+| Nesting inside a document | 98 levels of documents inside the document  |
+
+Keep documents far below 16 MiB. A query result is split into batches automatically, but a single document has to fit in one message.

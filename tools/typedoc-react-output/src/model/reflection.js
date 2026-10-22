@@ -70,14 +70,18 @@ function buildPageModel(plan, ctx) {
         reflection.indexSignatures.length > 1
           ? "Index signatures"
           : "Index signature",
-      members: reflection.indexSignatures.map((signature, index) => ({
-        ...emptyMember(signature, ctx),
-        name: `[${signature.parameters?.map((parameter) => parameter.name).join(", ") ?? ""}]`,
-        anchor:
-          index === 0 ? "index-signature" : `index-signature-${index + 1}`,
-        code: indexSignatureCode(signature, ctx),
-        comment: createCommentModel(signature.comment, ctx),
-      })),
+      members: reflection.indexSignatures.map((signature, index) => {
+        const signatureComment = createCommentModel(signature.comment, ctx);
+
+        return {
+          ...emptyMember(signature, ctx),
+          name: `[${signature.parameters?.map((parameter) => parameter.name).join(", ") ?? ""}]`,
+          anchor:
+            index === 0 ? "index-signature" : `index-signature-${index + 1}`,
+          code: indexSignatureCode(signature, ctx),
+          comment: signatureComment ? withoutPlain(signatureComment) : null,
+        };
+      }),
     });
   }
 

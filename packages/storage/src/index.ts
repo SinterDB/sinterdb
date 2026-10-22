@@ -1,11 +1,18 @@
-export { InMemoryCollection } from "./in-memory-collection.js";
+export {
+  InMemoryCollection,
+  validateDistinctField,
+} from "./in-memory-collection.js";
 export {
   StorageError,
   StorageErrorCode,
   StorageInsertManyError,
   StorageCorruptionError,
 } from "./errors.js";
+export { compilePipeline, MAX_PIPELINE_STAGES } from "./aggregation.js";
+export { OperationBudget } from "./budget.js";
+export { MAX_GROUPS, MAX_GROUP_KEY_FIELDS } from "./group.js";
 export { compileFilter } from "./filter.js";
+export { compileProjection } from "./projection.js";
 export { compileSort } from "./sort.js";
 export { compileUpdate } from "./update.js";
 export {
@@ -53,6 +60,8 @@ export type {
   InMemoryCollectionOptions,
   JournalOperation,
   StorageDeleteResult,
+  StorageAggregateOptions,
+  StorageFindOneOptions,
   StorageFindOptions,
   StorageInsertManyResult,
   StorageInsertOneResult,
@@ -60,6 +69,8 @@ export type {
   StorageUpdateResult,
 } from "./in-memory-collection.js";
 export type { StorageErrorCode as StorageErrorCodeValue } from "./errors.js";
+export type { CompiledPipeline } from "./aggregation.js";
+export type { BudgetLimits } from "./budget.js";
 export type { CompiledFilter } from "./filter.js";
 export type { CompiledSort, SortDirection, SortSpecification } from "./sort.js";
 export type { CompiledUpdate } from "./update.js";

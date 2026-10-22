@@ -222,6 +222,12 @@
   transition: border-color 120ms;
 }
 
+.tdk-search-button > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .tdk-search-button:hover {
   border-color: var(--tdk-border-strong);
 }
@@ -863,6 +869,9 @@
 .tdk-icon[data-kind="function"] {
   --tdk-kind: var(--tdk-k-function);
 }
+.tdk-icon:is([data-kind="guide"], [data-kind="section"]) {
+  --tdk-kind: var(--tdk-accent);
+}
 .tdk-icon[data-kind="class"] {
   --tdk-kind: var(--tdk-k-class);
 }
@@ -1004,6 +1013,34 @@
 .tdk-empty {
   color: var(--tdk-subtle);
   font-size: 0.875rem;
+}
+
+/* Copy link on # anchors */
+
+.tdk-anchor {
+  position: relative;
+}
+
+.tdk-anchor[data-copied] {
+  opacity: 1;
+}
+
+.tdk-anchor[data-copied]::after {
+  content: "Copied";
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 0.4rem);
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--tdk-border-strong);
+  border-radius: 4px;
+  background: light-dark(#ffffff, #141414);
+  color: var(--tdk-fg-strong);
+  font-family: var(--tdk-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 400;
+  white-space: nowrap;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 /* @since */

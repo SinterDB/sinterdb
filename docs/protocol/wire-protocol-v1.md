@@ -313,6 +313,12 @@ Initial known capabilities are:
 
 - `typed-documents`
 - `streaming`
+- `projection`: the server understands the optional `projection` parameter of
+  `find` and `findOne`. A server without it ignores the parameter and returns
+  whole documents, so clients MUST NOT send a projection to such a server.
+- `compound-indexes`: the server understands the `keys` option of `createIndex`. A server without it rejects the option as unknown, and clients SHOULD NOT send it.
+- `aggregation`: the server understands the `aggregate` command. A server without it answers `UnknownCommand`.
+- `query-budgets`: the server understands the optional `maxTimeMS` and `maxScanned` parameters of `find`, `findOne`, `aggregate`, `count`, `distinct` and `getMore`. A server without it ignores them, so clients MUST NOT send them to such a server.
 
 Unknown capability strings MUST be preserved during decoding and MAY be
 ignored when determining the negotiated feature set.
@@ -378,34 +384,80 @@ Commands are sent in a Command payload (section 5.3) and answered with a Result
 payload (section 5.4). Commands marked "database" require the `database` field.
 Database and collection names are created on first write.
 
-| Command            | Database | Parameters                                                            | Result                                                         |
-| ------------------ | -------- | --------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `serverInfo`       | No       | none                                                                  | `product`, `productVersion`, `protocolVersion`, `capabilities` |
-| `listDatabases`    | No       | none                                                                  | `databases`: array of names                                    |
-| `createCollection` | Yes      | `name`                                                                | `database`, `collection`, `created`                            |
-| `listCollections`  | Yes      | none                                                                  | `database`, `collections`: array of names                      |
-| `insertOne`        | Yes      | `collection`, `document`                                              | `acknowledged`, `insertedId`                                   |
-| `insertMany`       | Yes      | `collection`, `documents`                                             | `acknowledged`, `insertedCount`, `insertedIds`                 |
-| `findOne`          | Yes      | `collection`, `filter`                                                | `document`: document or `null`                                 |
-| `find`             | Yes      | `collection`, `filter`, optional `batchSize`, `sort`, `skip`, `limit` | `cursorId` (number or `null`), `documents`                     |
-| `getMore`          | Yes      | `cursorId`, optional `batchSize`                                      | `cursorId` (number or `null`), `documents`                     |
-| `closeCursor`      | Yes      | `cursorId`                                                            | `closed`: boolean                                              |
-| `replaceOne`       | Yes      | `collection`, `filter`, `replacement`, optional `upsert`              | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
-| `updateOne`        | Yes      | `collection`, `filter`, `update`, optional `upsert`                   | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
-| `updateMany`       | Yes      | `collection`, `filter`, `update`, optional `upsert`                   | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
-| `deleteOne`        | Yes      | `collection`, `filter`                                                | `acknowledged`, `deletedCount`                                 |
-| `deleteMany`       | Yes      | `collection`, `filter`                                                | `acknowledged`, `deletedCount`                                 |
-| `createIndex`      | Yes      | `collection`, `index`                                                 | `acknowledged`, `name`, `created`                              |
-| `dropIndex`        | Yes      | `collection`, `name`                                                  | `acknowledged`                                                 |
-| `listIndexes`      | Yes      | `collection`                                                          | `indexes`: array of index definitions                          |
-| `explain`          | Yes      | `collection`, `filter`                                                | the query plan, see below                                      |
-| `validateIndexes`  | Yes      | `collection`                                                          | `valid`, `indexes`, `documents`, `issues`                      |
+| Command            | Database | Parameters                                                                          | Result                                                         |
+| ------------------ | -------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `serverInfo`       | No       | none                                                                                | `product`, `productVersion`, `protocolVersion`, `capabilities` |
+| `listDatabases`    | No       | none                                                                                | `databases`: array of names                                    |
+| `createCollection` | Yes      | `name`                                                                              | `database`, `collection`, `created`                            |
+| `listCollections`  | Yes      | none                                                                                | `database`, `collections`: array of names                      |
+| `insertOne`        | Yes      | `collection`, `document`                                                            | `acknowledged`, `insertedId`                                   |
+| `insertMany`       | Yes      | `collection`, `documents`                                                           | `acknowledged`, `insertedCount`, `insertedIds`                 |
+| `findOne`          | Yes      | `collection`, `filter`, optional `projection`                                       | `document`: document or `null`                                 |
+| `find`             | Yes      | `collection`, `filter`, optional `batchSize`, `sort`, `skip`, `limit`, `projection` | `cursorId` (number or `null`), `documents`                     |
+| `count`            | Yes      | `collection`, `filter`                                                              | `count`: non-negative integer                                  |
+| `distinct`         | Yes      | `collection`, `field`, `filter`                                                     | `values`: array                                                |
+| `aggregate`        | Yes      | `collection`, `pipeline`, optional `batchSize`                                      | `cursorId` (number or `null`), `documents`                     |
+| `getMore`          | Yes      | `cursorId`, optional `batchSize`                                                    | `cursorId` (number or `null`), `documents`                     |
+| `closeCursor`      | Yes      | `cursorId`                                                                          | `closed`: boolean                                              |
+| `replaceOne`       | Yes      | `collection`, `filter`, `replacement`, optional `upsert`                            | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
+| `updateOne`        | Yes      | `collection`, `filter`, `update`, optional `upsert`                                 | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
+| `updateMany`       | Yes      | `collection`, `filter`, `update`, optional `upsert`                                 | `acknowledged`, `matchedCount`, `modifiedCount`, `upsertedId`  |
+| `deleteOne`        | Yes      | `collection`, `filter`                                                              | `acknowledged`, `deletedCount`                                 |
+| `deleteMany`       | Yes      | `collection`, `filter`                                                              | `acknowledged`, `deletedCount`                                 |
+| `createIndex`      | Yes      | `collection`, `index`                                                               | `acknowledged`, `name`, `created`                              |
+| `dropIndex`        | Yes      | `collection`, `name`                                                                | `acknowledged`                                                 |
+| `listIndexes`      | Yes      | `collection`                                                                        | `indexes`: array of index definitions                          |
+| `explain`          | Yes      | `collection`, `filter`                                                              | the query plan, see below                                      |
+| `validateIndexes`  | Yes      | `collection`                                                                        | `valid`, `indexes`, `documents`, `issues`                      |
 
 Notes:
 
 - `sort` is an ordered array of `[path, direction]` pairs where direction is
   `1` or `-1`. An array is used because document key order is not preserved on
   the wire.
+- `projection` is a document of field paths mapped to `1`/`true` (keep only
+  these fields) or `0`/`false` (keep everything but these fields). It is
+  applied to each result after sorting, skipping, and limiting, and only
+  servers that advertise the `projection` capability understand it. The rules
+  are in `docs/query-semantics.md`. An invalid projection returns
+  `DocumentValidationFailed` with `details.storageErrorCode` set to
+  `INVALID_FIND_OPTIONS`, like an invalid `sort`. Result documents carry `_id`
+  unless the projection excludes it, so clients must not assume it is
+  present.
+- `aggregate` runs `pipeline`, an array of stage documents, and returns a cursor
+  batch like `find`, which `getMore` and `closeCursor` continue. Each stage is a
+  document with one key: `$match` (a filter), `$project` (a projection), `$sort`
+  (an array of `[path, direction]` pairs, as for `find`), `$skip`, `$limit`, or
+  `$count` (a field name), or `$group` (a document with an `_id` and
+  accumulators; see [aggregation](../aggregation.md)). A pipeline has at most 32
+  stages. An invalid pipeline
+  returns `DocumentValidationFailed` with `details.storageErrorCode` set to
+  `INVALID_PIPELINE`, or to the code of the filter, projection or sort that was
+  invalid, even when the collection does not exist. A `pipeline` that is not an
+  array of documents returns `InvalidRequest`. Result documents may lack `_id`.
+  Only servers that advertise the `aggregation` capability understand it.
+- `count` counts the documents that match `filter`; an empty filter counts the
+  whole collection without reading it. `distinct` returns the distinct values of
+  `field` among the matching documents, in sort order, with the elements of any
+  array standing in for the array. Both treat a missing collection as empty and
+  still reject an invalid `filter`. The rules are in `docs/query-semantics.md`.
+  An invalid `field` returns `DocumentValidationFailed` with
+  `details.storageErrorCode` set to `INVALID_FIND_OPTIONS`. A result larger than
+  one message returns `ResultTooLarge`. A server that predates these commands
+  answers `UnknownCommand`.
+- `find`, `findOne`, `aggregate`, `count`, `distinct` and `getMore` accept two
+  optional budget parameters, `maxTimeMS` and `maxScanned`, each an integer of at
+  least 1 (anything else returns `InvalidRequest`, even for a collection that
+  does not exist). `maxScanned` is the most documents the command may examine,
+  and `maxTimeMS` the most time it may take, measured from when the server
+  starts the command. A command that passes one fails with
+  `OperationTimeLimitExceeded` or `ScanLimitExceeded`, with
+  `details.storageErrorCode` set to `OPERATION_TIME_LIMIT_EXCEEDED` or
+  `SCAN_LIMIT_EXCEEDED`. A cursor's budget is per command: `getMore` uses the
+  limits it carries, or none, and a `getMore` that fails closes the cursor.
+  Only servers that advertise the `query-budgets` capability understand them.
+- An invalid `filter` is rejected with `DocumentValidationFailed` whether or not
+  the collection exists, for every command that takes one.
 - `skip` is a non-negative integer. `limit` is a positive integer. `batchSize`
   is an integer from 1 to 10,000.
 - A `cursorId` of `null` means the result set is exhausted and no cursor
@@ -423,8 +475,10 @@ Notes:
   data directory, `details.storageErrorCode` is `DISK_FULL` or
   `PERMISSION_DENIED` and the write was not applied. For any other failure the
   outcome of that write is unknown until the server restarts and recovers.
-- `createIndex` takes an `index` document with `field` and the optional
-  `direction` (`1` or `-1`), `unique`, `sparse`, and `name`. Unknown options
+- `createIndex` takes an `index` document with either `field` and the optional
+  `direction` (`1` or `-1`), or `keys` (an array of `[field, direction]` pairs
+  for a compound index, from one to eight), and the optional `unique`,
+  `sparse`, and `name`. Giving both `field` and `keys` is `InvalidIndex`. Unknown options
   return `InvalidRequest`. An invalid definition returns `InvalidIndex`, a
   definition that conflicts with an existing index returns `IndexConflict`, and
   a unique index that existing documents violate returns `DuplicateKey`. It
@@ -432,13 +486,17 @@ Notes:
   identical index already exists.
 - `dropIndex` returns `IndexNotFound` for an unknown index or collection and
   `InvalidIndex` for the `_id_` index.
-- Each entry of `listIndexes` has `name`, `field`, `direction`, `unique`, and
-  `sparse`. The `_id_` index is first, followed by the others in creation order.
+- Each entry of `listIndexes` has `name`, `field`, `direction`, `keys`,
+  `unique`, and `sparse`. `field` and `direction` are the first key. `keys` is
+  an array of documents with `field` and `direction`, one for each indexed
+  field. A server older than 0.3.0 sends no `keys`. The `_id_` index is first, followed by the others in creation order.
   A collection that does not exist has no indexes.
 - `explain` returns `stage` (`COLLSCAN`, `IDLOOKUP`, or `IXSCAN`),
   `estimatedCandidates`, and `documents`. For an index it also returns `index`,
   `field`, and `access` (`equality`, `in`, or `range`), and for a range `lower`
-  and `upper` documents with `value` and `inclusive`. The plan format is
+  and `upper` documents with `value` and `inclusive`. For a compound index it
+  adds `fields` (every field in order) and `prefixLength` (how many leading
+  fields the query fixes), and `field` is the first one. The plan format is
   experimental.
 - `validateIndexes` returns `issues`, an array of documents with `index`,
   `problem`, and `detail`. A collection that does not exist is valid.
@@ -502,7 +560,14 @@ across a connection use numeric `WireErrorCode` values.
 | 6001 | `IndexNotFound` |
 | 6002 | `IndexConflict` |
 
-### 6.7 Internal errors
+### 6.7 Query budget errors
+
+| Code | Name                         |
+| ---: | ---------------------------- |
+| 7000 | `OperationTimeLimitExceeded` |
+| 7001 | `ScanLimitExceeded`          |
+
+### 6.8 Internal errors
 
 | Code | Name            |
 | ---: | --------------- |

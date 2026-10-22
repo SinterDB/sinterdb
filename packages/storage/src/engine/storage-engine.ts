@@ -58,7 +58,7 @@ export const STORAGE_FORMAT = "sinterdb-data";
  * Version 2 adds index definitions to the log and to snapshots. Version 1
  * directories are upgraded in place when they are opened.
  */
-export const STORAGE_FORMAT_VERSION = 2;
+export const STORAGE_FORMAT_VERSION = 3;
 export const DEFAULT_CHECKPOINT_THRESHOLD_BYTES = 64 * 1024 * 1024;
 export const DEFAULT_MEMORY_FLUSH_INTERVAL_MS = 100;
 /**

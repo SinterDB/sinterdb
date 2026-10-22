@@ -8,10 +8,10 @@ The official Node.js driver for the SinterDB document database.
 
 ## Installation
 
-The `0.2.0` developer preview is published under the `next` tag:
+The `0.3.0` developer preview is on npm:
 
 ```bash
-npm install sinterdb@next
+npm install sinterdb
 ```
 
 See the [quick start](../../docs/quick-start.md) for a walkthrough,
@@ -233,6 +233,72 @@ const page = await users
 Values of different types sort in this order: missing, `null`, numbers and
 bigints, strings, binary values, `CustomId`, booleans, then dates.
 
+### Counting and distinct values
+
+```ts
+const total = await users.countDocuments(); // the whole collection
+const adults = await users.countDocuments({ age: { $gte: 18 } });
+const same = await users.estimatedDocumentCount(); // always the whole collection
+
+// Distinct values, lowest first, typed from the field.
+const teams = await users.distinct("team"); // string[]
+const skus = await users.distinct("orders.sku", { active: true }); // string[]
+```
+
+- Counting happens on the server. No documents are transferred.
+- `countDocuments()` takes the same filter as `find()`. A collection that does
+  not exist has no documents, but an invalid filter is still an error.
+- `estimatedDocumentCount()` is the same as `countDocuments()` with no filter.
+  It needs no scan, because the server answers from the size of the collection.
+- `distinct()` returns each value once, in the sort order of
+  [query semantics](../../docs/query-semantics.md#counting-and-distinct-values).
+  A field that holds an array contributes its elements, and `1` and `1n` count
+  as two values.
+- A result larger than one message (16 MiB) fails with `ResultTooLarge`.
+- A server older than 0.3.0 answers these with `UnknownCommand`.
+
+### Projection
+
+A projection chooses which fields come back. It works on `find()` and
+`findOne()`, and the type of the result follows it.
+
+```ts
+// Keep only these fields (and _id).
+const names = await users
+  .find({ active: true }, { projection: { name: 1, email: 1 } })
+  .toArray();
+// names[0]: { _id: CustomId; name: string; email?: string }
+
+// Leave _id out.
+const ages = await users.find({}, { projection: { age: 1, _id: 0 } }).toArray();
+// ages[0]: { age: number }
+
+// Keep everything except these fields.
+const safe = await users.findOne(
+  { name: "Ada" },
+  { projection: { passwordHash: 0 } },
+);
+
+// Nested paths, and paths through arrays of documents.
+await users.find({}, { projection: { "profile.bio": 1, "orders.sku": 1 } });
+```
+
+- Use `1` or `true` to include a field and `0` or `false` to exclude one.
+  Include and exclude cannot be mixed, except that `_id` may be excluded from an
+  inclusion projection.
+- `_id` is returned unless you set it to `0`.
+- The projection applies after `sort`, `skip`, and `limit`, so you can sort or
+  filter by a field you do not return.
+- Write the projection inline (or `as const`) so TypeScript can see which fields
+  are in the result. A projection held in a variable typed `Projection<T>` gives
+  every field as optional.
+- Positions such as `"orders.0"` are not supported in a projection.
+- A server older than 0.3.0 would ignore a projection and return whole
+  documents, so the driver throws `SinterCompatibilityError` instead of sending
+  one.
+
+The exact rules are in [query semantics](../../docs/query-semantics.md#projection).
+
 ### Filter operators
 
 | Operator                     | Meaning                           |
@@ -242,7 +308,89 @@ bigints, strings, binary values, `CustomId`, booleans, then dates.
 | `$in`, `$nin`                | Membership, including array items |
 | `$exists`                    | Field presence                    |
 | `$not`                       | Negates a field operator document |
+| `$size`                      | An array with exactly this length |
+| `$elemMatch`                 | One array element meets all of it |
 | `$and`, `$or`, `$nor`        | Logical combination of filters    |
+
+A filter on a field that holds an array matches the array's elements:
+`{ tags: "db" }` matches `{ tags: ["db", "fast"] }`, and `{ scores: { $gt: 90 } }`
+matches when any element is above 90. A dotted path steps through arrays of
+documents (`"items.sku"`) or picks an element by position (`"items.0"`, which
+TypeScript does not check). Use `$elemMatch` when one element has to satisfy
+several conditions:
+
+```ts
+await orders
+  .find({
+    items: { $elemMatch: { sku: "a", qty: { $gt: 1 } } },
+  })
+  .toArray();
+```
+
+The exact rules are in [query semantics](../../docs/query-semantics.md).
+
+## Aggregate
+
+`aggregate()` runs a pipeline of stages over a collection and returns a cursor,
+like `find()`. The stages are `$match`, `$project`, `$sort`, `$skip`, `$limit`,
+`$count` and `$group`.
+
+```ts
+const oldest = await users
+  .aggregate<{ name: string }>([
+    { $match: { active: true } },
+    { $sort: [["age", -1]] },
+    { $limit: 10 },
+    { $project: { _id: 0, name: 1 } },
+  ])
+  .toArray();
+```
+
+`$sort` takes `[path, direction]` pairs, as the `sort` option of `find()` does.
+
+`$group` collects documents by a key and computes values with accumulators:
+
+```ts
+const byTeam = await users
+  .aggregate<{ _id: string; members: number; oldest: number | null }>([
+    {
+      $group: {
+        _id: "$team",
+        members: { $count: {} },
+        oldest: { $max: "$age" },
+      },
+    },
+  ])
+  .toArray();
+```
+
+The result type is the type argument you pass, because it depends on the
+pipeline. See [Aggregation](../../docs/aggregation.md) for every stage and its
+rules. A server older than 0.3.0 does not support it, and the driver throws
+`SinterCompatibilityError`.
+
+## Query Budgets
+
+`find()`, `findOne()`, `aggregate()`, `countDocuments()` and `distinct()` accept
+`maxTimeMS` and `maxScanned`, which cap the time and the documents a request may
+cost the server. A request that passes one fails with a `SinterServerError` named
+`OperationTimeLimitExceeded` or `ScanLimitExceeded`.
+
+```ts
+const found = await users
+  .find({ active: true }, { maxTimeMS: 2000, maxScanned: 100_000 })
+  .toArray();
+
+const total = await users.countDocuments(
+  { active: true },
+  { maxScanned: 50_000 },
+);
+```
+
+Cursors apply the limits to every batch. See
+[Query budgets](../../docs/query-budgets.md) for what counts and how the server
+checks. A server older than 0.3.0 does not support them, and the driver throws
+`SinterCompatibilityError`.
 
 ## Update
 
@@ -376,6 +524,28 @@ error. The options are:
 
 Creating an identical index again succeeds and reports `created: false`.
 
+A compound index covers several fields in order. Queries that fix the leading
+fields by equality use it:
+
+```ts
+await orders.createIndex({
+  keys: [
+    ["customerId", 1],
+    ["status", 1],
+  ],
+  unique: false,
+});
+
+const open = await orders.find({ customerId, status: "open" }).toArray();
+```
+
+A compound index serves equality and `$in` on its leading fields, then a range
+on the next one. It does not serve a sort yet.
+
+`indexes()` returns `keys` for every index, and `field` and `direction` for its
+first field. A server older than 0.3.0 refuses compound indexes, and the driver
+throws `SinterCompatibilityError` instead of sending one.
+
 The server chooses an index when a query allows it, and the result is always
 the same as scanning the collection. See what it would do with `explain()`:
 
@@ -499,9 +669,17 @@ Server rejections of write commands carry a wire code and name:
 | `IndexNotFound`            | Dropping an index or collection that does not exist  |
 | `IndexConflict`            | An index that clashes with an existing one           |
 
+Queries can also fail when they pass a budget (see
+[Query budgets](../../docs/query-budgets.md)):
+
+| Name                         | Cause                                         |
+| ---------------------------- | --------------------------------------------- |
+| `OperationTimeLimitExceeded` | A request ran longer than its `maxTimeMS`     |
+| `ScanLimitExceeded`          | A request examined more than its `maxScanned` |
+
 ## Current Scope
 
-Version `0.2.0` provides:
+Version `0.3.0` provides:
 
 - `SinterClient`
 - `sinterdb://` connection-string parsing
@@ -529,7 +707,15 @@ Version `0.2.0` provides:
 - `createIndex()`, `dropIndex()`, `indexes()`, and `validateIndexes()`
 - Unique and sparse single-field indexes with typed `IndexDefinition<TDocument>`
 - `find().explain()`
+- `projection` with inclusion and exclusion, and result types that follow it
+- `$elemMatch`, `$size`, and dotted paths through arrays
+- Sorting by several fields
+- `countDocuments()`, `estimatedDocumentCount()`, and `distinct()`
+- Compound indexes with `keys`
+- `aggregate()` and `AggregateCursor` with `$match`, `$project`, `$sort`,
+  `$skip`, `$limit`, `$count`, and `$group`
+- `maxTimeMS` and `maxScanned` query budgets
 
-`0.2.0` is a developer preview. See the
+`0.3.0` is a developer preview. See the
 [compatibility promise](../../docs/compatibility.md) for what stays stable
-between releases. The next milestone is `0.3.0`, Query Engine and Driver Contract.
+between releases. The next milestone is `0.3.5`, the Interactive CLI.

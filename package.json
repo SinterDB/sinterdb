@@ -1,12 +1,12 @@
 {
   "name": "sinterdb-workspace",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "A document-oriented database, its official Node.js driver, and supporting packages.",
   "author": "Killer88967",
   "license": "Apache-2.0",
   "type": "module",
-  "packageManager": "pnpm@12.11.2",
+  "packageManager": "pnpm@12.14.0",
   "engines": {
     "node": ">=24.0.0",
     "pnpm": ">=12.0.0"
@@ -47,12 +47,12 @@
     "@eslint/js": "^10.0.1",
     "@microsoft/api-extractor": "^7.59.4",
     "@types/node": "^26.6.5",
-    "@vitest/coverage-v8": "^5.0.4",
-    "eslint": "^10.12.0",
+    "@vitest/coverage-v8": "^5.0.5",
+    "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "prettier": "^3.9.10",
     "rimraf": "^6.1.3",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.5"
   }
 }

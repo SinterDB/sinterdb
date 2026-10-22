@@ -34,7 +34,7 @@ export const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
 /** The default `socketTimeoutMS`: 0, which disables the idle timeout. */
 export const DEFAULT_SOCKET_TIMEOUT_MS = 0;
 export const DRIVER_PRODUCT = "sinterdb-node-driver";
-export const DRIVER_PRODUCT_VERSION = "0.2.0";
+export const DRIVER_PRODUCT_VERSION = "0.3.0";
 
 const MAX_TIMEOUT_MS = 2_147_483_647;
 

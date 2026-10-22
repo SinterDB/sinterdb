@@ -22,8 +22,12 @@
   "containerEnv": {
     "FORCE_COLOR": "1"
   },
-  "forwardPorts": [4721],
+  "forwardPorts": [3000, 4721],
   "portsAttributes": {
+    "3000": {
+      "label": "SinterDB Website",
+      "onAutoForward": "openBrowserOnce"
+    },
     "4721": {
       "label": "SinterDB Server",
       "onAutoForward": "notify"
@@ -49,6 +53,7 @@
         "GitHub.vscode-github-actions",
         "yoavbls.pretty-ts-errors",
         "vitest.explorer",
+        "ms-azuretools.vscode-docker",
         "ms-vscode.hexeditor",
         "EditorConfig.EditorConfig",
         "bradlc.vscode-tailwindcss",
@@ -95,7 +100,8 @@
           "javascript",
           "javascriptreact",
           "typescript",
-          "typescriptreact"
+          "typescriptreact",
+          "mdx"
         ],
         "eslint.format.enable": true,
         "js/ts.tsdk.promptToUseWorkspaceVersion": true,

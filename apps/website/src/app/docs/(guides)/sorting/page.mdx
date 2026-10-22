@@ -1,0 +1,98 @@
+export const metadata = {
+  title: "Sorting",
+  description:
+    "Sort query results by one or more fields, and page through them with skip and limit.",
+};
+
+# Sorting
+
+Results come back in insertion order unless you sort them. Sorting, skipping and limiting are options of `find`.
+
+## Sort by a field
+
+`sort` is a list of `[field, direction]` pairs. Use `1` for ascending and `-1` for descending.
+
+```ts
+const youngestFirst = await users.find({}, { sort: [["age", 1]] }).toArray();
+const newestFirst = await posts
+  .find({}, { sort: [["createdAt", -1]] })
+  .toArray();
+```
+
+## Sort by several fields
+
+Later pairs break ties left by earlier ones:
+
+```ts
+await users
+  .find(
+    {},
+    {
+      sort: [
+        ["country", 1],
+        ["age", -1],
+      ],
+    },
+  )
+  .toArray();
+```
+
+This sorts by country, then by age from oldest to youngest within each country. Sorting is stable, so documents that tie on every field keep their insertion order.
+
+## Skip and limit
+
+```ts
+const pageSize = 20;
+const page = 3;
+
+const results = await posts
+  .find(
+    { published: true },
+    {
+      sort: [["createdAt", -1]],
+      skip: (page - 1) * pageSize,
+      limit: pageSize,
+    },
+  )
+  .toArray();
+```
+
+The order is always: filter, sort, skip, then limit. `limit` must be at least 1.
+
+<Callout title="Sort before you page">
+  Without `sort`, pages follow insertion order, which changes as documents are
+  deleted and added. Sort by a field that doesn't change, like `createdAt` or
+  `_id`, to get stable pages.
+</Callout>
+
+## How values sort
+
+A field can hold different types in different documents. Sorting orders types first, then values within a type. Ascending order, lowest first:
+
+| Rank | Type              |
+| ---- | ----------------- |
+| 1    | missing field     |
+| 2    | `null`            |
+| 3    | number and bigint |
+| 4    | string            |
+| 5    | `Uint8Array`      |
+| 6    | `CustomId`        |
+| 7    | boolean           |
+| 8    | `Date`            |
+| 9    | array             |
+| 10   | object            |
+
+Descending is the exact reverse, so documents missing the field come last.
+
+Within a type:
+
+- Numbers and bigints sort together by value, so `1n` falls between `0.5` and `1.5`. `NaN` sorts first.
+- Strings sort by Unicode code point: uppercase before lowercase, and no locale rules.
+- `false` sorts before `true`.
+- Arrays all compare equal to each other, and so do objects. Sorting by an array field, or by a path through an array such as `"items.price"`, leaves those documents in their existing order.
+
+## Performance
+
+Sorting is not served by indexes yet. The server finds the matching documents first and sorts them afterwards, so sorting a very large result takes time and memory. Narrow it down with a filter, or use `limit`.
+
+The sort type is <Api name="Sort" />, and the full rules are in [query-semantics.md](https://github.com/SinterDB/sinterdb/blob/main/docs/query-semantics.md#sort-order).

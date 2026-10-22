@@ -5,6 +5,47 @@ import type { ApiHierarchyNode } from "../_generated/model";
 
 const nodes: readonly ApiHierarchyNode[] = [
   {
+    name: "QueryBudgetOptions",
+    href: "/docs/api/interfaces/QueryBudgetOptions",
+    kind: "interface",
+    deprecated: false,
+    current: false,
+    children: [
+      {
+        name: "AggregateOptions",
+        href: "/docs/api/interfaces/AggregateOptions",
+        kind: "interface",
+        deprecated: false,
+        current: false,
+        children: [],
+      },
+      {
+        name: "FindOneOptions",
+        href: "/docs/api/interfaces/FindOneOptions",
+        kind: "interface",
+        deprecated: false,
+        current: false,
+        children: [],
+      },
+      {
+        name: "FindOptions",
+        href: "/docs/api/interfaces/FindOptions",
+        kind: "interface",
+        deprecated: false,
+        current: false,
+        children: [],
+      },
+      {
+        name: "FindQueryOptions",
+        href: "/docs/api/interfaces/FindQueryOptions",
+        kind: "interface",
+        deprecated: false,
+        current: false,
+        children: [],
+      },
+    ],
+  },
+  {
     name: "Error",
     href: null,
     kind: null,

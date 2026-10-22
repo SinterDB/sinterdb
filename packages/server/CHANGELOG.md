@@ -1,5 +1,13 @@
 # @sinterdb-internal/server
 
+## 0.3.0
+
+### Patch Changes
+
+- Updated dependencies
+  - sinterdb-protocol@0.3.0
+  - @sinterdb-internal/storage@0.3.0
+
 ## 0.2.0
 
 ### Patch Changes

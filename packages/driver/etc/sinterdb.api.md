@@ -10,6 +10,46 @@ import { DocumentValue } from 'sinterdb-protocol';
 import { EventEmitter } from 'node:events';
 
 // @public
+export class AggregateCursor<TResult extends object = Document> implements AsyncIterable<TResult> {
+    [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined>;
+    constructor(execute: CursorExecutor, collection: string, pipeline: readonly Document[], batchSize: number | undefined, budget?: QueryBudgetOptions);
+    close(): Promise<void>;
+    hasNext(): Promise<boolean>;
+    next(): Promise<TResult | null>;
+    toArray(): Promise<TResult[]>;
+}
+
+// @public
+export interface AggregateOptions extends QueryBudgetOptions {
+    readonly batchSize?: number;
+}
+
+// @public
+export type AggregationStage<TDocument extends object> = {
+    readonly $match: Filter<TDocument>;
+} | {
+    readonly $project: Projection<TDocument>;
+} | {
+    readonly $sort: Sort<TDocument>;
+} | {
+    readonly $skip: number;
+} | {
+    readonly $limit: number;
+} | {
+    readonly $count: string;
+} | {
+    readonly $group: GroupSpecification;
+};
+
+// @public
+export type ArrayOperators<TValue> = [
+Extract<TValue, readonly unknown[]>
+] extends [never] ? unknown : {
+    readonly $size?: number;
+    readonly $elemMatch?: ElementMatch<ElementOf<Extract<TValue, readonly unknown[]>>>;
+};
+
+// @public
 export type ArrayPaths<TDocument extends object> = PathsMatching<TDocument, readonly unknown[]>;
 
 // @public
@@ -23,12 +63,12 @@ export type ComparableValue = string | number | bigint | Date | Uint8Array | Cus
 
 // @public
 export type ComparisonOperators<TValue> = [
-Extract<TValue, ComparableValue>
+Extract<ElementOf<TValue>, ComparableValue>
 ] extends [never] ? unknown : {
-    readonly $gt?: Extract<TValue, ComparableValue>;
-    readonly $gte?: Extract<TValue, ComparableValue>;
-    readonly $lt?: Extract<TValue, ComparableValue>;
-    readonly $lte?: Extract<TValue, ComparableValue>;
+    readonly $gt?: Extract<ElementOf<TValue>, ComparableValue>;
+    readonly $gte?: Extract<ElementOf<TValue>, ComparableValue>;
+    readonly $lt?: Extract<ElementOf<TValue>, ComparableValue>;
+    readonly $lte?: Extract<ElementOf<TValue>, ComparableValue>;
 };
 
 // @public
@@ -61,7 +101,15 @@ export interface DeleteResult {
     readonly deletedCount: number;
 }
 
+// @public
+export type DistinctValue<TDocument extends object, TField extends string> = TField extends "_id" ? CustomId : Exclude<ElementOf<FilterPathValue<TDocument, TField>>, undefined>;
+
 export { Document }
+
+// @public
+export type ElementMatch<TElement> = [Extract<TElement, AtomicValue>] extends [
+never
+] ? TElement extends object ? Filter<TElement> : never : FilterOperators<TElement>;
 
 // @public
 export type ElementOf<TValue> = TValue extends readonly (infer TElement)[] ? TElement : TValue;
@@ -77,15 +125,22 @@ export interface ExplainResult {
     readonly documents: number;
     readonly estimatedCandidates: number;
     readonly field?: string;
+    readonly fields?: readonly string[];
     readonly index?: string;
     readonly lower?: IndexBoundInfo;
+    readonly prefixLength?: number;
     readonly stage: "COLLSCAN" | "IDLOOKUP" | "IXSCAN";
     readonly upper?: IndexBoundInfo;
 }
 
 // @public
+export type FieldPaths<TDocument, TDepth extends readonly unknown[] = []> = TDepth["length"] extends MaxPathDepth ? never : TDocument extends object ? {
+    [Key in keyof TDocument & string]: Key | (NonNullable<TDocument[Key]> extends readonly unknown[] | AtomicValue ? never : NonNullable<TDocument[Key]> extends object ? `${Key}.${FieldPaths<NonNullable<TDocument[Key]>, [...TDepth, unknown]>}` : never);
+}[keyof TDocument & string] : never;
+
+// @public
 export type Filter<TDocument extends object> = {
-    readonly [Path in FilterPaths<TDocument>]?: FilterPathValue<TDocument, Path> | FilterOperators<FilterPathValue<TDocument, Path>>;
+    readonly [Path in FilterPaths<TDocument>]?: FilterPathValue<TDocument, Path> | ElementOf<FilterPathValue<TDocument, Path>> | FilterOperators<FilterPathValue<TDocument, Path>>;
 } & {
     readonly _id?: CustomId | FilterOperators<CustomId>;
     readonly $and?: readonly Filter<TDocument>[];
@@ -95,51 +150,88 @@ export type Filter<TDocument extends object> = {
 
 // @public
 export type FilterOperators<TValue> = {
-    readonly $eq?: TValue;
-    readonly $ne?: TValue;
+    readonly $eq?: TValue | ElementOf<TValue>;
+    readonly $ne?: TValue | ElementOf<TValue>;
     readonly $in?: readonly (TValue | ElementOf<TValue>)[];
     readonly $nin?: readonly (TValue | ElementOf<TValue>)[];
     readonly $exists?: boolean;
     readonly $not?: FilterOperators<TValue>;
-} & ComparisonOperators<TValue>;
+} & ComparisonOperators<TValue> & ArrayOperators<TValue>;
 
 // @public
 export type FilterPaths<TDocument, TDepth extends readonly unknown[] = []> = TDepth["length"] extends MaxPathDepth ? never : TDocument extends object ? {
-    [Key in keyof TDocument & string]: Key | (NonNullable<TDocument[Key]> extends readonly unknown[] | AtomicValue ? never : NonNullable<TDocument[Key]> extends object ? `${Key}.${FilterPaths<NonNullable<TDocument[Key]>, [...TDepth, unknown]>}` : never);
+    [Key in keyof TDocument & string]: Key | (PathChild<TDocument[Key]> extends readonly unknown[] | AtomicValue ? never : PathChild<TDocument[Key]> extends object ? `${Key}.${FilterPaths<PathChild<TDocument[Key]>, [...TDepth, unknown]>}` : never);
 }[keyof TDocument & string] : never;
 
 // @public
-export type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? THead extends keyof TDocument ? FilterPathValue<NonNullable<TDocument[THead]>, TRest> : never : never;
+export type FilterPathValue<TDocument, TPath extends string> = TPath extends keyof TDocument ? TDocument[TPath] : TPath extends `${infer THead}.${infer TRest}` ? THead extends keyof TDocument ? FilterPathValue<PathChild<TDocument[THead]>, TRest> : never : never;
 
 // @public
-export class FindCursor<TDocument extends object = Document> implements AsyncIterable<WithId<TDocument>> {
-    [Symbol.asyncIterator](): AsyncGenerator<WithId<TDocument>, void, undefined>;
+export class FindCursor<TDocument extends object = Document, TResult extends object = WithId<TDocument>> implements AsyncIterable<TResult> {
+    [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined>;
     constructor(execute: CursorExecutor, collection: string, filter: Document, batchSize: number | undefined, query?: FindQueryOptions);
     close(): Promise<void>;
     // @beta
     explain(): Promise<ExplainResult>;
     hasNext(): Promise<boolean>;
-    next(): Promise<WithId<TDocument> | null>;
-    toArray(): Promise<WithId<TDocument>[]>;
+    next(): Promise<TResult | null>;
+    toArray(): Promise<TResult[]>;
 }
 
 // @public
-export interface FindOptions<TDocument extends object = Document> {
+export interface FindOneOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> extends QueryBudgetOptions {
+    readonly projection?: TProjection;
+}
+
+// @public
+export interface FindOptions<TDocument extends object = Document, TProjection extends Projection<TDocument> | undefined = undefined> extends QueryBudgetOptions {
     readonly batchSize?: number;
     readonly limit?: number;
+    readonly projection?: TProjection;
     readonly skip?: number;
     readonly sort?: Sort<TDocument>;
 }
 
 // @public
-export interface FindQueryOptions {
+export interface FindQueryOptions extends QueryBudgetOptions {
     readonly limit?: number;
+    readonly projection?: Document;
     readonly skip?: number;
     readonly sort?: readonly (readonly [string, SortDirection])[];
 }
 
 // @public
-export type IndexablePath<TDocument extends object> = Exclude<FilterPaths<TDocument>, "_id" | `_id.${string}`>;
+export type GroupAccumulator = {
+    readonly $count: Readonly<Record<string, never>>;
+} | {
+    readonly $sum: GroupValue;
+} | {
+    readonly $avg: GroupValue;
+} | {
+    readonly $min: GroupValue;
+} | {
+    readonly $max: GroupValue;
+} | {
+    readonly $first: GroupValue;
+} | {
+    readonly $last: GroupValue;
+};
+
+// @public
+export interface GroupSpecification {
+    readonly [field: string]: GroupAccumulator | GroupValue | {
+        readonly [name: string]: GroupValue;
+    };
+    readonly _id: GroupValue | {
+        readonly [name: string]: GroupValue;
+    };
+}
+
+// @public
+export type GroupValue = string | number | bigint | boolean | null | Date | Uint8Array | CustomId;
+
+// @public
+export type IndexablePath<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>;
 
 // @beta
 export interface IndexBoundInfo {
@@ -148,9 +240,21 @@ export interface IndexBoundInfo {
 }
 
 // @public
-export interface IndexDefinition<TDocument extends object = Document> {
-    readonly direction?: 1 | -1;
+export type IndexDefinition<TDocument extends object = Document> = IndexDefinitionOptions & ({
     readonly field: IndexablePath<TDocument>;
+    readonly direction?: 1 | -1;
+    readonly keys?: never;
+} | {
+    readonly keys: readonly (readonly [
+    IndexablePath<TDocument>,
+    1 | -1
+    ])[];
+    readonly field?: never;
+    readonly direction?: never;
+});
+
+// @public
+export interface IndexDefinitionOptions {
     readonly name?: string;
     readonly sparse?: boolean;
     readonly unique?: boolean;
@@ -160,6 +264,7 @@ export interface IndexDefinition<TDocument extends object = Document> {
 export interface IndexInfo {
     readonly direction: 1 | -1;
     readonly field: string;
+    readonly keys: readonly IndexKeyInfo[];
     readonly name: string;
     readonly sparse: boolean;
     readonly unique: boolean;
@@ -170,6 +275,12 @@ export interface IndexIssue {
     readonly detail: string;
     readonly index: string;
     readonly problem: string;
+}
+
+// @public
+export interface IndexKeyInfo {
+    readonly direction: 1 | -1;
+    readonly field: string;
 }
 
 // @public
@@ -212,11 +323,44 @@ export interface ParsedSinterConnectionString {
 }
 
 // @public
+export type PathChild<TValue> = NonNullable<ElementOf<NonNullable<TValue>>>;
+
+// @public
 export type PathsMatching<TDocument extends object, TKind> = {
     [Path in UpdatePaths<TDocument>]: [
     NonNullable<FilterPathValue<TDocument, Path>>
     ] extends [TKind] ? Path : never;
 }[UpdatePaths<TDocument>];
+
+// Warning: (ae-forgotten-export) The symbol "UnknownPaths" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "IncludedPaths" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Flagged" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ExcludedPaths" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Simplify" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Drop" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "IdPart" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Keep" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ProjectedDocument<TDocument extends object, TProjection> = [
+TProjection
+] extends [undefined] ? WithId<TDocument> : [UnknownPaths<TProjection>] extends [never] ? [IncludedPaths<TProjection>] extends [never] ? [Flagged<TProjection, 1 | true>] extends [never] ? [ExcludedPaths<TProjection>] extends [never] ? [Flagged<TProjection, 0 | false>] extends [never] ? WithId<TDocument> : Simplify<Omit<TDocument, "_id">> : Simplify<Drop<Omit<TDocument, "_id">, ExcludedPaths<TProjection>> & IdPart<TProjection>> : {
+    readonly _id: CustomId;
+} : Simplify<Keep<Omit<TDocument, "_id">, IncludedPaths<TProjection>> & IdPart<TProjection>> : Partial<WithId<TDocument>>;
+
+// @public
+export type Projection<TDocument extends object> = {
+    readonly [Path in FilterPaths<TDocument> | "_id"]?: ProjectionFlag;
+};
+
+// @public
+export type ProjectionFlag = 0 | 1 | boolean;
+
+// @public
+export interface QueryBudgetOptions {
+    readonly maxScanned?: number;
+    readonly maxTimeMS?: number;
+}
 
 // @public
 export class SinterClient extends EventEmitter<SinterClientEvents> {
@@ -279,14 +423,18 @@ export class SinterClientStateError extends SinterError {
 export class SinterCollection<TDocument extends object = Document> {
     constructor(
     database: SinterDatabase, name: string);
+    aggregate<TResult extends object = Document>(pipeline: readonly AggregationStage<TDocument>[], options?: AggregateOptions): AggregateCursor<TResult>;
+    countDocuments(filter?: Filter<TDocument>, options?: QueryBudgetOptions): Promise<number>;
     createIndex(definition: IndexDefinition<TDocument>): Promise<CreateIndexResult>;
     readonly database: SinterDatabase;
     deleteMany(filter: Filter<TDocument>): Promise<DeleteResult>;
     deleteOne(filter: Filter<TDocument>): Promise<DeleteResult>;
+    distinct<TField extends FilterPaths<TDocument> | "_id">(field: TField, filter?: Filter<TDocument>, options?: QueryBudgetOptions): Promise<DistinctValue<TDocument, TField>[]>;
     protected readonly documentType: TDocument;
     dropIndex(name: string): Promise<void>;
-    find(filter?: Filter<TDocument>, options?: FindOptions<TDocument>): FindCursor<TDocument>;
-    findOne(filter?: Filter<TDocument>): Promise<WithId<TDocument> | null>;
+    estimatedDocumentCount(): Promise<number>;
+    find<const TProjection extends Projection<TDocument> | undefined = undefined>(filter?: Filter<TDocument>, options?: FindOptions<TDocument, TProjection>): FindCursor<TDocument, ProjectedDocument<TDocument, TProjection>>;
+    findOne<const TProjection extends Projection<TDocument> | undefined = undefined>(filter?: Filter<TDocument>, options?: FindOneOptions<TDocument, TProjection>): Promise<ProjectedDocument<TDocument, TProjection> | null>;
     indexes(): Promise<IndexInfo[]>;
     insertMany(documents: readonly OptionalId<TDocument>[]): Promise<InsertManyResult>;
     insertOne(document: OptionalId<TDocument>): Promise<InsertOneResult>;
@@ -422,7 +570,7 @@ export class SinterSocketTimeoutError extends SinterConnectionError {
 
 // @public
 export type Sort<TDocument extends object> = readonly (readonly [
-path: FilterPaths<TDocument> | "_id",
+path: FieldPaths<TDocument> | "_id",
 direction: SortDirection
 ])[];
 
@@ -463,7 +611,7 @@ export interface UpdateOptions {
 }
 
 // @public
-export type UpdatePaths<TDocument extends object> = Exclude<FilterPaths<TDocument>, "_id" | `_id.${string}`>;
+export type UpdatePaths<TDocument extends object> = Exclude<FieldPaths<TDocument>, "_id" | `_id.${string}`>;
 
 // @public
 export interface UpdateResult {

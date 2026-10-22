@@ -20,21 +20,37 @@ export type {
   SinterPingResult,
   SinterServerInfo,
 } from "./client.js";
+export type { QueryBudgetOptions } from "./budget.js";
+
+export type {
+  AggregateOptions,
+  AggregationStage,
+  GroupAccumulator,
+  GroupSpecification,
+  GroupValue,
+} from "./aggregation.js";
 
 export { SinterCollection } from "./collection.js";
 export type {
+  DistinctValue,
   EqualityFilter,
+  FindOneOptions,
   FindOptions,
   InsertManyResult,
   InsertOneResult,
   OptionalId,
   WithId,
 } from "./collection.js";
+export type {
+  ProjectedDocument,
+  Projection,
+  ProjectionFlag,
+} from "./projection.js";
 
 export { DEFAULT_SINTERDB_PORT } from "./connection-string.js";
 export type { ParsedSinterConnectionString } from "./connection-string.js";
 
-export { FindCursor } from "./cursor.js";
+export { AggregateCursor, FindCursor } from "./cursor.js";
 export type { CursorExecutor, FindQueryOptions } from "./cursor.js";
 
 export { SinterDatabase } from "./database.js";
@@ -58,15 +74,19 @@ export {
 export type { SinterServerErrorOptions } from "./errors.js";
 
 export type {
+  ArrayOperators,
   AtomicValue,
   ComparableValue,
   ComparisonOperators,
+  ElementMatch,
   ElementOf,
+  FieldPaths,
   Filter,
   FilterOperators,
   FilterPaths,
   FilterPathValue,
   MaxPathDepth,
+  PathChild,
   Sort,
   SortDirection,
 } from "./filter.js";
@@ -77,7 +97,9 @@ export type {
   IndexablePath,
   IndexBoundInfo,
   IndexDefinition,
+  IndexDefinitionOptions,
   IndexInfo,
+  IndexKeyInfo,
   IndexIssue,
   IndexValidationResult,
 } from "./indexes.js";

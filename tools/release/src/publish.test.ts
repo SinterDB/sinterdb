@@ -217,13 +217,32 @@ describe("publishTarballs", () => {
     expect(npm.publishes()).toHaveLength(2);
   });
 
-  it('refuses to publish under "latest"', () => {
+  it("refuses to publish a prerelease under latest", () => {
     const npm = fakeNpm();
 
     expect(() =>
-      publishTarballs({ ...BASE, distTag: "latest", run: npm.run }),
-    ).toThrow(/must not be published under "latest"/);
+      publishTarballs({
+        ...BASE,
+        version: "0.3.0-rc.1",
+        distTag: "latest",
+        run: npm.run,
+      }),
+    ).toThrow(/prerelease and must not be published under "latest"/);
     expect(npm.calls).toHaveLength(0);
+  });
+
+  it("publishes a stable version under latest", () => {
+    const npm = fakeNpm({ tags: () => ({ latest: "0.1.0" }) });
+    const result = publishTarballs({
+      ...BASE,
+      distTag: "latest",
+      run: npm.run,
+    });
+
+    expect(result.published).toEqual([...NAMES]);
+    expect(npm.publishes().every((c) => c.arguments_.includes("latest"))).toBe(
+      true,
+    );
   });
 
   it("waits out a registry cache that hides the new version", () => {

@@ -23,8 +23,8 @@ this page changing too.
 | Format                   | Constant                    | Version |
 | ------------------------ | --------------------------- | ------- |
 | Wire protocol            | `PROTOCOL_VERSION`          | 1       |
-| Storage directory        | `STORAGE_FORMAT_VERSION`    | 2       |
-| Snapshot (checkpoint)    | `CHECKPOINT_FORMAT_VERSION` | 2       |
+| Storage directory        | `STORAGE_FORMAT_VERSION`    | 3       |
+| Snapshot (checkpoint)    | `CHECKPOINT_FORMAT_VERSION` | 3       |
 | Write-ahead log segments | `WAL_FORMAT_VERSION`        | 1       |
 
 ## Data files
@@ -83,6 +83,31 @@ Not covered:
 - Performance characteristics.
 - Anything imported from a path other than the package root.
 
+### Building on the driver
+
+A library built on `sinterdb`, such as an ODM, gets the promises above and
+should follow these rules:
+
+- **Import from `sinterdb` only.** The package `exports` map exposes nothing but
+  the root, so a deep import such as `sinterdb/dist/client.js` fails. `CustomId`
+  and `Document` are re-exported from the root, so a library does not need to
+  import `sinterdb-protocol`.
+- **Treat `SinterCompatibilityError` as "this server is too old".** When a
+  server lacks a capability (`projection`, `compound-indexes`, `aggregation`,
+  or `query-budgets`), the driver refuses the call before sending it. Check
+  `client.serverInfo?.capabilities` if you want to decide earlier.
+- **Match errors on class and code**, not on message text. Every driver error
+  extends `SinterError`, and `SinterErrorCode` values are stable.
+- **Avoid `executeCommand` unless you must.** It sends any command and returns
+  the raw result. The driver promises the method, but the commands and result
+  shapes it carries follow the [wire protocol](./protocol/wire-protocol-v1.md)
+  and may gain fields.
+- **Do not depend on `@beta` members** (see above).
+
+`packages/driver/src/odm-contract.integration.test.ts` is a model layer written
+the way an ODM would write one, using only the public exports. It runs on every
+build, so a change that would break such a library fails CI.
+
 Driver releases support Node.js 24 and later. Dropping a Node.js version is a
 breaking change.
 
@@ -98,6 +123,66 @@ breaking change.
 ## Migration notes
 
 Each breaking change lands here in the release that makes it.
+
+### 0.3.0
+
+- **Storage format 2 became 3** so an index can cover several fields.
+  Directories are upgraded in place on first open, and the upgrade is one way:
+  `0.2.0` refuses a format 3 directory. Nothing is rewritten, because format 2
+  files are read as they are. Copy your data directory before moving from
+  `0.2.0`.
+- **Compound indexes need a 0.3.0 server.** The server advertises a new
+  `compound-indexes` capability. A 0.3.0 driver refuses to send a `keys` index
+  definition to a server without it (`SinterCompatibilityError`). A `0.2.0`
+  driver can still list the indexes of a collection that has a compound one,
+  but sees only the first field of it, because `field` and `direction` describe
+  the first key. Do not drop and recreate such an index from a `0.2.0` driver.
+- **`IndexInfo` has a new `keys` property** with every field of the index, and
+  `ExplainResult` gains optional `fields` and `prefixLength`. Existing code that
+  reads `field` and `direction` keeps working.
+- **Aggregation needs a 0.3.0 server.** The server advertises a new
+  `aggregation` capability and an `aggregate` command with the stages `$match`,
+  `$project`, `$sort`, `$skip`, `$limit`, `$count` and `$group`. A 0.3.0 driver
+  refuses to send a pipeline to a server without it
+  (`SinterCompatibilityError`). The driver exports `AggregateCursor` and the
+  `AggregationStage`, `AggregateOptions`, `GroupSpecification`,
+  `GroupAccumulator` and `GroupValue` types. Nothing that worked before
+  changes.
+- **Query budgets need a 0.3.0 server.** The server advertises a new
+  `query-budgets` capability and accepts `maxTimeMS` and `maxScanned` on its
+  query commands, with two new wire errors, `OperationTimeLimitExceeded` (7000)
+  and `ScanLimitExceeded` (7001). A 0.3.0 driver refuses to send a limit to a
+  server without the capability (`SinterCompatibilityError`). The driver exports
+  the `QueryBudgetOptions` type. `countDocuments()` and `distinct()` take an
+  options argument after their filter. Nothing that worked before changes.
+- **Projection needs a 0.3.0 server.** The server advertises a new `projection`
+  capability. A 0.3.0 driver refuses to send a projection to a server without
+  it (`SinterCompatibilityError`) instead of getting whole documents back.
+  Queries without a projection work against any server of the same protocol
+  version. The protocol version is still 1 and data files are unchanged.
+- **A query result may not contain `_id`.** With `projection: { _id: 0 }` the
+  returned documents have no `_id`. The result type says so, but code that reads
+  `_id` from a cursor of projected documents needs to allow for it.
+- **`countDocuments`, `estimatedDocumentCount` and `distinct` need a 0.3.0
+  server.** They use the new `count` and `distinct` commands, which an older
+  server answers with `UnknownCommand` (a `SinterServerError`).
+- **An invalid filter is always an error.** Before, `find` and `findOne` on a
+  collection that did not exist returned nothing for a filter such as
+  `{ a: { $nope: 1 } }`. They now fail with `DocumentValidationFailed`, like
+  every other command that takes a filter.
+
+- **Queries now look inside arrays.** `{ tags: "x" }` matches
+  `{ tags: ["x", "y"] }`, and `{ scores: { $gt: 90 } }` matches when any element
+  is above 90. `{ tags: { $ne: "x" } }` and `$nin` now exclude documents whose
+  array holds the value; before, they wrongly included them. Dotted paths step
+  through arrays of documents (`"items.sku"`) or pick an element by position
+  (`"items.0"`). An index is not used once any indexed document has an array on
+  the indexed path, so such queries scan the collection. They return the same
+  documents, only slower. See [Arrays](./query-semantics.md#arrays).
+- **`IndexDefinition` is now a type, not an interface.** It is a union of the
+  single-field and the `keys` form. Code that builds a definition or passes one
+  to `createIndex()` compiles as before. Code that `extends` or `implements` it
+  needs to change.
 
 ### 0.2.0
 

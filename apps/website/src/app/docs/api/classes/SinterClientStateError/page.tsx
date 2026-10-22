@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 357,
+  id: 469,
   name: "SinterClientStateError",
   kind: "class",
   label: "Class",
@@ -63,7 +63,7 @@ const page: ApiPage = {
       title: "Constructors",
       members: [
         {
-          id: 367,
+          id: 479,
           name: "constructor",
           anchor: "constructor",
           kind: "constructor",
@@ -75,7 +75,7 @@ const page: ApiPage = {
           comment: null,
           signatures: [
             {
-              id: 368,
+              id: 480,
               code: [
                 ["new ", "kw"],
                 ["SinterClientStateError", "name"],
@@ -169,7 +169,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 372,
+          id: 484,
           name: "code",
           anchor: "code",
           kind: "property",

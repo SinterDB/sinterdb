@@ -1,3 +1,4 @@
+import type { BudgetLimits, OperationBudget } from "@sinterdb-internal/storage";
 import type { Document } from "sinterdb-protocol";
 
 import { estimateEncodedSize } from "./document-size.js";
@@ -29,6 +30,8 @@ interface CursorState {
   buffered: Document | undefined;
   exhausted: boolean;
   lastUsed: number;
+  /** The budget the iterator charges, restarted for every `getMore`. */
+  readonly budget: OperationBudget | undefined;
 }
 
 export class CursorManager {
@@ -65,6 +68,7 @@ export class CursorManager {
   public open(
     documents: Iterable<Document>,
     batchSize = DEFAULT_CURSOR_BATCH_SIZE,
+    budget?: OperationBudget,
   ): CursorBatch {
     validateBatchSize(batchSize);
     this.sweepExpired();
@@ -74,6 +78,7 @@ export class CursorManager {
       buffered: undefined,
       exhausted: false,
       lastUsed: this.now(),
+      budget,
     };
 
     const documentsBatch = takeBatch(state, batchSize, this.maxBatchBytes);
@@ -98,6 +103,7 @@ export class CursorManager {
   public getMore(
     cursorId: number,
     batchSize = DEFAULT_CURSOR_BATCH_SIZE,
+    limits: BudgetLimits = {},
   ): CursorBatch {
     validateCursorId(cursorId);
     validateBatchSize(batchSize);
@@ -110,8 +116,18 @@ export class CursorManager {
     }
 
     state.lastUsed = this.now();
+    state.budget?.restart(limits);
 
-    const documents = takeBatch(state, batchSize, this.maxBatchBytes);
+    let documents: Document[];
+
+    try {
+      documents = takeBatch(state, batchSize, this.maxBatchBytes);
+    } catch (error: unknown) {
+      // An iterator that threw is finished, so the cursor cannot continue.
+      this.cursors.delete(cursorId);
+
+      throw error;
+    }
 
     if (isExhausted(state)) {
       this.cursors.delete(cursorId);

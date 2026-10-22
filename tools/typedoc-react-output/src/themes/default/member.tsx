@@ -31,7 +31,8 @@ export function MemberCard({ member }: { readonly member: ApiMember }) {
           <a
             href={`#${member.anchor}`}
             className="tdk-anchor"
-            aria-label={`Link to ${member.name}`}
+            aria-label={`Copy link to ${member.name}`}
+            title="Copy link"
           >
             #
           </a>

@@ -38,20 +38,23 @@ const indexes = await users.indexes();
 await users.dropIndex("by_level");
 ```
 
-| Option      | Meaning                                                              |
-| ----------- | -------------------------------------------------------------------- |
-| `field`     | The field to index. TypeScript checks it against your document type. |
-| `direction` | `1` or `-1`. Both directions serve the same lookups today.           |
-| `unique`    | At most one document may have a given value.                         |
-| `sparse`    | Documents without the field are not indexed.                         |
-| `name`      | Up to 127 characters. `_id_` is reserved.                            |
+| Option      | Meaning                                                                |
+| ----------- | ---------------------------------------------------------------------- |
+| `field`     | The field to index. TypeScript checks it against your document type.   |
+| `direction` | `1` or `-1`. Both directions serve the same lookups today.             |
+| `keys`      | Several `[field, direction]` pairs for a compound index. See below.    |
+| `unique`    | At most one document may have a given value, or combination of values. |
+| `sparse`    | Documents without the field are not indexed.                           |
+| `name`      | Up to 127 characters. `_id_` is reserved.                              |
+
+Give either `field` or `keys`, never both.
 
 Rules:
 
 - Creating an identical index twice succeeds and reports `created: false`.
-- A collection can have one index per field and at most 32 indexes besides
-  `_id`. A different definition for a field that already has an index fails
-  with `IndexConflict`. Drop the old index first.
+- A collection can have one index per list of fields and at most 32 indexes
+  besides `_id`. A different definition for fields that already have an index,
+  in the same order, fails with `IndexConflict`. Drop the old index first.
 - `_id` cannot be indexed, changed, or dropped.
 - `createIndex` creates the collection if it does not exist.
 - Building an index scans the collection on the server's only thread, so
@@ -70,10 +73,12 @@ returns, including the order, which is always insertion order.
 | `{ field: { $in: [...] } }`                     | Yes, unless an indexed document holds an array in that field |
 | `{ _id: id }` and `{ _id: { $in: [...] } }`     | Yes: direct lookup                                           |
 | Several conditions joined by `$and`             | Yes: the most selective single index                         |
+| Equality, `$in`, and a range on a compound      | Yes: see [Compound indexes](#compound-indexes)               |
 | `$or`, `$nor`, `$ne`, `$nin`, `$exists`, `$not` | No: a scan, with the filter still applied                    |
 | `sort`, `skip`, `limit`                         | Applied after the index narrows the candidates               |
 
-How matching works:
+How matching works (the full comparison rules are in
+[Query semantics](./query-semantics.md)):
 
 - **Equality is exact.** Values are compared by their stored form, so `1` and
   `1n` are different, `0` and `-0` are different, and an array or document only
@@ -81,14 +86,70 @@ How matching works:
 - **Ranges compare values of the same kind.** `{ $gt: 5 }` matches numbers,
   `{ $gt: "a" }` matches strings. A range never matches a value of another kind,
   and mixing kinds in one range uses a scan.
-- **`$in` and arrays.** `$in` also matches array elements, which indexes do not
-  hold, so once any indexed document has an array in the field, `$in` on that
-  field falls back to a scan. Plain equality is unaffected.
+- **Arrays turn an index off.** A filter matches an array by its elements, and
+  an index holds each document's array as one entry. So once any indexed
+  document has an array in the field, or an array on the way to it (as in
+  `items.sku` when `items` is an array), queries on that field scan the
+  collection instead. Deleting or changing those documents turns the index
+  back on. An index on an array field is not useful today.
 - **One index per query.** The server picks the candidate with the fewest
   expected documents and uses it only if that is fewer than the collection
   holds. An index on a field where every document has the same value is not
   used.
 - **Not used for sorting.** Results are sorted after they are found.
+
+## Compound indexes
+
+A compound index covers several fields, in order. Use it when queries fix one
+field and then narrow by another.
+
+```ts
+await orders.createIndex({
+  keys: [
+    ["customerId", 1],
+    ["status", 1],
+  ],
+});
+
+// Both of these can use the index:
+await orders.find({ customerId: id }).toArray();
+await orders.find({ customerId: id, status: "open" }).toArray();
+
+// This cannot, because the first field is not fixed:
+await orders.find({ status: "open" }).toArray();
+```
+
+- **A query uses the index by its leading fields.** The query fixes the first
+  field by equality or `$in`, and can continue with the second, the third, and
+  so on. The first field it leaves out can carry a range (`$gt`, `$gte`, `$lt`,
+  `$lte`) that the index uses too. Anything after that is checked on each
+  candidate. With an index on `customerId` and `total`, a query for one
+  customer and a `total` above some value uses both fields.
+- **A range alone works on the first field.** `{ customerId: { $gt: a } }`
+  reads the index in a range, just as a single-field index does.
+- **`$in` expands into one lookup per combination**, up to 64 combinations. A
+  query that would need more falls back to the fields before it, or to a scan.
+  When a field has both an equality and a `$in`, the equality is used.
+- **The order of the fields matters.** `["a", "b"]` and `["b", "a"]` are two
+  different indexes, and both can exist. Two indexes over the same fields in
+  the same order cannot, whatever their directions.
+- **Up to 8 fields**, each at most once.
+- **Missing fields count as a value.** A document without one of the fields is
+  indexed with that field missing, and a query for `null` does not find it.
+  In a unique compound index, two documents that both lack the same fields and
+  share the rest conflict.
+- **`sparse` leaves out only documents with none of the fields.** A document
+  with at least one of them is indexed.
+- **`unique` applies to the combination.** Many documents may share the first
+  field as long as the whole combination differs. The error names every field.
+- **Arrays turn it off**, as for any index: once a document holds an array in
+  one of the fields, queries scan the collection instead.
+- **`explain()` shows the prefix.** `fields` lists every field and
+  `prefixLength` says how many the query fixed.
+- **Not used for sorting yet.** The planner does not read a compound index in
+  order, so it does not replace a sort. Results are sorted after they are found.
+- `field` and `direction` in `indexes()` and `explain()` describe the first
+  field, so older drivers keep working. Read `keys` for the whole index.
 
 ## Explaining a query
 
@@ -98,14 +159,16 @@ const plan = await users.find({ email: "ada@example.com" }).explain();
 
 `explain()` reports how the server would run the query without running it.
 
-| Field                 | Meaning                                             |
-| --------------------- | --------------------------------------------------- |
-| `stage`               | `COLLSCAN`, `IDLOOKUP`, or `IXSCAN`                 |
-| `index`, `field`      | The index used, when there is one                   |
-| `access`              | `equality`, `in`, or `range`                        |
-| `lower`, `upper`      | The range bounds, each with `value` and `inclusive` |
-| `estimatedCandidates` | How many documents the server expects to examine    |
-| `documents`           | How many documents the collection holds             |
+| Field                 | Meaning                                               |
+| --------------------- | ----------------------------------------------------- |
+| `stage`               | `COLLSCAN`, `IDLOOKUP`, or `IXSCAN`                   |
+| `index`, `field`      | The index used, and its first field                   |
+| `fields`              | Every field of a compound index, in order             |
+| `prefixLength`        | How many leading fields of a compound index are fixed |
+| `access`              | `equality`, `in`, or `range`                          |
+| `lower`, `upper`      | The range bounds, each with `value` and `inclusive`   |
+| `estimatedCandidates` | How many documents the server expects to examine      |
+| `documents`           | How many documents the collection holds               |
 
 ```json
 {
@@ -180,8 +243,8 @@ See [Durable Storage](./storage.md).
 
 ## Limits
 
-- Indexes cover one field. There are no compound, text, partial, or expiring
-  indexes yet.
+- There are no text, partial, or expiring indexes yet. A compound index is not
+  yet read in order to serve a sort.
 - Arrays are indexed as whole values. An index does not match on an individual
   array element.
 - Indexes live in memory next to the documents, and the whole dataset must fit.

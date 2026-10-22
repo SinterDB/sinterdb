@@ -1,0 +1,64 @@
+export const metadata = {
+  title: "Replacements",
+  description:
+    "Replace a whole document while keeping its _id, and insert a replacement when nothing matches.",
+};
+
+# Replacements
+
+<Api name="SinterCollection.replaceOne">replaceOne</Api> swaps a whole document
+for a new one. Fields that aren't in the replacement are gone afterwards. To
+change only some fields, use an [update](/docs/updates) instead.
+
+## Replace a document
+
+```ts
+const result = await users.replaceOne(
+  { email: "kage@example.com" },
+  { email: "kage@example.com", name: "Kage", age: 31 },
+);
+
+result.matchedCount; // 1
+result.modifiedCount; // 1, or 0 if the replacement was identical
+```
+
+Only the first matching document is replaced. There is no `replaceMany`.
+
+The replacement is a plain document, not an update. It can't contain operators like `$set`.
+
+## The `_id` stays
+
+The replaced document keeps its `_id`. You can leave `_id` out of the replacement, or include the same one. Including a **different** `_id` fails with a <Api name="SinterServerError" /> named `ImmutableId`.
+
+```ts
+const user = await users.findOne({ email: "kage@example.com" });
+
+if (user) {
+  await users.replaceOne({ _id: user._id }, { ...user, age: user.age + 1 });
+}
+```
+
+Reading a document, changing it, and replacing it by `_id` like this is a simple way to make larger edits. Keep in mind that another client could change the document between your read and your write.
+
+## Upsert
+
+With `upsert: true`, the replacement is inserted when nothing matches:
+
+```ts
+const result = await settings.replaceOne(
+  { key: "theme" },
+  { key: "theme", value: "dark" },
+  { upsert: true },
+);
+
+result.upsertedId; // the new _id, or null if a document was replaced
+```
+
+## Replace or update?
+
+| Use          | When                                                    |
+| ------------ | ------------------------------------------------------- |
+| `updateOne`  | You're changing a few fields and want to keep the rest. |
+| `replaceOne` | You have the complete new version of the document.      |
+
+The result is an <Api name="UpdateResult" />, the same as for updates.

@@ -1,5 +1,6 @@
 import { CustomId, type Document, type DocumentValue } from "sinterdb-protocol";
 
+import { budgetParameters, type QueryBudgetOptions } from "./budget.js";
 import type { WithId } from "./collection.js";
 import { SinterProtocolError } from "./errors.js";
 import type { SortDirection } from "./filter.js";
@@ -15,13 +16,120 @@ export type CursorExecutor = (
 ) => Promise<DocumentValue>;
 
 /** The query parts of a find that are sent with the first request. */
-export interface FindQueryOptions {
+export interface FindQueryOptions extends QueryBudgetOptions {
   /** Sort order as `[path, direction]` pairs. */
   readonly sort?: readonly (readonly [string, SortDirection])[];
   /** How many matching documents to skip. */
   readonly skip?: number;
   /** The maximum number of documents to return. */
   readonly limit?: number;
+  /** Which fields to return. */
+  readonly projection?: Document;
+}
+
+/**
+ * The batching shared by every cursor: it sends the opening command on the
+ * first read, continues with `getMore`, and releases the server-side cursor.
+ */
+class BatchReader<TResult extends object> {
+  private buffer: TResult[] = [];
+  private cursorId: number | null | undefined = undefined;
+  private closed = false;
+
+  public constructor(
+    private readonly execute: CursorExecutor,
+    private readonly open: (size: Document) => {
+      command: string;
+      parameters: Document;
+    },
+    private readonly batchSize: number | undefined,
+    private readonly requireId: boolean,
+    private readonly budget: Document = {},
+  ) {}
+
+  public async hasNext(): Promise<boolean> {
+    while (this.buffer.length === 0) {
+      if (this.closed || this.cursorId === null) {
+        return false;
+      }
+
+      await this.fetchBatch();
+    }
+
+    return true;
+  }
+
+  public async next(): Promise<TResult | null> {
+    if (!(await this.hasNext())) {
+      return null;
+    }
+
+    return this.buffer.shift() ?? null;
+  }
+
+  public async toArray(): Promise<TResult[]> {
+    const results: TResult[] = [];
+
+    try {
+      for (let doc = await this.next(); doc !== null; doc = await this.next()) {
+        results.push(doc);
+      }
+    } finally {
+      await this.close();
+    }
+
+    return results;
+  }
+
+  public async close(): Promise<void> {
+    if (this.closed) {
+      return;
+    }
+
+    this.closed = true;
+    this.buffer = [];
+
+    const id = this.cursorId;
+    this.cursorId = null;
+
+    if (typeof id === "number") {
+      await this.execute("closeCursor", { cursorId: id });
+    }
+  }
+
+  public async *iterate(): AsyncGenerator<TResult, void, undefined> {
+    try {
+      for (let doc = await this.next(); doc !== null; doc = await this.next()) {
+        yield doc;
+      }
+    } finally {
+      await this.close();
+    }
+  }
+
+  private async fetchBatch(): Promise<void> {
+    const size =
+      this.batchSize === undefined ? {} : { batchSize: this.batchSize };
+
+    let value: DocumentValue;
+
+    if (this.cursorId === undefined) {
+      const { command, parameters } = this.open(size);
+
+      value = await this.execute(command, parameters);
+    } else {
+      value = await this.execute("getMore", {
+        cursorId: this.cursorId,
+        ...size,
+        ...this.budget,
+      });
+    }
+
+    const batch = parseBatch<TResult>(value, this.requireId);
+
+    this.cursorId = batch.cursorId;
+    this.buffer.push(...batch.documents);
+  }
 }
 
 /**
@@ -34,18 +142,43 @@ export interface FindQueryOptions {
  */
 export class FindCursor<
   TDocument extends object = Document,
-> implements AsyncIterable<WithId<TDocument>> {
-  private buffer: WithId<TDocument>[] = [];
-  private cursorId: number | null | undefined = undefined;
-  private closed = false;
+  TResult extends object = WithId<TDocument>,
+> implements AsyncIterable<TResult> {
+  private readonly reader: BatchReader<TResult>;
 
   public constructor(
     private readonly execute: CursorExecutor,
     private readonly collection: string,
     private readonly filter: Document,
-    private readonly batchSize: number | undefined,
-    private readonly query: FindQueryOptions = {},
-  ) {}
+    batchSize: number | undefined,
+    query: FindQueryOptions = {},
+  ) {
+    this.reader = new BatchReader<TResult>(
+      execute,
+      (size) => ({
+        command: "find",
+        parameters: {
+          collection,
+          filter,
+          ...size,
+          ...(query.sort === undefined
+            ? {}
+            : {
+                sort: query.sort.map(([path, direction]) => [path, direction]),
+              }),
+          ...(query.skip === undefined ? {} : { skip: query.skip }),
+          ...(query.limit === undefined ? {} : { limit: query.limit }),
+          ...(query.projection === undefined
+            ? {}
+            : { projection: query.projection }),
+          ...budgetParameters(query),
+        },
+      }),
+      batchSize,
+      query.projection === undefined,
+      budgetParameters(query),
+    );
+  }
 
   /**
    * Asks the server how it would run this query, without running it. The
@@ -65,125 +198,119 @@ export class FindCursor<
   /**
    * Whether another document is available. This may fetch the next batch.
    */
-  public async hasNext(): Promise<boolean> {
-    while (this.buffer.length === 0) {
-      if (this.closed || this.cursorId === null) {
-        return false;
-      }
-
-      await this.fetchBatch();
-    }
-
-    return true;
+  public hasNext(): Promise<boolean> {
+    return this.reader.hasNext();
   }
 
   /**
    * Returns the next document, or `null` when the results are exhausted or
    * the cursor is closed.
    */
-  public async next(): Promise<WithId<TDocument> | null> {
-    if (!(await this.hasNext())) {
-      return null;
-    }
-
-    return this.buffer.shift() ?? null;
+  public next(): Promise<TResult | null> {
+    return this.reader.next();
   }
 
   /**
    * Reads all remaining documents into an array and closes the cursor. Large
    * result sets are held in memory; iterate instead when they may be large.
    */
-  public async toArray(): Promise<WithId<TDocument>[]> {
-    const results: WithId<TDocument>[] = [];
-
-    try {
-      for (let doc = await this.next(); doc !== null; doc = await this.next()) {
-        results.push(doc);
-      }
-    } finally {
-      await this.close();
-    }
-
-    return results;
+  public toArray(): Promise<TResult[]> {
+    return this.reader.toArray();
   }
 
   /**
    * Closes the cursor and releases it on the server. Closing twice does
    * nothing.
    */
-  public async close(): Promise<void> {
-    if (this.closed) {
-      return;
-    }
-
-    this.closed = true;
-    this.buffer = [];
-
-    const id = this.cursorId;
-    this.cursorId = null;
-
-    if (typeof id === "number") {
-      await this.execute("closeCursor", { cursorId: id });
-    }
+  public close(): Promise<void> {
+    return this.reader.close();
   }
 
   /**
    * Iterates the remaining documents, closing the cursor when the loop ends.
    */
-  public async *[Symbol.asyncIterator](): AsyncGenerator<
-    WithId<TDocument>,
-    void,
-    undefined
-  > {
-    try {
-      for (let doc = await this.next(); doc !== null; doc = await this.next()) {
-        yield doc;
-      }
-    } finally {
-      await this.close();
-    }
-  }
-
-  private async fetchBatch(): Promise<void> {
-    const size =
-      this.batchSize === undefined ? {} : { batchSize: this.batchSize };
-
-    const value =
-      this.cursorId === undefined
-        ? await this.execute("find", {
-            collection: this.collection,
-            filter: this.filter,
-            ...size,
-            ...(this.query.sort === undefined
-              ? {}
-              : {
-                  sort: this.query.sort.map(([path, direction]) => [
-                    path,
-                    direction,
-                  ]),
-                }),
-            ...(this.query.skip === undefined ? {} : { skip: this.query.skip }),
-            ...(this.query.limit === undefined
-              ? {}
-              : { limit: this.query.limit }),
-          })
-        : await this.execute("getMore", {
-            cursorId: this.cursorId as number,
-            ...size,
-          });
-
-    const batch = parseBatch<TDocument>(value);
-
-    this.cursorId = batch.cursorId;
-    this.buffer.push(...batch.documents);
+  public [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined> {
+    return this.reader.iterate();
   }
 }
 
-function parseBatch<TDocument extends object>(
+/**
+ * A lazy, batched cursor over the results of an aggregation. It reads like a
+ * {@link FindCursor}: nothing is sent until the first read, documents arrive in
+ * batches, and `toArray()` and `for await` close the cursor for you.
+ */
+export class AggregateCursor<
+  TResult extends object = Document,
+> implements AsyncIterable<TResult> {
+  private readonly reader: BatchReader<TResult>;
+
+  public constructor(
+    execute: CursorExecutor,
+    collection: string,
+    pipeline: readonly Document[],
+    batchSize: number | undefined,
+    budget: QueryBudgetOptions = {},
+  ) {
+    this.reader = new BatchReader<TResult>(
+      execute,
+      (size) => ({
+        command: "aggregate",
+        parameters: {
+          collection,
+          pipeline: [...pipeline],
+          ...size,
+          ...budgetParameters(budget),
+        },
+      }),
+      batchSize,
+      false,
+      budgetParameters(budget),
+    );
+  }
+
+  /** Whether another document is available. This may fetch the next batch. */
+  public hasNext(): Promise<boolean> {
+    return this.reader.hasNext();
+  }
+
+  /**
+   * Returns the next document, or `null` when the results are exhausted or
+   * the cursor is closed.
+   */
+  public next(): Promise<TResult | null> {
+    return this.reader.next();
+  }
+
+  /**
+   * Reads all remaining documents into an array and closes the cursor. Large
+   * result sets are held in memory; iterate instead when they may be large.
+   */
+  public toArray(): Promise<TResult[]> {
+    return this.reader.toArray();
+  }
+
+  /**
+   * Closes the cursor and releases it on the server. Closing twice does
+   * nothing.
+   */
+  public close(): Promise<void> {
+    return this.reader.close();
+  }
+
+  /**
+   * Iterates the remaining documents, closing the cursor when the loop ends.
+   */
+  public [Symbol.asyncIterator](): AsyncGenerator<TResult, void, undefined> {
+    return this.reader.iterate();
+  }
+}
+
+function parseBatch<TResult extends object>(
   value: DocumentValue,
+  requireId: boolean,
 ): {
   cursorId: number | null;
-  documents: WithId<TDocument>[];
+  documents: TResult[];
 } {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     throw invalidBatch();
@@ -207,7 +334,7 @@ function parseBatch<TDocument extends object>(
         typeof doc === "object" &&
         doc !== null &&
         !Array.isArray(doc) &&
-        (doc as Document)["_id"] instanceof CustomId,
+        (!requireId || (doc as Document)["_id"] instanceof CustomId),
     )
   ) {
     throw invalidBatch();
@@ -215,7 +342,7 @@ function parseBatch<TDocument extends object>(
 
   return {
     cursorId: cursorId as number | null,
-    documents: documents as unknown as WithId<TDocument>[],
+    documents: documents as unknown as TResult[],
   };
 }
 

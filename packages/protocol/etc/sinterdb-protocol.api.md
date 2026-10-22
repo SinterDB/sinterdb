@@ -269,6 +269,10 @@ export const PROTOCOL_VERSION = 1;
 const ProtocolCapability: {
     readonly TypedDocuments: "typed-documents";
     readonly Streaming: "streaming";
+    readonly Projection: "projection";
+    readonly CompoundIndexes: "compound-indexes";
+    readonly Aggregation: "aggregation";
+    readonly QueryBudgets: "query-budgets";
 };
 
 // @public (undocumented)
@@ -389,6 +393,8 @@ const WireErrorCode: {
     readonly InvalidIndex: 6000;
     readonly IndexNotFound: 6001;
     readonly IndexConflict: 6002;
+    readonly OperationTimeLimitExceeded: 7000;
+    readonly ScanLimitExceeded: 7001;
     readonly InternalError: 9000;
 };
 

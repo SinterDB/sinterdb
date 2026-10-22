@@ -86,6 +86,16 @@ const page: ApiPage = {
   ],
   usedBy: [
     {
+      name: "AggregateCursor",
+      href: "/docs/api/classes/AggregateCursor",
+      kind: "class",
+    },
+    {
+      name: "AggregateCursor.constructor",
+      href: "/docs/api/classes/AggregateCursor#constructor",
+      kind: "constructor",
+    },
+    {
       name: "CursorExecutor",
       href: "/docs/api/types/CursorExecutor",
       kind: "type-alias",
@@ -101,14 +111,24 @@ const page: ApiPage = {
       kind: "constructor",
     },
     {
+      name: "FindOneOptions",
+      href: "/docs/api/interfaces/FindOneOptions",
+      kind: "interface",
+    },
+    {
       name: "FindOptions",
       href: "/docs/api/interfaces/FindOptions",
       kind: "interface",
     },
     {
+      name: "FindQueryOptions.projection",
+      href: "/docs/api/interfaces/FindQueryOptions#projection",
+      kind: "property",
+    },
+    {
       name: "IndexDefinition",
-      href: "/docs/api/interfaces/IndexDefinition",
-      kind: "interface",
+      href: "/docs/api/types/IndexDefinition",
+      kind: "type-alias",
     },
     {
       name: "SinterClient.executeCommand",
@@ -119,6 +139,11 @@ const page: ApiPage = {
       name: "SinterCollection",
       href: "/docs/api/classes/SinterCollection",
       kind: "class",
+    },
+    {
+      name: "SinterCollection.aggregate",
+      href: "/docs/api/classes/SinterCollection#aggregate",
+      kind: "method",
     },
     {
       name: "SinterCollection.constructor",

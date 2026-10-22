@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { StorageError, StorageErrorCode } from "../errors.js";
+import type { IndexSpec } from "../indexing/spec.js";
 import {
+  Reader,
   decodeOperations,
+  encodeIndexSpec,
   encodeOperations,
+  readIndexSpec,
   type Operation,
 } from "./operations.js";
 
@@ -34,8 +38,7 @@ describe("operation codec", () => {
       collection: "users",
       index: {
         name: "email_1",
-        field: "email",
-        direction: 1,
+        keys: [{ field: "email", direction: 1 }],
         unique: true,
         sparse: false,
       },
@@ -46,8 +49,7 @@ describe("operation codec", () => {
       collection: "users",
       index: {
         name: "プロフィール",
-        field: "profile.level",
-        direction: -1,
+        keys: [{ field: "profile.level", direction: -1 }],
         unique: false,
         sparse: true,
       },
@@ -149,8 +151,7 @@ describe("operation codec", () => {
           collection: "b",
           index: {
             name: "bad",
-            field: "x.y",
-            direction: 1,
+            keys: [{ field: "x.y", direction: 1 }],
             unique: false,
             sparse: false,
           },
@@ -168,5 +169,79 @@ describe("operation codec", () => {
       expect((error as StorageError).code).toBe(StorageErrorCode.Corruption);
       expect((error as Error).message).toContain("index definition");
     }
+  });
+});
+
+describe("index definitions in the operation codec", () => {
+  const roundTrip = (index: IndexSpec): IndexSpec => {
+    const [operation] = decodeOperations(
+      encodeOperations([
+        { kind: "createIndex", database: "a", collection: "b", index },
+      ]),
+    );
+
+    return (operation as { index: IndexSpec }).index;
+  };
+
+  it("round-trips a compound index with mixed directions", () => {
+    const index: IndexSpec = {
+      name: "by_country_age",
+      keys: [
+        { field: "country", direction: 1 },
+        { field: "profile.age", direction: -1 },
+        { field: "name", direction: 1 },
+      ],
+      unique: true,
+      sparse: true,
+    };
+
+    expect(roundTrip(index)).toEqual(index);
+  });
+
+  it("writes a single-field index exactly as storage format 2 did", () => {
+    const bytes = Buffer.from(
+      encodeIndexSpec({
+        name: "n",
+        keys: [{ field: "f", direction: -1 }],
+        unique: true,
+        sparse: false,
+      }),
+    );
+
+    expect([...bytes]).toEqual([0, 1, 110, 0, 1, 102, 1 | 4]);
+  });
+
+  it("rejects an index definition with unknown flags", () => {
+    const bytes = Buffer.from(
+      encodeIndexSpec({
+        name: "n",
+        keys: [{ field: "f", direction: 1 }],
+        unique: false,
+        sparse: false,
+      }),
+    );
+
+    bytes[bytes.length - 1] = 16;
+
+    expect(() => readIndexSpec(new Reader(bytes))).toThrow(StorageError);
+  });
+
+  it("rejects a compound definition with a repeated field", () => {
+    const bytes = Buffer.from(
+      encodeIndexSpec({
+        name: "n",
+        keys: [
+          { field: "a", direction: 1 },
+          { field: "b", direction: 1 },
+        ],
+        unique: false,
+        sparse: false,
+      }),
+    );
+    const position = bytes.lastIndexOf(Buffer.from("b"));
+
+    bytes[position] = "a".charCodeAt(0);
+
+    expect(() => readIndexSpec(new Reader(bytes))).toThrow(StorageError);
   });
 });

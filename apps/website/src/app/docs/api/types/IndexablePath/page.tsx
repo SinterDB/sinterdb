@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 673,
+  id: 799,
   name: "IndexablePath",
   kind: "type-alias",
   label: "Type Alias",
@@ -23,7 +23,7 @@ const page: ApiPage = {
     ["> = ", "pn"],
     ["Exclude", "ref"],
     ["<", "pn"],
-    ["FilterPaths", "ref", "/docs/api/types/FilterPaths"],
+    ["FieldPaths", "ref", "/docs/api/types/FieldPaths"],
     ["<", "pn"],
     ["TDocument", "tp"],
     [">, ", "pn"],
@@ -60,7 +60,13 @@ const page: ApiPage = {
   signatureSection: null,
   signatures: [],
   sections: [],
-  toc: [],
+  toc: [
+    {
+      id: "used-by",
+      title: "Used by",
+      items: [],
+    },
+  ],
   sources: [
     {
       path: "packages/driver/src/indexes.ts",
@@ -68,7 +74,13 @@ const page: ApiPage = {
       url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L10",
     },
   ],
-  usedBy: [],
+  usedBy: [
+    {
+      name: "IndexDefinition",
+      href: "/docs/api/types/IndexDefinition",
+      kind: "type-alias",
+    },
+  ],
 };
 
 export const metadata: Metadata = {

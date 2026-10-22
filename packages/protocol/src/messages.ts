@@ -4,6 +4,10 @@ import type { Document, DocumentValue } from "./document.js";
 export const ProtocolCapability = {
   TypedDocuments: "typed-documents",
   Streaming: "streaming",
+  Projection: "projection",
+  CompoundIndexes: "compound-indexes",
+  Aggregation: "aggregation",
+  QueryBudgets: "query-budgets",
 } as const;
 
 export type ProtocolCapability =

@@ -37,7 +37,7 @@ export default function Home() {
     <>
       <PopupBanner
         type="notice"
-        label="SinterDB 0.2.0 developer preview docs are live."
+        label="SinterDB 0.3.0 developer preview docs are live."
         href="/docs"
         linkLabel="Read the docs"
         id="docs-launch"

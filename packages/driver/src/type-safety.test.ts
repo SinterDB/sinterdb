@@ -1,7 +1,9 @@
-import type { CustomId } from "sinterdb-protocol";
+import type { CustomId, Document } from "sinterdb-protocol";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import type { SinterCollection } from "./collection.js";
+import type { AggregationStage } from "./aggregation.js";
+import type { SinterCollection, WithId } from "./collection.js";
+import type { AggregateCursor } from "./cursor.js";
 import type { Filter, Sort } from "./filter.js";
 import type {
   CreateIndexResult,
@@ -10,6 +12,7 @@ import type {
   IndexInfo,
   IndexValidationResult,
 } from "./indexes.js";
+import type { ProjectedDocument, Projection } from "./projection.js";
 import type { DeleteResult, UpdateFilter, UpdateResult } from "./update.js";
 
 interface User {
@@ -24,6 +27,71 @@ interface User {
   email?: string;
   profile: { bio: string; stats: { level: number; badges: string[] } };
 }
+
+interface Order {
+  _id: CustomId;
+  tags: string[];
+  scores: number[];
+  items: { sku: string; qty: number; options: { color: string }[] }[];
+  note?: string;
+}
+
+describe("Filter<TDocument> types for arrays", () => {
+  it("accepts element matches, array operators, and paths through arrays", () => {
+    const filters: Filter<Order>[] = [
+      { tags: "db" },
+      { tags: ["db", "fast"] },
+      { tags: { $eq: "db" } },
+      { tags: { $ne: "db" } },
+      { scores: { $gt: 90 } },
+      { scores: { $gte: 1, $lt: 5 } },
+      { tags: { $size: 2 } },
+      { scores: { $elemMatch: { $gt: 1, $lt: 5 } } },
+      { items: { $elemMatch: { sku: "a", qty: { $gt: 1 } } } },
+      { "items.sku": "a", "items.qty": { $gte: 2 } },
+      { "items.options.color": { $in: ["red"] } },
+      { items: { $elemMatch: { options: { $elemMatch: { color: "red" } } } } },
+    ];
+
+    expect(filters).toHaveLength(12);
+  });
+
+  it("rejects what arrays cannot do", () => {
+    // @ts-expect-error $size is only for arrays
+    const sizeOnScalar: Filter<Order> = { note: { $size: 1 } };
+    // @ts-expect-error $elemMatch is only for arrays
+    const elemMatchOnScalar: Filter<Order> = { note: { $elemMatch: {} } };
+    // @ts-expect-error an element of a number array is a number
+    const wrongElement: Filter<Order> = { scores: "high" };
+    // @ts-expect-error range operators take the element type
+    const wrongRange: Filter<Order> = { scores: { $gt: "1" } };
+    // @ts-expect-error $elemMatch filters use the element's fields
+    const wrongField: Filter<Order> = { items: { $elemMatch: { nope: 1 } } };
+    // @ts-expect-error a path through an array reads the element's field type
+    const wrongPathValue: Filter<Order> = { "items.qty": "many" };
+    // @ts-expect-error unknown field behind an array
+    const unknownBehindArray: Filter<Order> = { "items.nope": 1 };
+
+    expect([
+      sizeOnScalar,
+      elemMatchOnScalar,
+      wrongElement,
+      wrongRange,
+      wrongField,
+      wrongPathValue,
+      unknownBehindArray,
+    ]).toHaveLength(7);
+  });
+
+  it("does not offer paths through arrays for sorting", () => {
+    const sorts: Sort<Order>[] = [[["note", 1]], [["_id", -1]]];
+    // @ts-expect-error sorting treats a path through an array as missing
+    const throughArray: Sort<Order> = [["items.sku", 1]];
+
+    expect(sorts).toHaveLength(2);
+    expect(throughArray).toHaveLength(1);
+  });
+});
 
 describe("Filter<TDocument> types", () => {
   it("accepts valid filters", () => {
@@ -212,6 +280,60 @@ describe("collection method types", () => {
       expect(definitions).toHaveLength(4);
     });
 
+    it("accepts compound definitions", () => {
+      const definitions: IndexDefinition<User>[] = [
+        {
+          keys: [
+            ["name", 1],
+            ["profile.stats.level", -1],
+          ],
+        },
+        { keys: [["name", 1]], unique: true, sparse: true, name: "only_name" },
+      ];
+
+      expect(definitions).toHaveLength(2);
+    });
+
+    it("rejects bad compound definitions", () => {
+      const unknownField: IndexDefinition<User> = {
+        keys: [
+          ["name", 1],
+          // @ts-expect-error unknown field
+          ["nope", 1],
+        ],
+      };
+      const onId: IndexDefinition<User> = {
+        keys: [
+          // @ts-expect-error _id always has its own index
+          ["_id", 1],
+        ],
+      };
+      const badDirection: IndexDefinition<User> = {
+        keys: [
+          // @ts-expect-error direction must be 1 or -1
+          ["name", 2],
+        ],
+      };
+      const both: IndexDefinition<User> = {
+        field: "name",
+        // @ts-expect-error field and keys cannot be combined
+        keys: [["name", 1]],
+      };
+      const outerDirection: IndexDefinition<User> = {
+        // @ts-expect-error direction goes inside each pair
+        keys: [["name", 1]],
+        direction: 1,
+      };
+
+      expect([
+        unknownField,
+        onId,
+        badDirection,
+        both,
+        outerDirection,
+      ]).toHaveLength(5);
+    });
+
     it("rejects _id, unknown fields, and bad options", () => {
       // @ts-expect-error _id always has its own index
       const onId: IndexDefinition<User> = { field: "_id" };
@@ -263,5 +385,279 @@ describe("collection method types", () => {
 
       expect(typeof neverCalled).toBe("function");
     });
+  });
+});
+
+interface Account {
+  _id: CustomId;
+  name: string;
+  nickname?: string;
+  address?: { city: string; zip: string };
+  owner: { name: string; tags: string[] } | null;
+  lines: { sku: string; qty: number }[];
+}
+
+describe("ProjectedDocument types", () => {
+  it("is the whole document without a projection", () => {
+    expectTypeOf<ProjectedDocument<Account, undefined>>().toEqualTypeOf<
+      WithId<Account>
+    >();
+    expectTypeOf<ProjectedDocument<Account, {}>>().toEqualTypeOf<
+      WithId<Account>
+    >();
+  });
+
+  it("keeps only included fields and _id", () => {
+    type Result = ProjectedDocument<Account, { name: 1; nickname: true }>;
+
+    expectTypeOf<Result>().toEqualTypeOf<{
+      readonly _id: CustomId;
+      name: string;
+      nickname?: string;
+    }>();
+  });
+
+  it("leaves _id out when it is set to 0", () => {
+    expectTypeOf<
+      ProjectedDocument<Account, { name: 1; _id: 0 }>
+    >().toEqualTypeOf<{
+      name: string;
+    }>();
+    expectTypeOf<
+      ProjectedDocument<Account, { name: 1; _id: false }>
+    >().toEqualTypeOf<{
+      name: string;
+    }>();
+  });
+
+  it("returns only the id for { _id: 1 }", () => {
+    expectTypeOf<ProjectedDocument<Account, { _id: 1 }>>().toEqualTypeOf<{
+      readonly _id: CustomId;
+    }>();
+  });
+
+  it("removes excluded fields", () => {
+    type Result = ProjectedDocument<
+      Account,
+      { nickname: 0; address: false; owner: 0; lines: 0 }
+    >;
+
+    expectTypeOf<Result>().toEqualTypeOf<{
+      name: string;
+      readonly _id: CustomId;
+    }>();
+    expectTypeOf<ProjectedDocument<Account, { _id: 0 }>>().toEqualTypeOf<{
+      name: string;
+      nickname?: string;
+      address?: { city: string; zip: string };
+      owner: { name: string; tags: string[] } | null;
+      lines: { sku: string; qty: number }[];
+    }>();
+  });
+
+  it("follows nested paths and arrays of documents", () => {
+    type Result = ProjectedDocument<
+      Account,
+      { "lines.sku": 1; "address.city": 1; _id: 0 }
+    >;
+
+    expectTypeOf<Result>().toEqualTypeOf<{
+      address?: { city: string };
+      lines: { sku: string }[];
+    }>();
+  });
+
+  it("makes a nested field optional when its parent can be null", () => {
+    expectTypeOf<
+      ProjectedDocument<Account, { "owner.name": 1; _id: 0 }>
+    >().toEqualTypeOf<{ owner?: { name: string } }>();
+  });
+
+  it("removes nested fields", () => {
+    expectTypeOf<
+      ProjectedDocument<Account, { "address.zip": 0; "lines.qty": 0; _id: 0 }>
+    >().toEqualTypeOf<{
+      name: string;
+      nickname?: string;
+      address?: { city: string };
+      owner: { name: string; tags: string[] } | null;
+      lines: { sku: string }[];
+    }>();
+  });
+
+  it("makes everything optional when the flags are not literals", () => {
+    expectTypeOf<ProjectedDocument<Account, { name: boolean }>>().toEqualTypeOf<
+      Partial<WithId<Account>>
+    >();
+    expectTypeOf<ProjectedDocument<Account, { name: number }>>().toEqualTypeOf<
+      Partial<WithId<Account>>
+    >();
+  });
+
+  it("only accepts real paths and flags", () => {
+    const valid: Projection<Account> = {
+      name: 1,
+      "address.city": true,
+      "lines.sku": 1,
+      _id: 0,
+    };
+
+    expectTypeOf(valid).not.toBeAny();
+
+    // @ts-expect-error unknown path
+    const unknown: Projection<Account> = { nope: 1 };
+    // @ts-expect-error positions are not supported
+    const position: Projection<Account> = { "lines.0": 1 };
+    // @ts-expect-error flags are 0, 1, true or false
+    const flag: Projection<Account> = { name: 2 };
+
+    void [unknown, position, flag];
+  });
+});
+
+describe("distinct types", () => {
+  interface Shop {
+    _id: CustomId;
+    tags: string[];
+    score?: number;
+    items: { sku: string; qty: number }[];
+    owner: { name: string } | null;
+  }
+
+  // These checks run in the compiler only: the collection is never used.
+  const shop = undefined as unknown as SinterCollection<Shop>;
+
+  it("types the values from the field", () => {
+    const check = (): void => {
+      expectTypeOf(shop.distinct("tags")).resolves.toEqualTypeOf<string[]>();
+      expectTypeOf(shop.distinct("score")).resolves.toEqualTypeOf<number[]>();
+      expectTypeOf(shop.distinct("items.sku")).resolves.toEqualTypeOf<
+        string[]
+      >();
+      expectTypeOf(shop.distinct("items.qty")).resolves.toEqualTypeOf<
+        number[]
+      >();
+      expectTypeOf(shop.distinct("_id")).resolves.toEqualTypeOf<CustomId[]>();
+      expectTypeOf(shop.distinct("owner.name")).resolves.toEqualTypeOf<
+        string[]
+      >();
+    };
+
+    expect(check).toBeTypeOf("function");
+  });
+
+  it("only accepts real fields and a typed filter", () => {
+    const check = (): void => {
+      // @ts-expect-error unknown field
+      void shop.distinct("nope");
+      // @ts-expect-error filter values are typed
+      void shop.distinct("tags", { score: "high" });
+      // @ts-expect-error the filter must be a filter of this collection
+      void shop.countDocuments({ nope: 1 });
+
+      expectTypeOf(shop.countDocuments()).resolves.toEqualTypeOf<number>();
+      expectTypeOf(
+        shop.estimatedDocumentCount(),
+      ).resolves.toEqualTypeOf<number>();
+    };
+
+    expect(check).toBeTypeOf("function");
+  });
+});
+
+describe("AggregationStage<TDocument> types", () => {
+  it("accepts the supported stages", () => {
+    const pipeline: AggregationStage<User>[] = [
+      { $match: { age: { $gte: 18 }, "profile.stats.level": 3 } },
+      { $project: { name: 1, "profile.bio": 1 } },
+      {
+        $sort: [
+          ["age", -1],
+          ["name", 1],
+        ],
+      },
+      { $skip: 5 },
+      { $limit: 10 },
+      { $count: "total" },
+      {
+        $group: {
+          _id: { team: "$team", level: 3 },
+          n: { $count: {} },
+          total: { $sum: "$age" },
+          mean: { $avg: "$age" },
+          youngest: { $min: "$age" },
+          oldest: { $max: "$age" },
+          first: { $first: "$name" },
+          last: { $last: "$name" },
+        },
+      },
+    ];
+
+    expect(pipeline).toHaveLength(7);
+  });
+
+  it("checks the fields that stages name", () => {
+    const pipeline: AggregationStage<User>[] = [
+      // @ts-expect-error unknown field in a $match filter
+      { $match: { nope: 1 } },
+      // @ts-expect-error unknown field in a $project
+      { $project: { nope: 1 } },
+      // @ts-expect-error unknown field in a $sort
+      { $sort: [["nope", 1]] },
+      // @ts-expect-error $skip takes a number
+      { $skip: "5" },
+      // @ts-expect-error $count takes a name
+      { $count: 1 },
+      // @ts-expect-error $group needs an _id
+      { $group: { n: { $count: {} } } },
+    ];
+
+    expect(pipeline).toHaveLength(6);
+  });
+
+  it("returns a cursor of the type the caller asks for", () => {
+    function count(collection: SinterCollection<User>) {
+      return collection.aggregate<{ total: number }>([{ $count: "total" }]);
+    }
+
+    function untyped(collection: SinterCollection<User>) {
+      return collection.aggregate([{ $limit: 1 }]);
+    }
+
+    expectTypeOf<ReturnType<typeof count>>().toEqualTypeOf<
+      AggregateCursor<{ total: number }>
+    >();
+    expectTypeOf<ReturnType<typeof untyped>>().toEqualTypeOf<
+      AggregateCursor<Document>
+    >();
+  });
+});
+
+describe("query budget option types", () => {
+  it("accepts maxTimeMS and maxScanned wherever a query runs", () => {
+    function accepted(users: SinterCollection<User>) {
+      const budget = { maxTimeMS: 1000, maxScanned: 50_000 };
+
+      void users.find({}, { ...budget, batchSize: 10 });
+      void users.findOne({}, budget);
+      void users.countDocuments({}, budget);
+      void users.distinct("name", {}, budget);
+      void users.aggregate([{ $limit: 1 }], { ...budget, batchSize: 10 });
+    }
+
+    expect(accepted).toBeTypeOf("function");
+  });
+
+  it("rejects limits that are not numbers", () => {
+    function rejected(users: SinterCollection<User>) {
+      // @ts-expect-error maxTimeMS is a number
+      void users.find({}, { maxTimeMS: "1000" });
+      // @ts-expect-error maxScanned is a number
+      void users.countDocuments({}, { maxScanned: "5" });
+      // @ts-expect-error there is no such limit
+      void users.distinct("name", {}, { maxMemory: 5 });
+    }
+
+    expect(rejected).toBeTypeOf("function");
   });
 });

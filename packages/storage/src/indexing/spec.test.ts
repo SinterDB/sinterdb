@@ -5,6 +5,7 @@ import {
   idIndexSpec,
   normalizeIndexSpec,
   sameDefinition,
+  sameFields,
   type CreateIndexInput,
 } from "./spec.js";
 
@@ -25,8 +26,7 @@ describe("normalizeIndexSpec", () => {
   it("fills in defaults", () => {
     expect(normalizeIndexSpec({ field: "email" })).toEqual({
       name: "email_1",
-      field: "email",
-      direction: 1,
+      keys: [{ field: "email", direction: 1 }],
       unique: false,
       sparse: false,
     });
@@ -43,8 +43,7 @@ describe("normalizeIndexSpec", () => {
       }),
     ).toEqual({
       name: "by_level",
-      field: "profile.level",
-      direction: -1,
+      keys: [{ field: "profile.level", direction: -1 }],
       unique: true,
       sparse: true,
     });
@@ -104,10 +103,134 @@ describe("normalizeIndexSpec", () => {
   it("describes the _id index", () => {
     expect(idIndexSpec()).toEqual({
       name: "_id_",
-      field: "_id",
-      direction: 1,
+      keys: [{ field: "_id", direction: 1 }],
       unique: true,
       sparse: false,
     });
+  });
+});
+
+describe("compound index definitions", () => {
+  it("takes ordered [field, direction] pairs", () => {
+    expect(
+      normalizeIndexSpec({
+        keys: [
+          ["country", 1],
+          ["profile.age", -1],
+        ],
+      }),
+    ).toEqual({
+      name: "country_1_profile.age_-1",
+      keys: [
+        { field: "country", direction: 1 },
+        { field: "profile.age", direction: -1 },
+      ],
+      unique: false,
+      sparse: false,
+    });
+  });
+
+  it("treats a single pair like the field shorthand", () => {
+    expect(normalizeIndexSpec({ keys: [["a", -1]] })).toEqual(
+      normalizeIndexSpec({ field: "a", direction: -1 }),
+    );
+  });
+
+  it("requires exactly one of field and keys", () => {
+    expectInvalid({});
+    expectInvalid({ field: "a", keys: [["b", 1]] });
+    expectInvalid({ keys: [["a", 1]], direction: 1 });
+  });
+
+  it("rejects invalid keys", () => {
+    expectInvalid({ keys: [] });
+    expectInvalid({ keys: "a" });
+    expectInvalid({ keys: ["a"] });
+    expectInvalid({ keys: [["a"]] });
+    expectInvalid({ keys: [["a", 1, 1]] });
+    expectInvalid({ keys: [["a", 2]] });
+    expectInvalid({ keys: [[5, 1]] });
+    expectInvalid({
+      keys: [
+        ["a", 1],
+        ["$b", 1],
+      ],
+    });
+    expectInvalid({
+      keys: [
+        ["a", 1],
+        ["_id", 1],
+      ],
+    });
+    expectInvalid({
+      keys: [
+        ["a", 1],
+        ["a", -1],
+      ],
+    });
+  });
+
+  it("allows at most 8 fields", () => {
+    const fields = Array.from({ length: 9 }, (_, index) => [`f${index}`, 1]);
+
+    expect(
+      normalizeIndexSpec({ keys: fields.slice(0, 8) as [string, 1][] }).keys,
+    ).toHaveLength(8);
+    expectInvalid({ keys: fields });
+  });
+
+  it("compares keys in order, with directions", () => {
+    const base = normalizeIndexSpec({
+      keys: [
+        ["a", 1],
+        ["b", 1],
+      ],
+    });
+
+    expect(
+      sameDefinition(
+        base,
+        normalizeIndexSpec({
+          keys: [
+            ["a", 1],
+            ["b", 1],
+          ],
+          name: "other",
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      sameDefinition(
+        base,
+        normalizeIndexSpec({
+          keys: [
+            ["b", 1],
+            ["a", 1],
+          ],
+        }),
+      ),
+    ).toBe(false);
+    expect(
+      sameDefinition(
+        base,
+        normalizeIndexSpec({
+          keys: [
+            ["a", 1],
+            ["b", -1],
+          ],
+        }),
+      ),
+    ).toBe(false);
+    expect(
+      sameFields(
+        base,
+        normalizeIndexSpec({
+          keys: [
+            ["a", -1],
+            ["b", -1],
+          ],
+        }),
+      ),
+    ).toBe(true);
   });
 });

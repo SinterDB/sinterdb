@@ -1,7 +1,8 @@
 import type { Document, DocumentValue } from "sinterdb-protocol";
 
-import { resolveField } from "../filter.js";
-import type { IndexSpec } from "./spec.js";
+import { pathTouchesArray, resolveField } from "../filter.js";
+import type { IndexContents, SecondaryIndex } from "./secondary-index.js";
+import type { IndexKey, IndexSpec } from "./spec.js";
 import {
   canonicalKey,
   compareSameClass,
@@ -26,22 +27,27 @@ export interface IndexConflict {
   readonly description: string;
 }
 
-export class FieldIndex {
+export class FieldIndex implements SecondaryIndex {
   private readonly segments: readonly string[];
   private readonly byValue = new Map<string, Set<string>>();
   private readonly missing = new Set<string>();
   private readonly ordered = new Map<ValueClass, OrderedEntry[]>();
   private readonly unsorted = new Set<ValueClass>();
-  private arrayValues = 0;
+  private readonly arrayDocuments = new Set<string>();
   private indexedDocuments = 0;
 
   public constructor(public readonly spec: IndexSpec) {
-    this.segments = spec.field.split(".");
+    this.segments = (spec.keys[0] as IndexKey).field.split(".");
   }
 
-  /** Whether any indexed document holds an array in the indexed field. */
+  /**
+   * Whether any indexed document holds an array in the indexed field, or has
+   * an array on the way to it. A query matches such a document by its
+   * elements, which the index does not hold, so it cannot answer queries
+   * about this field.
+   */
   public get hasArrayValues(): boolean {
-    return this.arrayValues > 0;
+    return this.arrayDocuments.size > 0;
   }
 
   public get documentCount(): number {
@@ -53,6 +59,10 @@ export class FieldIndex {
   }
 
   public add(docKey: string, document: Document, bulk = false): void {
+    if (pathTouchesArray(document, this.segments)) {
+      this.arrayDocuments.add(docKey);
+    }
+
     const field = resolveField(document, this.segments);
 
     if (!field.found) {
@@ -75,10 +85,6 @@ export class FieldIndex {
 
     keys.add(docKey);
 
-    if (Array.isArray(field.value)) {
-      this.arrayValues += 1;
-    }
-
     this.indexedDocuments += 1;
   }
 
@@ -93,6 +99,8 @@ export class FieldIndex {
   }
 
   public remove(docKey: string, document: Document): void {
+    this.arrayDocuments.delete(docKey);
+
     const field = resolveField(document, this.segments);
 
     if (!field.found) {
@@ -113,10 +121,6 @@ export class FieldIndex {
     if (keys.size === 0) {
       this.byValue.delete(key);
       this.removeOrdered(field.value, key);
-    }
-
-    if (Array.isArray(field.value)) {
-      this.arrayValues -= 1;
     }
 
     this.indexedDocuments -= 1;
@@ -226,11 +230,7 @@ export class FieldIndex {
   }
 
   /** A canonical description of the index contents, for consistency checks. */
-  public contents(): {
-    values: [string, string[]][];
-    missing: string[];
-    orderedProblems: string[];
-  } {
+  public contents(): IndexContents {
     const values = [...this.byValue]
       .map(([key, docKeys]) => [key, [...docKeys].sort()] as [string, string[]])
       .sort((left, right) =>
@@ -288,7 +288,7 @@ export class FieldIndex {
   private conflict(description: string): IndexConflict {
     return {
       index: this.spec.name,
-      field: this.spec.field,
+      field: (this.spec.keys[0] as IndexKey).field,
       description,
     };
   }

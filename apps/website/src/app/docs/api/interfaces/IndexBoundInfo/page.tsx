@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 675,
+  id: 801,
   name: "IndexBoundInfo",
   kind: "interface",
   label: "Interface",
@@ -35,7 +35,7 @@ const page: ApiPage = {
       title: "Properties",
       members: [
         {
-          id: 677,
+          id: 803,
           name: "inclusive",
           anchor: "inclusive",
           kind: "property",
@@ -63,13 +63,13 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 64,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L64",
+              line: 113,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L113",
             },
           ],
         },
         {
-          id: 676,
+          id: 802,
           name: "value",
           anchor: "value",
           kind: "property",
@@ -96,8 +96,8 @@ const page: ApiPage = {
           sources: [
             {
               path: "packages/driver/src/indexes.ts",
-              line: 62,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L62",
+              line: 111,
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L111",
             },
           ],
         },
@@ -132,8 +132,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/indexes.ts",
-      line: 60,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L60",
+      line: 109,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L109",
     },
   ],
   usedBy: [

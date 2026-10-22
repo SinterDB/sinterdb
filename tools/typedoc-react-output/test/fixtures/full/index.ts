@@ -48,6 +48,12 @@ export class Store {
   legacy(): void {}
 }
 
+/** Something went wrong in a {@link Store}. */
+export class StoreError extends Error {}
+
+/** No item has that key. */
+export class NotFoundError extends StoreError {}
+
 /**
  * A store from before {@link Store}.
  *

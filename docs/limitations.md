@@ -1,6 +1,6 @@
 # Known limitations
 
-SinterDB `0.2.0` is a developer preview. This page lists what it does not do
+SinterDB `0.3.0` is a developer preview. This page lists what it does not do
 yet, the hard limits it enforces, and the rough edges you may meet. Tests check
 the numbers and the "not supported" lists against the code, so this page stays
 true as the code changes. If something here surprises you, please open an
@@ -106,29 +106,45 @@ knows, such as the name length, come back as a `SinterServerError`.
   it cannot be changed afterwards. Plain strings and numbers are not accepted
   as `_id`.
 - **Values are compared by their stored form.** `1` and `1n` are different,
-  and so are `0` and `-0`. See [indexes.md](./indexes.md).
+  and so are `0` and `-0`. See [query-semantics.md](./query-semantics.md).
 - The database does not validate documents against a schema. The type you give
   `collection<T>()` is checked by TypeScript only.
 
 ## Queries
 
 Supported filter operators: `$eq`, `$ne`, `$in`, `$nin`, `$exists`, `$not`,
-`$gt`, `$gte`, `$lt`, `$lte`, `$and`, `$or`, and `$nor`.
+`$gt`, `$gte`, `$lt`, `$lte`, `$elemMatch`, `$size`, `$and`, `$or`, and `$nor`.
+How they compare values, and how they treat arrays, is in
+[query-semantics.md](./query-semantics.md).
 
-Not supported, and rejected with `DocumentValidationFailed`: `$regex`,
-`$elemMatch`, `$size`, `$all`, `$type`, `$mod`, `$expr`, `$text`, and `$where`.
+Not supported, and rejected with `DocumentValidationFailed`: `$regex`, `$all`,
+`$type`, `$mod`, `$expr`, `$text`, and `$where`.
 
 Also missing:
 
-- **No projection.** A query returns whole documents.
-- **No aggregation, no joins, and no `count` or `distinct`.** Count by reading
-  the documents, or keep a counter yourself with `$inc`.
+- **Aggregation is limited to seven stages.** `aggregate()` runs `$match`,
+  `$project`, `$sort`, `$skip`, `$limit`, `$count` and `$group`. `$lookup`,
+  `$unwind` and `$addFields` are rejected with `DocumentValidationFailed`, and
+  there are no joins. `countDocuments()`, `estimatedDocumentCount()` and
+  `distinct()` cover counting and distinct values.
+- **`$group` has seven accumulators and no array-building ones.** `$count`,
+  `$sum`, `$avg`, `$min`, `$max`, `$first` and `$last` exist. `$push` and
+  `$addToSet` are rejected with `DocumentValidationFailed`, because they would
+  build arrays with no size limit. A `$group` holds one entry per group in
+  memory, at most 100,000 of them, and fails with `DocumentValidationFailed`
+  beyond that. A field reference cannot step into arrays, and a literal string
+  that starts with `$` cannot be written.
+- **Query budgets are approximate and per request.** `maxTimeMS` is checked
+  once for every 64 documents examined, and does not interrupt a sort or group
+  that has read all of its documents. Budgets apply to each round trip of a
+  cursor, not to the whole cursor. There is no server-wide default or maximum.
 - **No full-text, geospatial, or regular-expression search.**
 - **A cursor is not a snapshot.** It reads the collection as it goes, so
   documents written while you iterate may or may not show up, and the document
   after the current one may already have been read.
-- Compound and multi-field indexes do not exist. Each index covers one field,
-  and a query uses at most one index. See [indexes.md](./indexes.md).
+- A query uses at most one index. Compound indexes serve equality, `$in` and one
+  range on their leading fields, not sorting, and are skipped once a document
+  holds an array in one of their fields. See [indexes.md](./indexes.md).
 - `explain()` is marked `@beta`; its shape may change in any release.
 
 ## Updates and transactions

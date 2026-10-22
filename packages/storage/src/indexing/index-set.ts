@@ -1,10 +1,13 @@
 import type { Document } from "sinterdb-protocol";
 
 import { StorageError, StorageErrorCode } from "../errors.js";
+import { CompoundIndex } from "./compound-index.js";
 import { FieldIndex, type IndexConflict } from "./field-index.js";
+import type { SecondaryIndex } from "./secondary-index.js";
 import {
   MAX_INDEXES_PER_COLLECTION,
   sameDefinition,
+  sameFields,
   type IndexSpec,
 } from "./spec.js";
 
@@ -21,13 +24,13 @@ export interface IndexIssue {
 }
 
 export class IndexSet {
-  private readonly indexes = new Map<string, FieldIndex>();
+  private readonly indexes = new Map<string, SecondaryIndex>();
 
   public get isEmpty(): boolean {
     return this.indexes.size === 0;
   }
 
-  public all(): FieldIndex[] {
+  public all(): SecondaryIndex[] {
     return [...this.indexes.values()];
   }
 
@@ -35,7 +38,7 @@ export class IndexSet {
     return this.all().map((index) => index.spec);
   }
 
-  public get(name: string): FieldIndex | undefined {
+  public get(name: string): SecondaryIndex | undefined {
     return this.indexes.get(name);
   }
 
@@ -69,10 +72,10 @@ export class IndexSet {
     }
 
     for (const other of this.indexes.values()) {
-      if (other.spec.field === spec.field) {
+      if (sameFields(other.spec, spec)) {
         throw new StorageError(
           StorageErrorCode.IndexConflict,
-          `An index on field ${JSON.stringify(spec.field)} already exists as ${JSON.stringify(other.spec.name)}. Drop it before creating another.`,
+          `An index on ${describeFields(spec)} already exists as ${JSON.stringify(other.spec.name)}. Drop it before creating another.`,
         );
       }
     }
@@ -84,7 +87,7 @@ export class IndexSet {
       );
     }
 
-    const index = new FieldIndex(spec);
+    const index = buildIndex(spec);
 
     for (const [key, document] of documents) {
       const conflict = index.conflictFor(key, document);
@@ -171,7 +174,7 @@ export class IndexSet {
     const issues: IndexIssue[] = [];
 
     for (const live of this.indexes.values()) {
-      const fresh = new FieldIndex(live.spec);
+      const fresh = buildIndex(live.spec);
 
       for (const [key, document] of documents()) {
         fresh.add(key, document, true);
@@ -267,10 +270,24 @@ export class IndexSet {
   }
 }
 
+function buildIndex(spec: IndexSpec): SecondaryIndex {
+  return spec.keys.length === 1
+    ? new FieldIndex(spec)
+    : new CompoundIndex(spec);
+}
+
+function describeFields(spec: IndexSpec): string {
+  const fields = spec.keys.map((key) => JSON.stringify(key.field));
+
+  return fields.length === 1
+    ? `field ${fields[0]}`
+    : `fields ${fields.join(", ")}`;
+}
+
 function duplicateKey(conflict: IndexConflict): StorageError {
   return new StorageError(
     StorageErrorCode.DuplicateKey,
-    `Duplicate key for unique index ${JSON.stringify(conflict.index)} on field ${JSON.stringify(conflict.field)}: ${conflict.description}.`,
+    `Duplicate key for unique index ${JSON.stringify(conflict.index)} on ${conflict.field.includes(", ") ? "fields" : "field"} ${JSON.stringify(conflict.field)}: ${conflict.description}.`,
   );
 }
 

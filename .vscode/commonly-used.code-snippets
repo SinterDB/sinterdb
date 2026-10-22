@@ -1,4 +1,14 @@
 {
+  "Public Async Method Definition": {
+    "scope": "typescript",
+    "prefix": "public async",
+    "body": "public async ${1:name}($2) {$3};",
+  },
+  "Private Async Method Definition": {
+    "scope": "typescript",
+    "prefix": "private async",
+    "body": "private async ${1:name}($2) {$3};",
+  },
   "Public Get Definition": {
     "scope": "typescript",
     "prefix": "public get",
@@ -15,5 +25,30 @@
     "prefix": "interface",
     "body": "interface ${1:Name} {$2};",
     "description": "Insert a interface",
+  },
+  "TODO": {
+    "scope": "typescript",
+    "prefix": "todo",
+    "body": "// TODO: $1",
+  },
+  "FIXME": {
+    "scope": "typescript",
+    "prefix": "fixme",
+    "body": "// FIXME: $1",
+  },
+  "FINDME": {
+    "scope": "typescript",
+    "prefix": "findme",
+    "body": "// FINDME: $1",
+  },
+  "IDEA": {
+    "scope": "typescript",
+    "prefix": "idea",
+    "body": "// IDEA: $1",
+  },
+  "DEPRECATED": {
+    "scope": "typescript",
+    "prefix": "deprecated",
+    "body": "// DEPRECATED: $1",
   },
 }

@@ -33,6 +33,10 @@ describe("CommandDispatcher", () => {
       capabilities: [
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
+        ProtocolCapability.Projection,
+        ProtocolCapability.CompoundIndexes,
+        ProtocolCapability.Aggregation,
+        ProtocolCapability.QueryBudgets,
       ],
     });
   });
@@ -605,6 +609,255 @@ describe("CommandDispatcher", () => {
         sessionB,
       ),
     ).toThrow(/does not exist/);
+  });
+
+  describe("projection", () => {
+    function seeded(): CommandDispatcher {
+      const dispatcher = createDispatcher();
+
+      dispatcher.dispatch({
+        command: "insertMany",
+        database: "app",
+        parameters: {
+          collection: "users",
+          documents: [
+            { n: 1, name: "Ada", secret: "x" },
+            { n: 2, name: "Grace", secret: "y" },
+          ],
+        },
+      });
+
+      return dispatcher;
+    }
+
+    it("projects find results", () => {
+      const result = seeded().dispatch(
+        {
+          command: "find",
+          database: "app",
+          parameters: {
+            collection: "users",
+            filter: {},
+            sort: [["n", -1]],
+            projection: { name: 1, _id: 0 },
+          },
+        },
+        new CursorManager(),
+      );
+
+      expect(result).toEqual({
+        cursorId: null,
+        documents: [{ name: "Grace" }, { name: "Ada" }],
+      });
+    });
+
+    it("projects findOne results", () => {
+      const result = seeded().dispatch({
+        command: "findOne",
+        database: "app",
+        parameters: {
+          collection: "users",
+          filter: { n: 1 },
+          projection: { secret: 0, _id: 0 },
+        },
+      });
+
+      expect(result).toEqual({ document: { n: 1, name: "Ada" } });
+    });
+
+    it("rejects a projection that is not a document", () => {
+      for (const command of ["find", "findOne"]) {
+        expectCommandError(
+          () =>
+            seeded().dispatch(
+              {
+                command,
+                database: "app",
+                parameters: {
+                  collection: "users",
+                  filter: {},
+                  projection: [["name", 1]],
+                },
+              },
+              new CursorManager(),
+            ),
+          WireErrorCode.InvalidRequest,
+        );
+      }
+    });
+
+    it("rejects an invalid projection", () => {
+      for (const command of ["find", "findOne"]) {
+        expectCommandError(
+          () =>
+            seeded().dispatch(
+              {
+                command,
+                database: "app",
+                parameters: {
+                  collection: "users",
+                  filter: {},
+                  projection: { name: 1, secret: 0 },
+                },
+              },
+              new CursorManager(),
+            ),
+          WireErrorCode.DocumentValidationFailed,
+        );
+      }
+    });
+  });
+
+  describe("count and distinct", () => {
+    function seeded(): CommandDispatcher {
+      const dispatcher = createDispatcher();
+
+      dispatcher.dispatch({
+        command: "insertMany",
+        database: "app",
+        parameters: {
+          collection: "users",
+          documents: [
+            { n: 1, team: "a", tags: ["x", "y"] },
+            { n: 2, team: "b", tags: ["y"] },
+            { n: 3, team: "a" },
+          ],
+        },
+      });
+
+      return dispatcher;
+    }
+
+    function run(
+      dispatcher: CommandDispatcher,
+      command: string,
+      parameters: Document,
+    ): unknown {
+      return dispatcher.dispatch({ command, database: "app", parameters });
+    }
+
+    it("counts documents", () => {
+      const dispatcher = seeded();
+
+      expect(
+        run(dispatcher, "count", { collection: "users", filter: {} }),
+      ).toEqual({
+        count: 3,
+      });
+      expect(
+        run(dispatcher, "count", {
+          collection: "users",
+          filter: { team: "a" },
+        }),
+      ).toEqual({ count: 2 });
+    });
+
+    it("returns distinct values", () => {
+      const dispatcher = seeded();
+
+      expect(
+        run(dispatcher, "distinct", {
+          collection: "users",
+          field: "tags",
+          filter: {},
+        }),
+      ).toEqual({ values: ["x", "y"] });
+      expect(
+        run(dispatcher, "distinct", {
+          collection: "users",
+          field: "n",
+          filter: { team: "a" },
+        }),
+      ).toEqual({ values: [1, 3] });
+    });
+
+    it("answers for a collection that does not exist", () => {
+      const dispatcher = createDispatcher();
+
+      expect(
+        run(dispatcher, "count", { collection: "nope", filter: {} }),
+      ).toEqual({ count: 0 });
+      expect(
+        run(dispatcher, "distinct", {
+          collection: "nope",
+          field: "a",
+          filter: {},
+        }),
+      ).toEqual({ values: [] });
+    });
+
+    it("rejects an invalid filter even when the collection does not exist", () => {
+      const dispatcher = createDispatcher();
+      const filter = { a: { $nope: 1 } };
+
+      for (const [command, parameters] of [
+        ["count", { collection: "nope", filter }],
+        ["distinct", { collection: "nope", field: "a", filter }],
+        ["find", { collection: "nope", filter }],
+        ["findOne", { collection: "nope", filter }],
+        ["deleteOne", { collection: "nope", filter }],
+        ["deleteMany", { collection: "nope", filter }],
+        ["explain", { collection: "nope", filter }],
+        ["replaceOne", { collection: "nope", filter, replacement: { a: 1 } }],
+        [
+          "updateOne",
+          { collection: "nope", filter, update: { $set: { a: 1 } } },
+        ],
+        [
+          "updateMany",
+          { collection: "nope", filter, update: { $set: { a: 1 } } },
+        ],
+      ] as const) {
+        expectCommandError(
+          () => run(dispatcher, command, parameters),
+          WireErrorCode.DocumentValidationFailed,
+        );
+      }
+    });
+
+    it("rejects an invalid projection even when the collection does not exist", () => {
+      expectCommandError(
+        () =>
+          run(createDispatcher(), "find", {
+            collection: "nope",
+            filter: {},
+            projection: { a: 1, b: 0 },
+          }),
+        WireErrorCode.DocumentValidationFailed,
+      );
+    });
+
+    it("rejects an invalid distinct field", () => {
+      for (const collection of ["users", "nope"]) {
+        expectCommandError(
+          () =>
+            run(seeded(), "distinct", { collection, field: "$a", filter: {} }),
+          WireErrorCode.DocumentValidationFailed,
+        );
+      }
+    });
+
+    it("requires its parameters", () => {
+      const dispatcher = seeded();
+
+      expectCommandError(
+        () => run(dispatcher, "count", { collection: "users" }),
+        WireErrorCode.InvalidRequest,
+      );
+      expectCommandError(
+        () => run(dispatcher, "distinct", { collection: "users", filter: {} }),
+        WireErrorCode.InvalidRequest,
+      );
+      expectCommandError(
+        () =>
+          run(dispatcher, "distinct", {
+            collection: "users",
+            field: 1,
+            filter: {},
+          }),
+        WireErrorCode.InvalidRequest,
+      );
+    });
   });
 });
 

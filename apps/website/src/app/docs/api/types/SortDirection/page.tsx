@@ -4,7 +4,7 @@ import { ApiReflectionPage } from "../../_components/pages";
 import type { ApiPage } from "../../_generated/model";
 
 const page: ApiPage = {
-  id: 659,
+  id: 783,
   name: "SortDirection",
   kind: "type-alias",
   label: "Type Alias",
@@ -43,8 +43,8 @@ const page: ApiPage = {
   sources: [
     {
       path: "packages/driver/src/filter.ts",
-      line: 119,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L119",
+      line: 184,
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L184",
     },
   ],
   usedBy: [

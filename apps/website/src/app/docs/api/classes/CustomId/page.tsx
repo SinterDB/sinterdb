@@ -576,6 +576,11 @@ const page: ApiPage = {
       kind: "type-alias",
     },
     {
+      name: "DistinctValue",
+      href: "/docs/api/types/DistinctValue",
+      kind: "type-alias",
+    },
+    {
       name: "Filter",
       href: "/docs/api/types/Filter",
       kind: "type-alias",
@@ -584,6 +589,11 @@ const page: ApiPage = {
       name: "Filter._id",
       href: "/docs/api/types/Filter#_id",
       kind: "property",
+    },
+    {
+      name: "GroupValue",
+      href: "/docs/api/types/GroupValue",
+      kind: "type-alias",
     },
     {
       name: "InsertManyResult.insertedIds",
@@ -604,6 +614,11 @@ const page: ApiPage = {
       name: "OptionalId._id",
       href: "/docs/api/types/OptionalId#_id",
       kind: "property",
+    },
+    {
+      name: "ProjectedDocument",
+      href: "/docs/api/types/ProjectedDocument",
+      kind: "type-alias",
     },
     {
       name: "SinterInsertManyError.constructor",

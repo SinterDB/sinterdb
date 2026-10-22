@@ -375,6 +375,10 @@ export class ServerSession {
       capabilities: [
         ProtocolCapability.TypedDocuments,
         ProtocolCapability.Streaming,
+        ProtocolCapability.Projection,
+        ProtocolCapability.CompoundIndexes,
+        ProtocolCapability.Aggregation,
+        ProtocolCapability.QueryBudgets,
       ],
     });
 

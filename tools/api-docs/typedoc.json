@@ -3,6 +3,16 @@
   "name": "SinterDB driver API",
   "entryPoints": ["../../packages/driver/dist/index.d.ts"],
   "tsconfig": "./tsconfig.json",
+  "intentionallyNotExported": [
+    "Drop",
+    "ExcludedPaths",
+    "Flagged",
+    "IdPart",
+    "IncludedPaths",
+    "Keep",
+    "Simplify",
+    "UnknownPaths"
+  ],
   "plugin": ["@sinterdb/typedoc-react-output"],
   "outputs": [
     {
@@ -40,7 +50,9 @@
       "pageNavigation": true,
       "sourceLinks": true,
       "comments": true,
-      "externalInherited": false
+      "externalInherited": false,
+      "errorGroup": true,
+      "search": false
     },
     "theme": {
       "name": "default",

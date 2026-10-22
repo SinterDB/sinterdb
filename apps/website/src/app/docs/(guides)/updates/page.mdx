@@ -1,0 +1,93 @@
+export const metadata = {
+  title: "Updates",
+  description:
+    "Change fields with update operators, update one or many documents, and insert when nothing matches.",
+};
+
+# Updates
+
+An update changes part of a document with operators such as `$set` and `$inc`. To swap the whole document, see [Replacements](/docs/replacements).
+
+## Update one or many
+
+```ts
+await users.updateOne(
+  { email: "kage@example.com" },
+  { $set: { name: "Kage" } },
+);
+
+await users.updateMany({ age: { $lt: 18 } }, { $set: { minor: true } });
+```
+
+<Api name="SinterCollection.updateOne">updateOne</Api> changes the first
+matching document. <Api name="SinterCollection.updateMany">updateMany</Api>
+changes all of them.
+
+## Operators
+
+| Operator    | What it does                                                 |
+| ----------- | ------------------------------------------------------------ |
+| `$set`      | Sets fields, creating them if they're missing                |
+| `$unset`    | Removes fields                                               |
+| `$inc`      | Adds to a number. A missing field is set to the amount       |
+| `$min`      | Lowers a field to the value, if the value is smaller         |
+| `$max`      | Raises a field to the value, if the value is larger          |
+| `$push`     | Appends to an array, creating it if the field is missing     |
+| `$addToSet` | Appends to an array unless an equal element is already there |
+| `$pull`     | Removes every matching element from an array                 |
+
+One update can use several operators:
+
+```ts
+await users.updateOne(
+  { email: "kage@example.com" },
+  {
+    $set: { "address.city": "Osaka" },
+    $inc: { loginCount: 1 },
+    $max: { lastSeen: new Date() },
+    $addToSet: { tags: "beta" },
+    $unset: { resetToken: true },
+  },
+);
+```
+
+Dotted paths reach into nested documents. TypeScript only lets each operator target fields of the right type: `$inc` only accepts number fields, and `$push` only array fields.
+
+## The result
+
+```ts
+const result = await users.updateMany(
+  { active: false },
+  { $set: { archived: true } },
+);
+
+result.matchedCount; // documents the filter matched
+result.modifiedCount; // documents that actually changed
+```
+
+`modifiedCount` only counts documents whose stored data changed. Setting a field to the value it already has matches the document but doesn't modify it.
+
+## Upsert
+
+With `upsert: true`, an update that matches nothing inserts a new document instead. It starts from the equality conditions in the filter, then the update is applied to it:
+
+```ts
+const result = await counters.updateOne(
+  { name: "page-views" },
+  { $inc: { value: 1 } },
+  { upsert: true },
+);
+
+result.upsertedId; // the new _id, or null if a document matched
+```
+
+The first call inserts `{ name: "page-views", value: 1 }`. Later calls increment it.
+
+## Rules
+
+- **`_id` can't be changed.** Updates can't target `_id`.
+- **Each command is atomic.** An `updateMany` changes every matching document or none: if one document can't be updated, nothing is.
+- **Commands don't form transactions.** Two separate updates can be interleaved with other clients' writes.
+- **Not supported yet:** `$mul`, `$rename`, `$pop`, positional operators like `$`, and update pipelines. The server rejects them with `InvalidUpdate`.
+
+The update type is <Api name="UpdateFilter" />, and the result is <Api name="UpdateResult" />.
