@@ -99,6 +99,53 @@ describe("the sort order in docs/query-semantics.md", () => {
   });
 });
 
+describe("the collation table in docs/query-semantics.md", () => {
+  const section = markdown.slice(
+    markdown.indexOf("## Collation"),
+    markdown.indexOf("## Counting and distinct values"),
+  );
+  const rows = [...section.matchAll(/^\|\s*`(\w+)`\s*\|(.*)\|$/gm)].map(
+    (row) => ({
+      kind: row[1] as string,
+      cells: (row[2] as string).split("|").map((cell) => cell.trim()),
+    }),
+  );
+  const ranks = [...markdown.matchAll(/^\|\s*\d+\s*\|\s*`(\w+)`\s*\|$/gm)]
+    .map((row) => row[1] as string)
+    .filter((kind) => kind !== "missing" && kind !== "document");
+
+  it("lists every kind that can be stored, in sort order", () => {
+    expect(rows.map((row) => row.kind)).toEqual([...ranks, "document"]);
+  });
+
+  it("agrees with the range operators about which kinds they accept", () => {
+    for (const row of rows) {
+      const operand: Record<string, DocumentValue> = {
+        null: null,
+        number: 1,
+        string: "s",
+        binary: new Uint8Array([1]),
+        id: CustomId.generate(),
+        boolean: true,
+        date: new Date(5),
+        array: [1],
+        document: { x: 1 },
+      };
+      const accepted = (() => {
+        try {
+          compileFilter({ a: { $gt: operand[row.kind] as DocumentValue } });
+
+          return true;
+        } catch {
+          return false;
+        }
+      })();
+
+      expect(accepted, row.kind).toBe(row.cells[1] === "yes");
+    }
+  });
+});
+
 describe("numbers", () => {
   it("never equals a bigint, in either direction", () => {
     expect(matches({ a: 1 }, { a: 1n })).toBe(false);

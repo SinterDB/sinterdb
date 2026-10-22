@@ -167,6 +167,30 @@ Values that compare equal keep their existing order, so a sort is stable. A
 sort with several fields compares the first field, then the second for ties,
 and so on.
 
+## Collation
+
+SinterDB has one collation, and it is fixed: there is no locale, no case
+folding, and no Unicode normalization, and nothing to configure. A query, a
+sort, a `distinct` result, and an index all use the rules below, so an index
+never changes which documents a query returns or in what order. This table
+gathers rules that are explained in detail under [Equality](#equality),
+[Range operators](#range-operators), and [Sort order](#sort-order).
+
+| Kind       | Equal when                               | Range operators | Order within the kind                          |
+| ---------- | ---------------------------------------- | --------------- | ---------------------------------------------- |
+| `null`     | both are `null`                          | no              | one value                                      |
+| `number`   | same encoding (`1` is not `1n`)          | yes             | by numeric value; `NaN` first; `0` equals `-0` |
+| `string`   | same code points                         | yes             | by code point, the same as UTF-8 byte order    |
+| `binary`   | same bytes                               | yes             | byte by byte, a prefix first                   |
+| `id`       | same bytes                               | yes             | by its bytes, the same as binary               |
+| `boolean`  | same value                               | no              | `false` before `true`                          |
+| `date`     | same time                                | yes             | by time; an invalid date is not comparable     |
+| `array`    | same elements in the same order          | no              | all arrays compare equal when sorting          |
+| `document` | same fields and values, in any key order | no              | all documents compare equal when sorting       |
+
+Values of different kinds are never equal and never match a range operator.
+When sorting, they order by kind first, in the [rank order](#sort-order) above.
+
 ## Counting and distinct values
 
 `countDocuments` counts the documents that match a filter, using exactly the

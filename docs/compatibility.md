@@ -83,6 +83,31 @@ Not covered:
 - Performance characteristics.
 - Anything imported from a path other than the package root.
 
+### Building on the driver
+
+A library built on `sinterdb`, such as an ODM, gets the promises above and
+should follow these rules:
+
+- **Import from `sinterdb` only.** The package `exports` map exposes nothing but
+  the root, so a deep import such as `sinterdb/dist/client.js` fails. `CustomId`
+  and `Document` are re-exported from the root, so a library does not need to
+  import `sinterdb-protocol`.
+- **Treat `SinterCompatibilityError` as "this server is too old".** When a
+  server lacks a capability (`projection`, `compound-indexes`, `aggregation`,
+  or `query-budgets`), the driver refuses the call before sending it. Check
+  `client.serverInfo?.capabilities` if you want to decide earlier.
+- **Match errors on class and code**, not on message text. Every driver error
+  extends `SinterError`, and `SinterErrorCode` values are stable.
+- **Avoid `executeCommand` unless you must.** It sends any command and returns
+  the raw result. The driver promises the method, but the commands and result
+  shapes it carries follow the [wire protocol](./protocol/wire-protocol-v1.md)
+  and may gain fields.
+- **Do not depend on `@beta` members** (see above).
+
+`packages/driver/src/odm-contract.integration.test.ts` is a model layer written
+the way an ODM would write one, using only the public exports. It runs on every
+build, so a change that would break such a library fails CI.
+
 Driver releases support Node.js 24 and later. Dropping a Node.js version is a
 breaking change.
 
