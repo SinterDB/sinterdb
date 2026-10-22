@@ -39,7 +39,7 @@
     "url": "git+https://github.com/SinterDB/sinterdb.git",
     "directory": "apps/server-cli"
   },
-  "homepage": "https://github.com/SinterDB/sinterdb#readme",
+  "homepage": "https://sinterdb.vercel.app",
   "bugs": {
     "url": "https://github.com/SinterDB/sinterdb/issues"
   },
