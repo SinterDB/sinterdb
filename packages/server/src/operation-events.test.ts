@@ -12,7 +12,7 @@ import {
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { ServerCommandEvent } from "./session.js";
-import { SinterServer } from "./server.js";
+import { SinterServer, type ServerConnectionEvent } from "./server.js";
 
 // With logOperations on, the server emits one `command` event for every
 // command it runs. With it off, nothing is timed and nothing is emitted.
@@ -27,14 +27,20 @@ afterEach(async () => {
   client = undefined;
 });
 
-async function start(
-  logOperations: boolean,
-): Promise<{ events: ServerCommandEvent[]; send: Sender }> {
+async function start(logOperations: boolean): Promise<{
+  events: ServerCommandEvent[];
+  connections: ServerConnectionEvent[];
+  send: Sender;
+}> {
   server = new SinterServer({ port: 0, logOperations }, {});
 
   const events: ServerCommandEvent[] = [];
+  const connections: ServerConnectionEvent[] = [];
 
   server.on("command", (event: ServerCommandEvent) => events.push(event));
+  server.on("connection", (event: ServerConnectionEvent) =>
+    connections.push(event),
+  );
 
   const address = await server.start();
 
@@ -78,7 +84,7 @@ async function start(
     },
   });
 
-  return { events, send };
+  return { events, connections, send };
 }
 
 type Sender = (
@@ -187,5 +193,41 @@ describe("operation events", () => {
       new SinterServer({}, { SINTERDB_LOG_OPERATIONS: "true" }).config
         .logOperations,
     ).toBe(true);
+  });
+
+  it("reports connections opening and closing, with a running count", async () => {
+    const { connections, send } = await start(true);
+
+    await send(command("listDatabases", undefined, {}));
+
+    const second = connect({
+      host: server?.address?.host ?? "127.0.0.1",
+      port: server?.address?.port ?? 0,
+    });
+
+    await new Promise<void>((resolve) => second.once("connect", resolve));
+    second.destroy();
+    client?.destroy();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(
+      connections.map((event) => [event.id, event.state, event.active]),
+    ).toEqual([
+      [1, "opened", 1],
+      [2, "opened", 2],
+      [2, "closed", 1],
+      [1, "closed", 0],
+    ]);
+    expect(connections[0]?.remoteAddress).toBeDefined();
+  });
+
+  it("reports no connections unless logOperations is on", async () => {
+    const { connections, send } = await start(false);
+
+    await send(command("listDatabases", undefined, {}));
+    client?.destroy();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(connections).toEqual([]);
   });
 });

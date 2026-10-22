@@ -15,7 +15,13 @@ import {
   parseMaintenanceArguments,
   runMaintenanceCommand,
 } from "./maintenance-command.js";
-import { logError, logInfo, logOperation, logWarning } from "./logger.js";
+import {
+  logConnection,
+  logError,
+  logInfo,
+  logOperation,
+  logWarning,
+} from "./logger.js";
 import { createStyle, styleHelp } from "./style.js";
 
 export async function main(
@@ -127,6 +133,7 @@ async function startServer(
 
   if (server.config.logOperations) {
     server.on("command", logOperation);
+    server.on("connection", logConnection);
   }
 
   server.on("error", (error: Error) => {

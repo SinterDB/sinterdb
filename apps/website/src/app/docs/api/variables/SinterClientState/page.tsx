@@ -96,7 +96,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/client.ts",
               line: 135,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L135",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L135",
             },
           ],
         },
@@ -129,7 +129,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/client.ts",
               line: 133,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L133",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L133",
             },
           ],
         },
@@ -162,7 +162,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/client.ts",
               line: 131,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L131",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L131",
             },
           ],
         },
@@ -195,7 +195,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/client.ts",
               line: 129,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L129",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L129",
             },
           ],
         },
@@ -230,7 +230,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/client.ts",
               line: 127,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L127",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L127",
             },
           ],
         },
@@ -284,12 +284,12 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/client.ts",
       line: 125,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L125",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L125",
     },
     {
       path: "packages/driver/src/client.ts",
       line: 139,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L139",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L139",
     },
   ],
   usedBy: [

@@ -64,7 +64,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/connection-string.ts",
               line: 19,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/connection-string.ts#L19",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L19",
             },
           ],
         },
@@ -97,7 +97,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/connection-string.ts",
               line: 13,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/connection-string.ts#L13",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L13",
             },
           ],
         },
@@ -132,7 +132,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/connection-string.ts",
               line: 17,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/connection-string.ts#L17",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L17",
             },
           ],
         },
@@ -174,7 +174,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/connection-string.ts",
       line: 11,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/connection-string.ts#L11",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/connection-string.ts#L11",
     },
   ],
   usedBy: [

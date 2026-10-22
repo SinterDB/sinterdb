@@ -98,6 +98,11 @@ unknown command) logs at level `warn`, because the server is fine. Both levels
 go to standard output so the lines of one run stay in order. On a terminal the
 same event prints as readable, colored lines.
 
+The same option also logs each client connection as `connection.opened` and
+`connection.closed`, with the connection's `id` (counting up from 1 for each
+run of the server), its `remoteAddress`, and how many connections are `active`
+afterwards.
+
 Document contents and filters are never logged. A busy server writes a lot of
 lines with this on.
 

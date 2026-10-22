@@ -30,6 +30,20 @@ export const SinterServerState = {
 export type SinterServerState =
   (typeof SinterServerState)[keyof typeof SinterServerState];
 
+/**
+ * A client connection opening or closing. The server emits it as a
+ * `connection` event only when `logOperations` is on.
+ */
+export interface ServerConnectionEvent {
+  /** A number that is unique for this run of the server and counts up from 1. */
+  readonly id: number;
+  readonly state: "opened" | "closed";
+  /** The client's address. Missing when the socket is already gone. */
+  readonly remoteAddress?: string;
+  /** How many connections are open after this event. */
+  readonly active: number;
+}
+
 export interface SinterServerAddress {
   host: string;
   port: number;
@@ -61,6 +75,7 @@ export class SinterServer extends EventEmitter {
   private engine: StorageEngine | undefined;
   private netServer: NetServer | undefined;
   private readonly sockets = new Set<Socket>();
+  private nextConnectionId = 1;
   private dispatcher: CommandDispatcher | undefined;
   private committer: GroupCommitter | undefined;
   private currentState: SinterServerState = SinterServerState.Stopped;
@@ -263,6 +278,10 @@ export class SinterServer extends EventEmitter {
   private trackSocket(socket: Socket): void {
     this.sockets.add(socket);
 
+    const connectionId = this.nextConnectionId++;
+
+    this.reportConnection(connectionId, "opened", socket);
+
     new ServerSession(socket, {
       dispatcher: this.dispatcher as CommandDispatcher,
       ...(this.committer === undefined ? {} : { durability: this.committer }),
@@ -275,7 +294,27 @@ export class SinterServer extends EventEmitter {
 
     socket.once("close", () => {
       this.sockets.delete(socket);
+      this.reportConnection(connectionId, "closed", socket);
     });
+  }
+
+  private reportConnection(
+    id: number,
+    state: ServerConnectionEvent["state"],
+    socket: Socket,
+  ): void {
+    if (!this.config.logOperations) {
+      return;
+    }
+
+    this.emit("connection", {
+      id,
+      state,
+      ...(socket.remoteAddress === undefined
+        ? {}
+        : { remoteAddress: socket.remoteAddress }),
+      active: this.sockets.size,
+    } satisfies ServerConnectionEvent);
   }
 
   private async close(server: NetServer, timeoutMS: number): Promise<void> {

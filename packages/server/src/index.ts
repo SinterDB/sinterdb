@@ -56,6 +56,7 @@ export type {
   ServerEnvironment,
 } from "./config.js";
 export type {
+  ServerConnectionEvent,
   SinterServerAddress,
   SinterServerState as SinterServerStateValue,
 } from "./server.js";
