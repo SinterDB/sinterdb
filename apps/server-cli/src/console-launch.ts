@@ -5,6 +5,7 @@ import {
 
 import type { CliCommand } from "./cli.js";
 import type { ConfigValues } from "./config-file.js";
+import { createConsoleActions } from "./console-actions.js";
 import { runConsole } from "./console-terminal.js";
 import { createStyle } from "./style.js";
 import { ServerSupervisor } from "./supervisor.js";
@@ -68,6 +69,7 @@ export function consoleServerArguments(
 /** Opens the console on this terminal and returns when the person quits. */
 export async function openConsole(
   command: Extract<CliCommand, { kind: "start" }>,
+  dataDirectory?: string,
 ): Promise<void> {
   const entry = process.argv[1];
 
@@ -82,5 +84,13 @@ export async function openConsole(
     output: process.stdout,
     style: createStyle(process.stdout),
     version: SERVER_PRODUCT_VERSION,
+    ...(dataDirectory === undefined
+      ? {}
+      : {
+          data: {
+            directory: dataDirectory,
+            actions: createConsoleActions(dataDirectory),
+          },
+        }),
   });
 }

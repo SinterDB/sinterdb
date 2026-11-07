@@ -29,25 +29,47 @@ export type ConsoleEffect =
   | { readonly kind: "start" }
   | { readonly kind: "stop" }
   | { readonly kind: "restart" }
+  | { readonly kind: "kill" }
+  | { readonly kind: "inspect" }
+  | { readonly kind: "backup"; readonly to: string }
+  | { readonly kind: "repair"; readonly apply: boolean }
   | { readonly kind: "quit" };
 
-export type ConsoleMode = "normal" | "filter" | "command";
+export type ConsoleMode = "normal" | "filter" | "command" | "backup";
 
+/** A panel over the log. A report can be scrolled, and a repair applied. */
 export interface ConsoleOverlay {
   readonly title: string;
   readonly lines: readonly string[];
+  /** A dry run of a repair that the panel can go on to apply. */
+  readonly action?: "repair";
+}
+
+/** What the panel shows right now: a window of its lines, and its hint. */
+export interface ConsoleOverlayView {
+  readonly title: string;
+  readonly lines: readonly string[];
+  readonly hint: string;
+}
+
+/** What an action found, to show in a panel. */
+export interface ConsoleReport {
+  readonly title: string;
+  readonly lines: readonly string[];
+  readonly applicable?: boolean;
 }
 
 export const CONSOLE_HELP_LINES: readonly string[] = [
   "s  start or restart    x  stop          q  quit",
   "p  pause or resume     l  cycle level   f  follow",
   "/  filter by text      c  clear         :  command",
-  "i  inspect   b  backup   r  repair   (coming soon)",
+  "i  inspect   b  backup   r  repair   k  kill",
   "",
-  "up down pgup pgdn home   scroll the log",
+  "up down pgup pgdn home   scroll the log or a panel",
   "",
   "Commands (after :)",
-  "start  stop  restart  quit  clear  help",
+  "start  stop  restart  kill  quit  clear  help",
+  "inspect  backup [dir]  repair",
   "level all|warn|error   filter [text]",
   "",
   "esc closes this panel or cancels what you are typing.",
@@ -68,6 +90,8 @@ export interface ConsoleModelOptions {
   readonly version: string;
   readonly now?: () => number;
   readonly logCapacity?: number;
+  /** The data directory Inspect, Backup and Repair work on, if one is set. */
+  readonly dataDir?: string;
 }
 
 export interface ConsoleSnapshot {
@@ -101,7 +125,9 @@ export interface ConsoleSnapshot {
   readonly mode: ConsoleMode;
   readonly input: string;
   readonly notice?: string;
-  readonly overlay?: ConsoleOverlay;
+  /** The question a confirmation asks, while one is waiting. */
+  readonly confirm?: string;
+  readonly overlay?: ConsoleOverlayView;
 }
 
 /**
@@ -135,9 +161,15 @@ export class ConsoleModel {
   private input = "";
   private notice: string | undefined;
   private overlay: ConsoleOverlay | undefined;
+  private overlayOffset = 0;
+  private confirmation:
+    { readonly question: string; readonly effect: ConsoleEffect } | undefined;
+  private readonly dataDir: string | undefined;
+  private quitting = false;
 
   public constructor(options: ConsoleModelOptions) {
     this.version = options.version;
+    this.dataDir = options.dataDir;
     this.now = options.now ?? Date.now;
     this.logs = new LogBuffer(options.logCapacity);
   }
@@ -244,16 +276,16 @@ export class ConsoleModel {
   public handleKey(key: ConsoleKey): ConsoleEffect | undefined {
     this.notice = undefined;
 
+    if (this.confirmation !== undefined) {
+      return this.answerConfirmation(key);
+    }
+
     if (key.ctrl && key.name === "c") {
-      return { kind: "quit" };
+      return this.requestQuit();
     }
 
     if (this.overlay !== undefined) {
-      if (key.name === "escape" || key.text === "q" || key.text === "?") {
-        this.overlay = undefined;
-      }
-
-      return undefined;
+      return this.handleOverlayKey(key);
     }
 
     if (this.mode !== "normal") {
@@ -313,16 +345,15 @@ export class ConsoleModel {
       case "x":
         return this.requestStop();
       case "i":
-        this.notice = "Inspect is not available yet.";
-        return undefined;
+        return this.requestInspect();
       case "b":
-        this.notice = "Backup is not available yet.";
-        return undefined;
+        return this.requestBackup();
       case "r":
-        this.notice = "Repair is not available yet.";
-        return undefined;
+        return this.requestRepair();
+      case "k":
+        return this.requestKill();
       case "q":
-        return { kind: "quit" };
+        return this.requestQuit();
       default:
         return undefined;
     }
@@ -366,7 +397,10 @@ export class ConsoleModel {
       mode: this.mode,
       input: this.input,
       ...(this.notice === undefined ? {} : { notice: this.notice }),
-      ...(this.overlay === undefined ? {} : { overlay: this.overlay }),
+      ...(this.confirmation === undefined
+        ? {}
+        : { confirm: this.confirmation.question }),
+      ...(this.overlay === undefined ? {} : { overlay: this.overlayView() }),
     };
   }
 
@@ -436,6 +470,12 @@ export class ConsoleModel {
         return undefined;
       }
 
+      if (mode === "backup") {
+        return text === ""
+          ? this.say("Type a directory to back up to.")
+          : { kind: "backup", to: text };
+      }
+
       return this.runCommand(text);
     }
 
@@ -461,7 +501,17 @@ export class ConsoleModel {
         return this.requestRestart();
       case "quit":
       case "exit":
-        return { kind: "quit" };
+        return this.requestQuit();
+      case "kill":
+        return this.requestKill();
+      case "inspect":
+        return this.requestInspect();
+      case "repair":
+        return this.requestRepair();
+      case "backup":
+        return argument === ""
+          ? this.requestBackup()
+          : this.requestBackup(argument);
       case "clear":
         this.logs.clear();
         this.offset = 0;
@@ -484,6 +534,184 @@ export class ConsoleModel {
         this.notice = `Unknown command "${word}". Press ? for help.`;
         return undefined;
     }
+  }
+
+  /** Shows what an action found, in a panel over the log. */
+  public showReport(report: ConsoleReport): void {
+    this.overlay = {
+      title: report.title,
+      lines: report.lines,
+      ...(report.applicable === true ? { action: "repair" as const } : {}),
+    };
+    this.overlayOffset = 0;
+    this.mode = "normal";
+    this.input = "";
+  }
+
+  private say(notice: string): undefined {
+    this.notice = notice;
+
+    return undefined;
+  }
+
+  private overlayWindow(): number {
+    return Math.max(1, this.logHeight() - 2);
+  }
+
+  private overlayView(): ConsoleOverlayView {
+    const overlay = this.overlay as ConsoleOverlay;
+    const window = this.overlayWindow();
+    const most = Math.max(0, overlay.lines.length - window);
+    const from = Math.min(this.overlayOffset, most);
+    const shown = overlay.lines.slice(from, from + window);
+    const hint = [
+      "esc closes",
+      ...(overlay.action === undefined ? [] : ["a applies the steps"]),
+      ...(most > 0
+        ? [
+            `up/down scrolls ${from + 1}-${from + shown.length} of ${overlay.lines.length}`,
+          ]
+        : []),
+    ].join(", ");
+
+    return { title: overlay.title, lines: shown, hint };
+  }
+
+  private handleOverlayKey(key: ConsoleKey): ConsoleEffect | undefined {
+    const overlay = this.overlay as ConsoleOverlay;
+
+    if (key.name === "escape" || key.text === "q" || key.text === "?") {
+      this.overlay = undefined;
+      this.overlayOffset = 0;
+      return undefined;
+    }
+
+    if (key.text === "a" && overlay.action === "repair") {
+      return this.confirm("Apply the repair steps?", {
+        kind: "repair",
+        apply: true,
+      });
+    }
+
+    const most = Math.max(0, overlay.lines.length - this.overlayWindow());
+    const page = this.overlayWindow();
+    const moves: Record<string, number> = {
+      up: -1,
+      down: 1,
+      pageup: -page,
+      pagedown: page,
+      home: -Number.MAX_SAFE_INTEGER,
+      end: Number.MAX_SAFE_INTEGER,
+    };
+    const move = moves[key.name];
+
+    if (move !== undefined) {
+      this.overlayOffset = Math.max(
+        0,
+        Math.min(most, this.overlayOffset + move),
+      );
+    }
+
+    return undefined;
+  }
+
+  private confirm(
+    question: string,
+    effect: ConsoleEffect,
+  ): ConsoleEffect | undefined {
+    this.mode = "normal";
+    this.input = "";
+    this.confirmation = { question, effect };
+
+    return undefined;
+  }
+
+  /** Only `y` says yes. Any other key says no. Ctrl-C twice quits. */
+  private answerConfirmation(key: ConsoleKey): ConsoleEffect | undefined {
+    const confirmation = this.confirmation as {
+      question: string;
+      effect: ConsoleEffect;
+    };
+
+    this.confirmation = undefined;
+
+    const yes = !key.ctrl && key.text?.toLowerCase() === "y";
+    const again =
+      key.ctrl && key.name === "c" && confirmation.effect.kind === "quit";
+
+    return yes || again ? confirmation.effect : undefined;
+  }
+
+  private serverActive(): boolean {
+    return (
+      this.server !== SupervisorState.Stopped &&
+      this.server !== SupervisorState.Crashed
+    );
+  }
+
+  /** Once the console is quitting, asking again no longer asks to confirm. */
+  public markQuitting(): void {
+    this.quitting = true;
+  }
+
+  private requestQuit(): ConsoleEffect | undefined {
+    return this.serverActive() && !this.quitting
+      ? this.confirm("Stop the running server and quit?", { kind: "quit" })
+      : { kind: "quit" };
+  }
+
+  private requestKill(): ConsoleEffect | undefined {
+    return this.serverActive()
+      ? this.confirm("Kill the server without a clean shutdown?", {
+          kind: "kill",
+        })
+      : this.say("The server is not running.");
+  }
+
+  private requestInspect(): ConsoleEffect | undefined {
+    return this.dataDir === undefined
+      ? this.say(NO_DATA_DIRECTORY)
+      : { kind: "inspect" };
+  }
+
+  private requestRepair(): ConsoleEffect | undefined {
+    if (this.dataDir === undefined) {
+      return this.say(NO_DATA_DIRECTORY);
+    }
+
+    return this.serverActive()
+      ? this.say("Stop the server first (x), then repair.")
+      : { kind: "repair", apply: false };
+  }
+
+  /** With a directory it backs up at once, otherwise it asks for one. */
+  private requestBackup(to?: string): ConsoleEffect | undefined {
+    if (this.dataDir === undefined) {
+      return this.say(NO_DATA_DIRECTORY);
+    }
+
+    if (this.serverActive()) {
+      return this.say("Stop the server first (x), then back up.");
+    }
+
+    if (to !== undefined) {
+      return { kind: "backup", to };
+    }
+
+    this.mode = "backup";
+    this.input = this.backupSuggestion(this.dataDir);
+
+    return undefined;
+  }
+
+  private backupSuggestion(dataDir: string): string {
+    const stamp = new Date(this.now())
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[-:]/g, "")
+      .replace("T", "-");
+
+    return `${dataDir.replace(/[\\/]+$/, "")}-backup-${stamp}`;
   }
 
   private requestStart(): ConsoleEffect | undefined {
@@ -530,6 +758,8 @@ export class ConsoleModel {
     return { kind: "restart" };
   }
 }
+
+const NO_DATA_DIRECTORY = "No data directory set (sinterd config set dataDir).";
 
 /** `exited with code 1`, or `ended by SIGKILL`. */
 export function describeExit(exit: SupervisorExit): string {

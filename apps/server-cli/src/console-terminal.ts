@@ -1,6 +1,7 @@
 import { emitKeypressEvents, type Key } from "node:readline";
 import type { EventEmitter } from "node:events";
 
+import type { ConsoleActions } from "./console-actions.js";
 import {
   ConsoleModel,
   type ConsoleEffect,
@@ -49,6 +50,14 @@ export interface RunConsoleOptions {
   readonly output: ConsoleOutput;
   readonly style: Style;
   readonly version: string;
+  /**
+   * The data directory, and what can be done to it. Without them Inspect,
+   * Backup and Repair say that no data directory is set.
+   */
+  readonly data?: {
+    readonly directory: string;
+    readonly actions: ConsoleActions;
+  };
   /** Where `SIGINT`, `SIGTERM`, `SIGHUP` and `exit` come from. Default: the process. */
   readonly signals?: EventEmitter;
   readonly now?: () => number;
@@ -113,6 +122,7 @@ export async function runConsole(options: RunConsoleOptions): Promise<void> {
   const signals = options.signals ?? process;
   const model = new ConsoleModel({
     version: options.version,
+    ...(options.data === undefined ? {} : { dataDir: options.data.directory }),
     ...(options.now === undefined ? {} : { now: options.now }),
   });
 
@@ -218,6 +228,7 @@ export async function runConsole(options: RunConsoleOptions): Promise<void> {
     }
 
     quitting = true;
+    model.markQuitting();
     model.note("info", "Stopping the server and quitting...");
     sync();
     enqueue(shutDown);
@@ -237,9 +248,39 @@ export async function runConsole(options: RunConsoleOptions): Promise<void> {
           await start();
         });
         return;
+      case "kill":
+        // Not queued: a stop that is stuck must not hold the kill back.
+        void supervisor.kill().catch((error: unknown) => {
+          fail("The server did not die", error);
+        });
+        return;
+      case "inspect":
+        report((actions, width) => actions.inspect(width));
+        return;
+      case "backup":
+        report((actions, width) => actions.backup(effect.to, width));
+        return;
+      case "repair":
+        report((actions, width) => actions.repair(effect.apply, width));
+        return;
       case "quit":
         quit();
     }
+  };
+
+  const report = (
+    run: (
+      actions: ConsoleActions,
+      width: number,
+    ) => Parameters<ConsoleModel["showReport"]>[0],
+  ): void => {
+    if (options.data === undefined) {
+      return;
+    }
+
+    // The panel has a margin on each side.
+    model.showReport(run(options.data.actions, (output.columns ?? 80) - 4));
+    render();
   };
 
   const onKeypress = (text: string | undefined, key: Key | undefined): void => {

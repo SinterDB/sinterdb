@@ -81,7 +81,12 @@ export async function main(
           interactive: isInteractiveTerminal(),
         })
       ) {
-        await openConsole(command);
+        await openConsole(
+          command,
+          typeof file.values.dataDir === "string"
+            ? file.values.dataDir
+            : undefined,
+        );
         return;
       }
 

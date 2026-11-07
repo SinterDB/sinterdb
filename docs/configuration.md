@@ -172,6 +172,10 @@ the log, two rows of buttons and a line for typing.
 | ------------------------------------ | -------------------------------------------------------------- |
 | `s`                                  | Start the server, or restart it while it runs.                 |
 | `x`                                  | Stop the server.                                               |
+| `k`                                  | Kill the server at once, after asking.                         |
+| `i`                                  | Inspect the data directory. Works while the server runs.       |
+| `b`                                  | Back up the data directory. The server must be stopped.        |
+| `r`                                  | Show what repair would do. The server must be stopped.         |
 | `p`                                  | Pause or resume the log. Lines still arrive.                   |
 | `l`                                  | Cycle between all lines, warnings and errors, and errors only. |
 | `/`                                  | Show only lines that contain some text.                        |
@@ -182,8 +186,18 @@ the log, two rows of buttons and a line for typing.
 | `?`                                  | Show the help panel. `Esc` closes it.                          |
 | `q`, `Ctrl+C`                        | Quit. A running server is stopped first.                       |
 
-`i`, `b` and `r` are reserved for Inspect, Backup and Repair, which are not
-available yet.
+Inspect, Backup and Repair run the same code as `sinterd inspect`,
+`sinterd backup` and `sinterd repair`, on the `dataDir` from the config file.
+Their results open in a panel over the log: scroll it with the arrow keys and
+close it with `Esc`. Backup asks where to write, with a name already filled in
+next to the data directory. Repair shows its plan first; press `a` and answer
+`y` to carry it out. Steps that need an extra flag are shown but are left to
+the `sinterd repair` command (see `sinterd repair --help`). With no `dataDir`
+in the config file, the three say so.
+
+Killing the server, and quitting while it runs, ask first: only `y` says yes.
+`Ctrl+C` twice quits. A second quit while the server is still stopping kills
+it.
 
 The log keeps the newest 1000 lines. The console needs a terminal of at least
 60 columns and 16 rows, and says so when it is smaller. It gives the screen

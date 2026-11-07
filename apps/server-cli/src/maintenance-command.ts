@@ -198,6 +198,43 @@ export function runMaintenanceCommand(command: MaintenanceCommand): void {
   }
 }
 
+/** What a maintenance action found, as text a person can read. */
+export interface MaintenanceOutcome {
+  readonly text: string;
+  /** Whether the directory is, or after the action became, openable. */
+  readonly ok: boolean;
+  /** For a repair dry run: whether some of its steps can be carried out now. */
+  readonly applicable?: boolean;
+}
+
+/** Examines a data directory and describes it. Never changes anything. */
+export function inspectDirectory(
+  directory: string,
+  style: Style,
+): MaintenanceOutcome {
+  const report = inspectDataDirectory(directory);
+
+  return {
+    text: formatInspection(report, style),
+    ok: report.recovery.recoverable,
+  };
+}
+
+/** Repairs a data directory, or with no `apply`, describes what it would do. */
+export function repairDirectory(
+  options: RepairOptions,
+  style: Style,
+): MaintenanceOutcome {
+  const result = repairDataDirectory(options);
+
+  return {
+    text: formatRepair(result, style),
+    ok: repairSucceeded(result),
+    applicable:
+      !result.apply && result.actions.some((action) => action.allowed),
+  };
+}
+
 function repairSucceeded(result: RepairResult): boolean {
   if (!result.apply) {
     return result.before.recovery.recoverable && result.actions.length === 0;

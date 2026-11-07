@@ -320,8 +320,7 @@ function overlayLines(snapshot: ConsoleSnapshot, style: Style): Segment[][] {
   const height = snapshot.rows - CHROME_ROWS;
   const lines: Segment[][] = [
     [{ text: ` ${overlay.title}`, paint: style.bold }],
-    [],
-    ...overlay.lines.map((line): Segment[] => [{ text: `  ${line}` }]),
+    ...overlay.lines.map((line): Segment[] => [{ text: ` ${line}` }]),
   ];
 
   while (lines.length < height - 1) {
@@ -329,7 +328,7 @@ function overlayLines(snapshot: ConsoleSnapshot, style: Style): Segment[][] {
   }
 
   lines.length = Math.min(lines.length, height - 1);
-  lines.push([{ text: "  Press esc to close.", paint: style.dim }]);
+  lines.push([{ text: ` ${overlay.hint}`, paint: style.dim }]);
 
   return lines;
 }
@@ -389,6 +388,22 @@ function prompt(snapshot: ConsoleSnapshot, style: Style): Segment[] {
       { text: snapshot.input },
       { text: cursor, paint: style.dim },
       { text: "   enter applies, esc cancels", paint: style.dim },
+    ];
+  }
+
+  if (snapshot.confirm !== undefined) {
+    return [
+      { text: " ? ", paint: style.bold },
+      { text: snapshot.confirm, paint: style.yellow },
+      { text: " [y/N]", paint: style.dim },
+    ];
+  }
+
+  if (snapshot.mode === "backup") {
+    return [
+      { text: " Back up to: ", paint: style.bold },
+      { text: snapshot.input },
+      { text: cursor, paint: style.dim },
     ];
   }
 
