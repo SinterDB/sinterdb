@@ -7,6 +7,9 @@ import {
 } from "@sinterdb-internal/server";
 import { describe, expect, it } from "vitest";
 
+import { parseCliArguments } from "./cli.js";
+import { shouldOpenConsole } from "./console-launch.js";
+
 // The Dockerfile, the Compose example, and docs/docker.md must agree with each
 // other and with the server. CI builds the image and runs it for real
 // (packages/driver/src/docker.integration.test.ts); these checks run anywhere,
@@ -104,6 +107,26 @@ describe("Dockerfile", () => {
       "true",
     );
     expect(guide).toContain("SINTERDB_RECLAIM_LOCK");
+  });
+
+  it("never opens the console, even with docker run -it", () => {
+    const command = parseCliArguments([]);
+
+    if (command.kind !== "start") {
+      throw new Error("Expected a start command.");
+    }
+
+    expect(
+      shouldOpenConsole({
+        command,
+        environment: {
+          TERM: "xterm",
+          ...Object.fromEntries(environmentOfRuntimeStage()),
+        },
+        file: {},
+        interactive: true,
+      }),
+    ).toBe(false);
   });
 
   it("does not run the server as root, and the data directory belongs to that user", () => {

@@ -1,6 +1,6 @@
 {
   "name": "sinterdb",
-  "version": "0.3.0",
+  "version": "0.3.5",
   "description": "The official Node.js driver for the SinterDB document database.",
   "author": "Killer88967",
   "license": "Apache-2.0",
