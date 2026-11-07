@@ -51,7 +51,7 @@ const page: ApiPage = {
             {
               path: "packages/protocol/src/document.ts",
               line: 4,
-              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/document.ts#L4",
+              url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/protocol/src/document.ts#L4",
             },
           ],
         },
@@ -81,7 +81,7 @@ const page: ApiPage = {
     {
       path: "packages/protocol/src/document.ts",
       line: 3,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/protocol/src/document.ts#L3",
+      url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/protocol/src/document.ts#L3",
     },
   ],
   usedBy: [

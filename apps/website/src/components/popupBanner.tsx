@@ -1,6 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import {
+  Banner,
+  BannerClose,
+  BannerContent,
+  BannerDescription,
+} from "@/components/cl/banner";
+import { cn } from "@/lib/cl-utils";
 
 export type BannerType = "notice" | "important" | "warning" | "error";
 
@@ -23,20 +29,6 @@ const STYLES: Record<BannerType, { box: string; dot: string }> = {
   },
 };
 
-function subscribe(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  return () => window.removeEventListener("storage", onChange);
-}
-
-function readDismissed(key: string | undefined) {
-  if (!key) return false;
-  try {
-    return localStorage.getItem(key) === "1";
-  } catch {
-    return false;
-  }
-}
-
 export default function PopupBanner({
   label,
   type = "notice",
@@ -53,59 +45,38 @@ export default function PopupBanner({
   linkLabel?: string;
   className?: string;
 }) {
-  const storageKey = id ? `banner-dismissed:${id}` : undefined;
-
-  // Hidden on the server, so a banner someone already closed never flashes.
-  const stored = useSyncExternalStore(
-    subscribe,
-    () => readDismissed(storageKey),
-    () => true,
-  );
-  const [closed, setClosed] = useState(false);
-
-  if (stored || closed) return null;
-
   const style = STYLES[type];
 
-  function dismiss() {
-    setClosed(true);
-    if (storageKey) {
-      try {
-        localStorage.setItem(storageKey, "1");
-      } catch {}
-    }
-  }
-
   return (
-    <div
+    <Banner
       role={type === "error" ? "alert" : "status"}
-      className={`fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-xl items-center gap-3 rounded-xl border px-4 py-3 text-sm shadow-2xl shadow-black/50 backdrop-blur-xl transition duration-300 starting:translate-y-3 starting:opacity-0 ${style.box} ${className}`}
+      storageKey={id ? `banner-dismissed:${id}` : undefined}
+      className={cn(
+        "fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-xl rounded-xl border py-3 shadow-2xl shadow-black/50 backdrop-blur-xl duration-300 starting:translate-y-3 starting:opacity-0",
+        style.box,
+        className,
+      )}
     >
-      <span className={`size-1.5 shrink-0 rounded-full ${style.dot}`} />
+      <span className={cn("size-1.5 shrink-0 rounded-full", style.dot)} />
 
-      <p className="min-w-0 flex-1 leading-6">
-        {label}
-        {href && (
-          <>
-            {" "}
-            <a
-              href={href}
-              className="font-medium underline underline-offset-4 opacity-90 transition hover:opacity-100"
-            >
-              {linkLabel} →
-            </a>
-          </>
-        )}
-      </p>
+      <BannerContent className="items-center sm:justify-start">
+        <BannerDescription className="leading-6 opacity-100">
+          {label}
+          {href && (
+            <>
+              {" "}
+              <a
+                href={href}
+                className="opacity-90 transition hover:opacity-100"
+              >
+                {linkLabel} →
+              </a>
+            </>
+          )}
+        </BannerDescription>
+      </BannerContent>
 
-      <button
-        type="button"
-        onClick={dismiss}
-        aria-label="Dismiss"
-        className="-mr-1 flex size-7 shrink-0 items-center justify-center rounded-md opacity-60 transition hover:bg-white/10 hover:opacity-100"
-      >
-        ✕
-      </button>
-    </div>
+      <BannerClose />
+    </Banner>
   );
 }

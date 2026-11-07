@@ -71,7 +71,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/update.ts",
       line: 14,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/update.ts#L14",
+      url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/driver/src/update.ts#L14",
     },
   ],
   usedBy: [

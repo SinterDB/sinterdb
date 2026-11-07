@@ -124,7 +124,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/indexes.ts",
       line: 40,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/indexes.ts#L40",
+      url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/driver/src/indexes.ts#L40",
     },
   ],
   usedBy: [

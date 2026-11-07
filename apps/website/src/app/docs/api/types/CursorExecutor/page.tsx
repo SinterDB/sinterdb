@@ -55,7 +55,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/cursor.ts",
       line: 13,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/cursor.ts#L13",
+      url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/driver/src/cursor.ts#L13",
     },
   ],
   usedBy: [

@@ -112,7 +112,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/aggregation.ts",
       line: 28,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L28",
+      url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/driver/src/aggregation.ts#L28",
     },
   ],
   usedBy: [

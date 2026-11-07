@@ -1,0 +1,19 @@
+{
+  "$schema": "https://cladux.vercel.app/schema/cl.json",
+  "style": "tailwind",
+  "tsx": true,
+  "framework": "next",
+  "registry": "https://cladux.vercel.app/r",
+  "css": {
+    "globals": "src/app/globals.css",
+    "dir": "src/styles",
+    "entry": "src/styles/cl.css",
+    "tokens": true
+  },
+  "aliases": {
+    "components": "@/components/cl",
+    "hooks": "@/hooks",
+    "lib": "@/lib",
+    "utils": "@/lib/cl-utils"
+  }
+}

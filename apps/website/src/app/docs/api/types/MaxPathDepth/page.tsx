@@ -44,7 +44,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/filter.ts",
       line: 94,
-      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/filter.ts#L94",
+      url: "https://github.com/SinterDB/sinterdb/blob/0.3.5/packages/driver/src/filter.ts#L94",
     },
   ],
   usedBy: [
