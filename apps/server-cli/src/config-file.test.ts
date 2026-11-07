@@ -15,8 +15,10 @@ import {
   CONFIG_KEYS,
   ConfigFileError,
   applyConfigFile,
+  configKeyVariable,
   defaultConfigPath,
   isConfigKey,
+  loadConfigFile,
   parseConfigValue,
   readConfigFile,
   resolveConfigEntries,
@@ -397,6 +399,77 @@ describe("applyConfigFile", () => {
         { SINTERDB_DURABILITY: "fsync" },
       ),
     ).toEqual({ dataDirectory: "d" });
+  });
+});
+
+describe("the ui setting", () => {
+  it("is a boolean that is on by default", () => {
+    expect(
+      resolveConfigEntries({}, {}).find((item) => item.key === "ui"),
+    ).toMatchObject({ value: "true", source: "default" });
+    expect(parseConfigValue("ui", "false")).toBe(false);
+    expect(() => validateConfigValue("ui", false)).not.toThrow();
+  });
+
+  it("is read from the file but never changes the server's options", () => {
+    const path = fileWith('{"ui":false}');
+
+    expect(readConfigFile(path).values).toEqual({ ui: false });
+    expect(
+      resolveConfigEntries({ ui: false }, {}).find((item) => item.key === "ui"),
+    ).toMatchObject({ value: "false", source: "file" });
+    expect(applyConfigFile({}, { ui: false }, {})).toEqual({});
+  });
+
+  it("must be true or false in the file", () => {
+    expect(() => readConfigFile(fileWith('{"ui":"no"}'))).toThrow(
+      /"ui" must be a boolean/,
+    );
+  });
+
+  it("has no environment variable", () => {
+    expect(configKeyVariable("ui")).toBeUndefined();
+    expect(configKeyVariable("port")).toBe("SINTERDB_PORT");
+  });
+});
+
+describe("loadConfigFile", () => {
+  it("reads the file it is given", () => {
+    const path = fileWith('{"port":9}');
+
+    expect(loadConfigFile(path)).toEqual({
+      path,
+      exists: true,
+      values: { port: 9 },
+    });
+  });
+
+  it("refuses a file that was asked for and is missing", () => {
+    const path = join(directory, "missing.json");
+
+    expect(() => loadConfigFile(path)).toThrow(
+      `The config file ${path} does not exist.`,
+    );
+  });
+
+  it("accepts a missing default file", () => {
+    const original = process.env["XDG_CONFIG_HOME"];
+
+    process.env["XDG_CONFIG_HOME"] = directory;
+
+    try {
+      expect(loadConfigFile()).toEqual({
+        path: join(directory, "sinterdb", "config.json"),
+        exists: false,
+        values: {},
+      });
+    } finally {
+      if (original === undefined) {
+        delete process.env["XDG_CONFIG_HOME"];
+      } else {
+        process.env["XDG_CONFIG_HOME"] = original;
+      }
+    }
   });
 });
 

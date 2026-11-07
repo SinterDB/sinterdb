@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -169,6 +169,42 @@ describe("sinterd with a config file", () => {
     const details = await startWith(
       JSON.stringify({ checkpointKeep: 4, writeConcern: "memory" }),
     );
+
+    expect(details["storage"]).toBe("memory");
+  });
+
+  it("starts a server for a bare sinterd when it has no terminal", async () => {
+    // No arguments at all, and standard input, output and error are pipes.
+    const child = spawn(process.execPath, [CLI], {
+      stdio: ["pipe", "pipe", "pipe"],
+      env: {
+        ...process.env,
+        XDG_CONFIG_HOME: directory(),
+        SINTERDB_PORT: "0",
+      },
+    });
+    let output = "";
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        child.stdout.on("data", (chunk: Buffer) => {
+          output += chunk.toString();
+
+          if (output.includes("server.started")) {
+            resolve();
+          }
+        });
+        child.once("exit", () => reject(new Error(`Exited: ${output}`)));
+      });
+
+      expect(output).not.toContain("\u001B[?1049h");
+    } finally {
+      child.kill("SIGKILL");
+    }
+  });
+
+  it("accepts --no-ui", async () => {
+    const details = await startWith(undefined, ["--no-ui"]);
 
     expect(details["storage"]).toBe("memory");
   });

@@ -220,6 +220,14 @@ describe("runConfigCommand", () => {
     expect(output).toContain("SINTERDB_PORT is set and overrides the file.");
   });
 
+  it("sets ui, which has no environment variable to warn about", () => {
+    run(["set", "ui", "false"], { SINTERDB_PORT: "9" });
+
+    expect(JSON.parse(readFileSync(path, "utf8"))).toEqual({ ui: false });
+    expect(output).toContain("ui = false");
+    expect(output).not.toContain("overrides");
+  });
+
   it("does not warn when the variable is not set", () => {
     run(["set", "port", "5"]);
 
