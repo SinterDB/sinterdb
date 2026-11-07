@@ -679,7 +679,7 @@ Queries can also fail when they pass a budget (see
 
 ## Current Scope
 
-Version `0.3.0` provides:
+Version `0.3.5` provides:
 
 - `SinterClient`
 - `sinterdb://` connection-string parsing

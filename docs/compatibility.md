@@ -124,6 +124,19 @@ breaking change.
 
 Each breaking change lands here in the release that makes it.
 
+### 0.3.5
+
+- **A bare `sinterd` in a terminal opens the console.** Before, it started a
+  server in that terminal. The console starts with the server stopped, so
+  press `s` to start it. To get the old behavior, run `sinterd --no-ui`, pass
+  any server option (`--port 4721`, say), set any `SINTERDB_*` variable, or
+  set `"ui": false` in the config file (`sinterd config set ui false`).
+  Nothing changes when standard input, output or error is not a terminal, or
+  when `TERM` is `dumb`, so scripts, Docker, systemd and CI behave as they did.
+  `--config <file>` on its own still opens the console.
+- Nothing else changes. The driver API, the wire protocol (still 1), the storage
+  format (still 3) and every other command and flag are the same as in 0.3.0.
+
 ### 0.3.0
 
 - **Storage format 2 became 3** so an index can cover several fields.

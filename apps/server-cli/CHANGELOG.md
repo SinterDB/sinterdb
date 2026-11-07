@@ -1,5 +1,18 @@
 # sinterdb-server
 
+## 0.3.5
+
+### Patch Changes
+
+- Interactive CLI.
+
+  - Add a full-screen console. Run `sinterd` with no options in a terminal and it opens a console that starts stopped. From it you can start, stop, restart and kill the server, watch a live log with follow, pause, a level filter and a text filter, and run Inspect, Backup and Repair on the data directory. Every button has a key, and `?` lists them.
+  - Behavior change: a bare `sinterd` in an interactive terminal now opens the console instead of starting a server in that terminal. Pass `--no-ui`, any server option or a `SINTERDB_*` variable, or set `"ui": false` in the config file, to keep the plain behavior. Scripts, Docker, systemd and CI are not affected, because the console needs a terminal on standard input, output and error.
+  - Add `--no-ui` and the `ui` setting.
+  - Add `sinterd config get`, `set`, `list` and `unset`, stored in a config file. Flags come before environment variables, then the file, then defaults.
+  - Add structured events for operations and connections to the server log, which the console reads from a pipe. The log keeps its format, and operations are logged only with `--log-operations`, as before.
+  - Nothing changes for the driver, the wire protocol or the storage format.
+
 ## 0.3.0
 
 ### Minor Changes

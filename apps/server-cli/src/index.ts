@@ -2,6 +2,7 @@
 
 import { BACKUP_HELP_TEXT, BackupUsageError } from "./backup-command.js";
 import { CliUsageError, HELP_TEXT } from "./cli.js";
+import { CONFIG_HELP_TEXT, ConfigUsageError } from "./config-command.js";
 import { logError } from "./logger.js";
 import { main } from "./main.js";
 import {
@@ -28,6 +29,8 @@ try {
     reportUsageError(error.message, BACKUP_HELP_TEXT);
   } else if (error instanceof MaintenanceUsageError) {
     reportUsageError(error.message, MAINTENANCE_HELP_TEXT);
+  } else if (error instanceof ConfigUsageError) {
+    reportUsageError(error.message, CONFIG_HELP_TEXT);
   } else {
     logError("server.start_failed", "SinterDB server failed to start.", error);
     process.exitCode = 1;

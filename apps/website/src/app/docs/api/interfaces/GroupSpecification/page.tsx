@@ -80,7 +80,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/aggregation.ts",
               line: 134,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/aggregation.ts#L134",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L134",
             },
           ],
         },
@@ -130,7 +130,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/aggregation.ts",
               line: 129,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/aggregation.ts#L129",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L129",
             },
           ],
         },
@@ -172,7 +172,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/aggregation.ts",
       line: 127,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/aggregation.ts#L127",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/aggregation.ts#L127",
     },
   ],
   usedBy: [

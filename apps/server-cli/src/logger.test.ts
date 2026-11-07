@@ -5,6 +5,7 @@ import {
   formatJsonLog,
   formatPrettyLog,
   logError,
+  logConnection,
   logInfo,
   logOperation,
   logWarning,
@@ -272,5 +273,36 @@ describe("log output", () => {
     expect(JSON.parse(written.out())).toMatchObject({
       message: "listCollections app",
     });
+  });
+
+  it("writes a connection opening and closing", () => {
+    const written = capture();
+
+    logConnection({
+      id: 3,
+      state: "opened",
+      remoteAddress: "127.0.0.1",
+      active: 2,
+    });
+    logConnection({ id: 3, state: "closed", active: 1 });
+
+    const [opened, closed] = written
+      .out()
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line) as Record<string, unknown>);
+
+    expect(opened).toMatchObject({
+      level: "info",
+      event: "connection.opened",
+      message: "Connection #3 opened.",
+      details: { id: 3, remoteAddress: "127.0.0.1", active: 2 },
+    });
+    expect(closed).toMatchObject({
+      event: "connection.closed",
+      message: "Connection #3 closed.",
+      details: { id: 3, active: 1 },
+    });
+    expect(closed?.["details"]).not.toHaveProperty("remoteAddress");
   });
 });

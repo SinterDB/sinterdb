@@ -23,7 +23,7 @@
   "Interface": {
     "scope": "typescript",
     "prefix": "interface",
-    "body": "interface ${1:Name} {$2};",
+    "body": "interface ${1:Name} {$2}",
     "description": "Insert a interface",
   },
   "TODO": {

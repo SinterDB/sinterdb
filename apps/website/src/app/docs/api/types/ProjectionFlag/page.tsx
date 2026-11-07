@@ -47,7 +47,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/projection.ts",
       line: 7,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/projection.ts#L7",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/projection.ts#L7",
     },
   ],
   usedBy: [

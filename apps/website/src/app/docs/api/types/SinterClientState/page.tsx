@@ -48,12 +48,12 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/client.ts",
       line: 125,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L125",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L125",
     },
     {
       path: "packages/driver/src/client.ts",
       line: 139,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/client.ts#L139",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/client.ts#L139",
     },
   ],
   usedBy: [

@@ -1,4 +1,6 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
@@ -12,6 +14,7 @@ import {
 import { describe, expect, it } from "vitest";
 
 import { HELP_TEXT } from "./cli.js";
+import { CONFIG_KEYS, readConfigFile } from "./config-file.js";
 
 // docs/configuration.md is the reference for every server setting. These
 // tests fail when a flag or environment variable exists in the code but not in
@@ -71,5 +74,33 @@ describe("docs/configuration.md", () => {
       `\`${DEFAULT_CHECKPOINT_KEEP}\``,
     );
     expect(HELP_TEXT).toContain(`default ${mebibytes} MiB`);
+  });
+
+  it("documents exactly the config file keys, with an example that works", () => {
+    const keys = [
+      ...markdown.matchAll(
+        /^\| `([a-zA-Z]+)`\s+\| (?:string|number|boolean)/gm,
+      ),
+    ].map((match) => match[1]);
+    const example = [...markdown.matchAll(/```json\n([^`]*)```/g)]
+      .map((match) => match[1])
+      .find((block) => block?.includes('"dataDir"'));
+
+    expect(keys).toEqual([...CONFIG_KEYS]);
+    expect(example).toBeDefined();
+    expect(Object.keys(JSON.parse(example ?? "{}"))).toEqual([...CONFIG_KEYS]);
+
+    const directory = mkdtempSync(join(tmpdir(), "sinterd-doc-"));
+
+    try {
+      const path = join(directory, "config.json");
+
+      writeFileSync(path, example ?? "");
+      expect(Object.keys(readConfigFile(path).values)).toEqual([
+        ...CONFIG_KEYS,
+      ]);
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 });

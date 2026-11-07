@@ -6,6 +6,21 @@ import {
 
 import { HELP_TEXT, parseCliArguments, type CliCommand } from "./cli.js";
 import {
+  isConfigCommandName,
+  parseConfigArguments,
+  runConfigCommand,
+} from "./config-command.js";
+import {
+  applyConfigFile,
+  loadConfigFile,
+  type LoadedConfigFile,
+} from "./config-file.js";
+import {
+  isInteractiveTerminal,
+  openConsole,
+  shouldOpenConsole,
+} from "./console-launch.js";
+import {
   isBackupCommandName,
   parseBackupArguments,
   runBackupCommand,
@@ -15,7 +30,13 @@ import {
   parseMaintenanceArguments,
   runMaintenanceCommand,
 } from "./maintenance-command.js";
-import { logError, logInfo, logOperation, logWarning } from "./logger.js";
+import {
+  logConnection,
+  logError,
+  logInfo,
+  logOperation,
+  logWarning,
+} from "./logger.js";
 import { createStyle, styleHelp } from "./style.js";
 
 export async function main(
@@ -25,6 +46,11 @@ export async function main(
 
   if (isBackupCommandName(first)) {
     runBackupCommand(parseBackupArguments(first, rest));
+    return;
+  }
+
+  if (isConfigCommandName(first)) {
+    runConfigCommand(parseConfigArguments(rest));
     return;
   }
 
@@ -44,15 +70,36 @@ export async function main(
       process.stdout.write(`${SERVER_PRODUCT_VERSION}\n`);
       return;
 
-    case "start":
-      await startServer(command);
+    case "start": {
+      const file = loadConfigFile(command.config);
+
+      if (
+        shouldOpenConsole({
+          command,
+          environment: process.env,
+          file: file.values,
+          interactive: isInteractiveTerminal(),
+        })
+      ) {
+        await openConsole(
+          command,
+          typeof file.values.dataDir === "string"
+            ? file.values.dataDir
+            : undefined,
+        );
+        return;
+      }
+
+      await startServer(command, file);
+    }
   }
 }
 
 async function startServer(
   command: Extract<CliCommand, { kind: "start" }>,
+  file: LoadedConfigFile,
 ): Promise<void> {
-  const config: ServerConfigInput = {
+  const flags: ServerConfigInput = {
     ...(command.host === undefined ? {} : { host: command.host }),
     ...(command.port === undefined ? {} : { port: command.port }),
     ...(command.dataDir === undefined
@@ -77,7 +124,9 @@ async function startServer(
     ...(command.logOperations === true ? { logOperations: true } : {}),
   };
 
-  const server = new SinterServer(config);
+  const server = new SinterServer(
+    applyConfigFile(flags, file.values, process.env),
+  );
   let shutdownOperation: Promise<void> | undefined;
 
   const shutdown = (reason: string): Promise<void> => {
@@ -127,6 +176,7 @@ async function startServer(
 
   if (server.config.logOperations) {
     server.on("command", logOperation);
+    server.on("connection", logConnection);
   }
 
   server.on("error", (error: Error) => {
@@ -154,6 +204,7 @@ async function startServer(
     port: address.port,
     family: address.family,
     version: SERVER_PRODUCT_VERSION,
+    ...(file.exists ? { configFile: file.path } : {}),
     ...(server.config.dataDirectory === undefined
       ? { storage: "memory" }
       : {

@@ -154,17 +154,13 @@ export function runBackupCommand(command: BackupCommand): void {
   try {
     switch (command.name) {
       case "backup": {
-        const result = createBackup({
-          dataDirectory: required(command.dataDir),
-          backupDirectory: required(command.to),
-          ...(command.reclaimLock ? { reclaimLock: true } : {}),
-        });
-
         process.stdout.write(
-          formatBackupResult(style, `Backup written to ${result.directory}`, [
-            ["files", String(result.files)],
-            ["size", describeSize(result.bytes)],
-          ]),
+          backupText(
+            style,
+            required(command.dataDir),
+            required(command.to),
+            command.reclaimLock,
+          ),
         );
         return;
       }
@@ -206,6 +202,25 @@ export function runBackupCommand(command: BackupCommand): void {
     );
     process.exitCode = 1;
   }
+}
+
+/** Backs up a closed data directory and describes the result. */
+export function backupText(
+  style: Style,
+  dataDirectory: string,
+  backupDirectory: string,
+  reclaimLock = false,
+): string {
+  const result = createBackup({
+    dataDirectory,
+    backupDirectory,
+    ...(reclaimLock ? { reclaimLock: true } : {}),
+  });
+
+  return formatBackupResult(style, `Backup written to ${result.directory}`, [
+    ["files", String(result.files)],
+    ["size", describeSize(result.bytes)],
+  ]);
 }
 
 function describeSize(bytes: number): string {

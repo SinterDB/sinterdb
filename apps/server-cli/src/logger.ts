@@ -87,6 +87,31 @@ export function logOperation(operation: OperationDetails): void {
   );
 }
 
+/** The part of a server connection event that the log needs. */
+export interface ConnectionDetails {
+  readonly id: number;
+  readonly state: "opened" | "closed";
+  readonly remoteAddress?: string;
+  readonly active: number;
+}
+
+/** A client connection opening or closing. */
+export function logConnection(connection: ConnectionDetails): void {
+  writeLog(
+    "info",
+    `connection.${connection.state}`,
+    `Connection #${connection.id} ${connection.state}.`,
+    {
+      id: connection.id,
+      ...(connection.remoteAddress === undefined
+        ? {}
+        : { remoteAddress: connection.remoteAddress }),
+      active: connection.active,
+    },
+    process.stdout,
+  );
+}
+
 /**
  * A problem that affects one connection or request but not the server, such
  * as a client that disconnected abruptly.
@@ -235,7 +260,7 @@ function formatValue(value: unknown): string {
   );
 }
 
-function clock(timestamp: string): string {
+export function clock(timestamp: string): string {
   const date = new Date(timestamp);
   const two = (value: number): string => String(value).padStart(2, "0");
 

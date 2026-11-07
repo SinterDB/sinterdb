@@ -8,9 +8,10 @@ For connection strings, see [connection-strings.md](./connection-strings.md).
 
 ## Server
 
-Start the server with options on the command line, in environment variables, or
-both. When both are set, **the command line wins**, then the environment, then
-the default.
+Start the server with options on the command line, in environment variables, in
+a [config file](#config-file), or any mix of them. When several are set, **the
+command line wins**, then the environment, then the config file, then the
+default.
 
 | Option                       | Flag                             | Environment variable           | Default     |
 | ---------------------------- | -------------------------------- | ------------------------------ | ----------- |
@@ -24,6 +25,8 @@ the default.
 | Snapshots kept               | `--checkpoint-keep <n>`          | `SINTERDB_CHECKPOINT_KEEP`     | `2`         |
 | Reclaim lock                 | `--reclaim-lock`                 | `SINTERDB_RECLAIM_LOCK`        | `false`     |
 | Operation log                | `--log-operations`               | `SINTERDB_LOG_OPERATIONS`      | `false`     |
+| Config file                  | `--config <path>`                | none                           | see below   |
+| Interactive console          | `--no-ui` turns it off           | none                           | see below   |
 
 Two more flags do not start a server: `-h, --help` prints the usage text, and
 `-v, --version` prints the server version.
@@ -98,6 +101,11 @@ unknown command) logs at level `warn`, because the server is fine. Both levels
 go to standard output so the lines of one run stay in order. On a terminal the
 same event prints as readable, colored lines.
 
+The same option also logs each client connection as `connection.opened` and
+`connection.closed`, with the connection's `id` (counting up from 1 for each
+run of the server), its `remoteAddress`, and how many connections are `active`
+afterwards.
+
 Document contents and filters are never logged. A busy server writes a lot of
 lines with this on.
 
@@ -135,6 +143,134 @@ to 100. The server also keeps the log since the oldest kept snapshot, so keeping
 more snapshots uses more disk and gives recovery more older states to fall back
 on if the newest ones are damaged. Two is the smallest allowed value, because two
 is what makes a damaged newest snapshot recoverable.
+
+### Interactive console
+
+Run `sinterd` with no options in a terminal and it opens a full-screen console
+instead of starting a server in that terminal. The console starts stopped. It
+runs the server as a separate process, the same `sinterd` that a service or a
+container runs, with `--log-operations` added so it can show each command.
+
+The console opens only when all of these are true:
+
+- standard input, output and error are all terminals, and `TERM` is not `dumb`;
+- no server option is given on the command line (`--config` is fine), and no
+  `SINTERDB_*` environment variable is set;
+- `--no-ui` is not given, and the config file does not say `"ui": false`.
+
+Everything else starts a server exactly as before, so Docker, systemd, CI and
+every script that passes options are not affected. A script that ran a bare
+`sinterd` from a terminal needs `--no-ui` (or any option) to keep that
+behavior.
+
+The console is a box. The top row shows the server state, address and where
+it keeps its data. Below it are the uptime, open connections, commands per
+second (over the last 5 seconds), commands run and how many failed. Then comes
+the log, two rows of buttons and a line for typing.
+
+| Key                                  | What it does                                                   |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `s`                                  | Start the server, or restart it while it runs.                 |
+| `x`                                  | Stop the server.                                               |
+| `k`                                  | Kill the server at once, after asking.                         |
+| `i`                                  | Inspect the data directory. Works while the server runs.       |
+| `b`                                  | Back up the data directory. The server must be stopped.        |
+| `r`                                  | Show what repair would do. The server must be stopped.         |
+| `p`                                  | Pause or resume the log. Lines still arrive.                   |
+| `l`                                  | Cycle between all lines, warnings and errors, and errors only. |
+| `/`                                  | Show only lines that contain some text.                        |
+| `f`, `End`                           | Follow the newest line again.                                  |
+| `Up`, `Down`, `PgUp`, `PgDn`, `Home` | Scroll the log.                                                |
+| `c`                                  | Clear the log.                                                 |
+| `:`                                  | Type a command. See `help` for the list.                       |
+| `?`                                  | Show the help panel. `Esc` closes it.                          |
+| `q`, `Ctrl+C`                        | Quit. A running server is stopped first.                       |
+
+Inspect, Backup and Repair run the same code as `sinterd inspect`,
+`sinterd backup` and `sinterd repair`, on the `dataDir` from the config file.
+Their results open in a panel over the log: scroll it with the arrow keys and
+close it with `Esc`. Backup asks where to write, with a name already filled in
+next to the data directory. Repair shows its plan first; press `a` and answer
+`y` to carry it out. Steps that need an extra flag are shown but are left to
+the `sinterd repair` command (see `sinterd repair --help`). With no `dataDir`
+in the config file, the three say so.
+
+Killing the server, and quitting while it runs, ask first: only `y` says yes.
+`Ctrl+C` twice quits. A second quit while the server is still stopping kills
+it.
+
+The log keeps the newest 1000 lines. The console needs a terminal of at least
+60 columns and 16 rows, and says so when it is smaller. It gives the screen
+back when it quits, when it gets `SIGINT`, `SIGTERM` or `SIGHUP`, and when it
+fails.
+
+### Config file
+
+A config file keeps settings so you do not have to type them every time. It is
+a JSON object, and every key is optional:
+
+```json
+{
+  "host": "0.0.0.0",
+  "port": 4721,
+  "dataDir": "/var/lib/sinterdb",
+  "writeConcern": "flushed",
+  "checkpointBytes": 67108864,
+  "checkpointInterval": 300,
+  "checkpointKeep": 2,
+  "reclaimLock": false,
+  "logOperations": false,
+  "ui": true
+}
+```
+
+| Key                  | Type    | Same as                 |
+| -------------------- | ------- | ----------------------- |
+| `host`               | string  | `--host`                |
+| `port`               | number  | `--port`                |
+| `dataDir`            | string  | `--data-dir`            |
+| `writeConcern`       | string  | `--write-concern`       |
+| `checkpointBytes`    | number  | `--checkpoint-bytes`    |
+| `checkpointInterval` | number  | `--checkpoint-interval` |
+| `checkpointKeep`     | number  | `--checkpoint-keep`     |
+| `reclaimLock`        | boolean | `--reclaim-lock`        |
+| `logOperations`      | boolean | `--log-operations`      |
+| `ui`                 | boolean | `--no-ui` turns it off  |
+
+The server reads `$XDG_CONFIG_HOME/sinterdb/config.json`, or
+`~/.config/sinterdb/config.json` when `XDG_CONFIG_HOME` is not set
+(`%APPDATA%\sinterdb\config.json` on Windows). `--config <path>` reads another
+file instead, and the server refuses to start when that file does not exist. A
+missing default file is the same as an empty one, so a server without a config
+file starts exactly as before. When a file was read, the `server.started` event
+reports its path as `configFile`.
+
+An invalid file stops the server from starting, and the message names the file
+and the setting: invalid JSON, an unknown key, a value of the wrong type, or a
+value the server would refuse on the command line.
+
+`writeConcern`, `checkpointBytes`, `checkpointInterval`, `checkpointKeep` and
+`reclaimLock` only apply with a data directory. A value for one of them in the
+file is ignored when no data directory is set by a flag, a variable or the file
+itself, and while the deprecated `--durability` is set, so a shared file never
+stops an in-memory server from starting. `sinterd config list` shows which file
+values are in use.
+
+Manage the file with the `config` command instead of editing it by hand:
+
+| Command                            | What it does                                                                  |
+| ---------------------------------- | ----------------------------------------------------------------------------- |
+| `sinterd config list`              | Every key with its effective value and where the value comes from.            |
+| `sinterd config get <key>`         | Prints one effective value. Exits with `1` and prints nothing if none is set. |
+| `sinterd config set <key> <value>` | Checks the value with the server's own rules, then saves it.                  |
+| `sinterd config unset <key>`       | Removes the key from the file.                                                |
+| `sinterd config path`              | Prints the file in use.                                                       |
+
+All of them accept `--config <path>`. A running server does not notice changes:
+they take effect the next time it starts, and `set` and `unset` say so. When an
+environment variable sets the same key, `set` also warns that the variable
+overrides the file. The `backup`, `restore`, `inspect` and `repair` commands do
+not read the config file.
 
 ### Stopping the server
 

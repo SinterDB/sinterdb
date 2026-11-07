@@ -118,7 +118,7 @@ const page: ApiPage = {
                 {
                   path: "packages/driver/src/errors.ts",
                   line: 77,
-                  url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/errors.ts#L77",
+                  url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L77",
                 },
               ],
             },
@@ -135,7 +135,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/errors.ts",
               line: 77,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/errors.ts#L77",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L77",
             },
           ],
         },
@@ -182,7 +182,7 @@ const page: ApiPage = {
             {
               path: "packages/driver/src/errors.ts",
               line: 58,
-              url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/errors.ts#L58",
+              url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L58",
             },
           ],
         },
@@ -219,7 +219,7 @@ const page: ApiPage = {
     {
       path: "packages/driver/src/errors.ts",
       line: 76,
-      url: "https://github.com/SinterDB/sinterdb/blob/v0.3.0/packages/driver/src/errors.ts#L76",
+      url: "https://github.com/SinterDB/sinterdb/blob/main/packages/driver/src/errors.ts#L76",
     },
   ],
   usedBy: [],
